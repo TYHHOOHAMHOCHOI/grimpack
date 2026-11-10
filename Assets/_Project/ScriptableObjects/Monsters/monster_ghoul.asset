@@ -1,0 +1,48 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d762bed24f6934449bf718614a6f4957, type: 3}
+  m_Name: monster_ghoul
+  m_EditorClassIdentifier: Project05.Runtime::Project05.Data.MonsterDefinitionSO
+  MonsterId: monster_ghoul
+  MonsterName: "X\xE1c S\u1ED1ng \u0110\xF3i Kh\xE1t"
+  Subtitle: "Qu\xE1i \u0110\u1ED9t Bi\u1EBFn"
+  IsElite: 0
+  IsBoss: 0
+  SpriteName: monster_ghoul
+  MaxHP: 64
+  BaseSpeed: 18
+  GoldReward: 16
+  Moveset:
+  - MoveName: "C\xE0o X\xE9 Th\u1ECBt T\u01B0\u01A1i"
+    IntentType: 0
+    BaseDamage: 11
+    ShieldGain: 0
+    StatusStacks: 0
+    StatusToApply: 0
+    SpeedBonus: 0
+    TargetsBacklineFirst: 0
+  - MoveName: "Nanh Vu\u1ED1t Nhi\u1EC5m Khu\u1EA9n"
+    IntentType: 1
+    BaseDamage: 9
+    ShieldGain: 0
+    StatusStacks: 3
+    StatusToApply: 1
+    SpeedBonus: 0
+    TargetsBacklineFirst: 0
+  - MoveName: "G\u1EA7m R\xFA Kh\xE1t M\xE1u"
+    IntentType: 5
+    BaseDamage: 0
+    ShieldGain: 6
+    StatusStacks: 0
+    StatusToApply: 0
+    SpeedBonus: 3
+    TargetsBacklineFirst: 0

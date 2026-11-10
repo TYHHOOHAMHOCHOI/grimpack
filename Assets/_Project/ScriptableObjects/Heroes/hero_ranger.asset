@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 029cc0d30a556d34db12e1c31fdcd62e, type: 3}
+  m_Name: hero_ranger
+  m_EditorClassIdentifier: Project05.Runtime::Project05.Data.HeroDefinitionSO
+  HeroId: hero_ranger
+  HeroName: "Th\u1EE3 S\u0103n Huy\u1EBFt Nguy\u1EC7t"
+  RoleTitle: "H\u1EADu Tuy\u1EBFn \u2022 S\xE1t Th\u01B0\u01A1ng Nhanh / Xu\u1EA5t Huy\u1EBFt"
+  LoreDescription: "X\u1EA1 th\u1EE7 t\u1ED1c \u0111\u1ED9 cao v\u1EDBi l\u01B0\u1EE1i r\xECu \u0111\u1ED3 t\u1EC3 v\xE0 chi\u1EBFn h\xE0i l\u01B0\u1EDBt gi\xF3."
+  PreferredPosition: 2
+  SpriteName: hero_ranger
+  MaxHP: 82
+  BaseSpeed: 29
+  StartingShield: 0
+  BackpackWidth: 5
+  BackpackHeight: 4
+  InitialUnlockedRows: 3
+  InitialUnlockedCols: 4
+  StartingItemIds:
+  - item_executioner_axe
+  - item_haste_boots
+  - item_whetstone

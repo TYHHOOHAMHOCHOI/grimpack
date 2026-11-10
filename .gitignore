@@ -1,0 +1,44 @@
+# Unity generated
+/[Ll]ibrary/
+/[Tt]emp/
+/[Oo]bj/
+/[Bb]uild/
+/[Bb]uilds/
+/[Ll]ogs/
+/[Uu]ser[Ss]ettings/
+/[Mm]emory[Cc]aptures/
+/[Rr]ecordings/
+*.csproj
+*.sln
+*.slnx
+*.suo
+*.user
+*.userprefs
+*.pidb
+*.booproj
+.vs/
+.vscode/
+.idea/
+.gradle/
+ExportedObj/
+.consulo/
+sysinfo.txt
+*.apk
+*.aab
+*.unitypackage
+crashlytics-build.properties
+test-results.xml
+
+# Studio framework: local / ephemeral state
+project.local.yaml
+CLAUDE.local.md
+.claude/settings.local.json
+.claude/agent-memory/
+production/session-state/
+production/session-logs/
+__pycache__/
+*.pyc
+
+# OS
+.DS_Store
+Thumbs.db

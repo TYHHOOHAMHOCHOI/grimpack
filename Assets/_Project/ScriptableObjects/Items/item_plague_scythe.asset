@@ -1,0 +1,57 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 822bd5ebc0403b745beebc331017a27d, type: 3}
+  m_Name: item_plague_scythe
+  m_EditorClassIdentifier: Project05.Runtime::Project05.Data.ItemDefinitionSO
+  ItemId: item_plague_scythe
+  DisplayName: "L\u01B0\u1EE1i H\xE1i Huy\u1EBFt Nguy\u1EC7t (Ch\u1EEF T)"
+  Description: "V\u0169 kh\xED Th\u1EA7n Tho\u1EA1i ch\u1EEF T: Qu\xE9t to\xE0n b\u1ED9 qu\xE1i 24 S\xE1t th\u01B0\u01A1ng V\u1EADt l\xFD + 4 \u0110\u1ED9c + 4 Ch\u1EA3y m\xE1u!"
+  Category: 0
+  RarityTier: 5
+  GoldCost: 55
+  SpriteName: item_axe
+  Shape:
+    _occupiedOffsets:
+    - X: 0
+      Y: 0
+    - X: 1
+      Y: 0
+    - X: 2
+      Y: 0
+    - X: 1
+      Y: 1
+    _synergyStarOffsets:
+    - X: 0
+      Y: 1
+    - X: 2
+      Y: 1
+  CooldownTurns: 2
+  BasePhysicalDamage: 24
+  BaseMagicDamage: 0
+  BaseShield: 0
+  BaseHeal: 0
+  BasePoison: 4
+  BaseBleed: 4
+  BaseStun: 0
+  TargetAllEnemies: 1
+  HealLowestAlly: 0
+  PassiveBonusSpeed: 0
+  PassiveBonusMaxHp: 0
+  SynergyTargetCategory: 0
+  SynergyTargetsAnyCategory: 1
+  StarBonusDamage: 5
+  StarBonusShield: 0
+  StarBonusHeal: 0
+  StarBonusPoison: 0
+  StarBonusBleed: 0
+  StarCooldownReduction: 0
+  StarBonusSpeed: 0

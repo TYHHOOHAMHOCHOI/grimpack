@@ -1,0 +1,48 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d762bed24f6934449bf718614a6f4957, type: 3}
+  m_Name: monster_cultist
+  m_EditorClassIdentifier: Project05.Runtime::Project05.Data.MonsterDefinitionSO
+  MonsterId: monster_cultist
+  MonsterName: "T\xEDn \u0110\u1ED3 Huy\u1EBFt Gi\xE1o"
+  Subtitle: "K\u1EBB Th\u1EDD T\xE0 Th\u1EA7n"
+  IsElite: 0
+  IsBoss: 0
+  SpriteName: monster_cultist
+  MaxHP: 56
+  BaseSpeed: 21
+  GoldReward: 18
+  Moveset:
+  - MoveName: "Phun S\u01B0\u01A1ng \u0110\u1ED9c"
+    IntentType: 2
+    BaseDamage: 6
+    ShieldGain: 0
+    StatusStacks: 4
+    StatusToApply: 0
+    SpeedBonus: 0
+    TargetsBacklineFirst: 1
+  - MoveName: "Hi\u1EBFn T\u1EBF Huy\u1EBFt \u0110ao"
+    IntentType: 0
+    BaseDamage: 12
+    ShieldGain: 0
+    StatusStacks: 0
+    StatusToApply: 0
+    SpeedBonus: 0
+    TargetsBacklineFirst: 0
+  - MoveName: "Khi\xEAn H\u1EAFc \xC1m"
+    IntentType: 4
+    BaseDamage: 0
+    ShieldGain: 12
+    StatusStacks: 0
+    StatusToApply: 0
+    SpeedBonus: 0
+    TargetsBacklineFirst: 0

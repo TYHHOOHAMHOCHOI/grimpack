@@ -1,0 +1,55 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 822bd5ebc0403b745beebc331017a27d, type: 3}
+  m_Name: item_haste_boots
+  m_EditorClassIdentifier: Project05.Runtime::Project05.Data.ItemDefinitionSO
+  ItemId: item_haste_boots
+  DisplayName: "Chi\u1EBFn H\xE0i T\u1ED1c H\xE0nh"
+  Description: "T\u0103ng +6 T\u1ED1c \u0111\u1ED9 (gi\xFAp \u0111\u1EA7y thanh h\xE0nh \u0111\u1ED9ng nhanh h\u01A1n qu\xE1i). T\u1EA1o +8 Gi\xE1p m\u1ED7i 2 l\u01B0\u1EE3t."
+  Category: 1
+  RarityTier: 2
+  GoldCost: 24
+  SpriteName: item_boots
+  Shape:
+    _occupiedOffsets:
+    - X: 0
+      Y: 0
+    - X: 0
+      Y: 1
+    _synergyStarOffsets:
+    - X: 0
+      Y: -1
+    - X: -1
+      Y: 0
+    - X: 1
+      Y: 0
+  CooldownTurns: 2
+  BasePhysicalDamage: 0
+  BaseMagicDamage: 0
+  BaseShield: 8
+  BaseHeal: 0
+  BasePoison: 0
+  BaseBleed: 0
+  BaseStun: 0
+  TargetAllEnemies: 0
+  HealLowestAlly: 0
+  PassiveBonusSpeed: 6
+  PassiveBonusMaxHp: 0
+  SynergyTargetCategory: 1
+  SynergyTargetsAnyCategory: 0
+  StarBonusDamage: 0
+  StarBonusShield: 5
+  StarBonusHeal: 0
+  StarBonusPoison: 0
+  StarBonusBleed: 0
+  StarCooldownReduction: 0
+  StarBonusSpeed: 0

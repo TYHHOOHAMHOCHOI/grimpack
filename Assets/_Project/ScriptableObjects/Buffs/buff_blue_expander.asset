@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b7d78ebda8bdbbd48a50b9fb09b49f24, type: 3}
+  m_Name: buff_blue_expander
+  m_EditorClassIdentifier: Project05.Runtime::Project05.Data.BuffDefinitionSO
+  BuffId: buff_blue_expander
+  BuffName: "R\u01B0\u01A1ng Chi\u1EBFn Thu\u1EADt Lam B\u1EA3o"
+  Description: "M\u1EDF kh\xF3a ngay +2 \xD4 Balo cho m\u1ECDi nh\xE2n v\u1EADt & +5 T\u1ED1c \u0111\u1ED9."
+  Tier: 2
+  BonusMaxHP: 0
+  BonusSpeed: 5
+  BonusWeaponDamage: 0
+  BonusMagicDamage: 0
+  BonusStartingShield: 0
+  BonusPoisonPerTrigger: 0
+  BonusBleedPerTrigger: 0
+  BonusHealPerTrigger: 0
+  CooldownReductionTurns: 0
+  UnlockExtraBackpackSlots: 2
+  ImmediateGoldGain: 0
+  ImmediateHealPercent: 0

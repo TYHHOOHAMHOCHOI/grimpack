@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b7d78ebda8bdbbd48a50b9fb09b49f24, type: 3}
+  m_Name: buff_red_bloodmoon
+  m_EditorClassIdentifier: Project05.Runtime::Project05.Data.BuffDefinitionSO
+  BuffId: buff_red_bloodmoon
+  BuffName: "Kh\u1EBF \u01AF\u1EDBc Huy\u1EBFt Nguy\u1EC7t"
+  Description: "C\u1EA5p \u0110\u1ECF T\u1ED1i Th\u01B0\u1EE3ng: +14 S\xE1t th\u01B0\u01A1ng, +12 T\u1ED1c \u0111\u1ED9, gi\u1EA3m 1 l\u01B0\u1EE3t Cooldown, m\u1EDF +4 \xD4 Balo & +25 Gi\xE1p \u0111\u1EA7u tr\u1EADn!"
+  Tier: 5
+  BonusMaxHP: 25
+  BonusSpeed: 12
+  BonusWeaponDamage: 14
+  BonusMagicDamage: 14
+  BonusStartingShield: 25
+  BonusPoisonPerTrigger: 0
+  BonusBleedPerTrigger: 4
+  BonusHealPerTrigger: 0
+  CooldownReductionTurns: 1
+  UnlockExtraBackpackSlots: 4
+  ImmediateGoldGain: 0
+  ImmediateHealPercent: 50

@@ -1,0 +1,51 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 822bd5ebc0403b745beebc331017a27d, type: 3}
+  m_Name: item_crimson_vial
+  m_EditorClassIdentifier: Project05.Runtime::Project05.Data.ItemDefinitionSO
+  ItemId: item_crimson_vial
+  DisplayName: "Huy\u1EBFt D\u01B0\u1EE3c C\u1ED5"
+  Description: "H\u1ED3i chi\xEAu 2 l\u01B0\u1EE3t: H\u1ED3i 12 HP cho \u0111\u1ED3ng \u0111\u1ED9i th\u1EA5p m\xE1u nh\u1EA5t. T\u0103ng +4 Gi\xE1p cho Gi\xE1p k\u1EC1 tr\xEAn/d\u01B0\u1EDBi."
+  Category: 3
+  RarityTier: 1
+  GoldCost: 18
+  SpriteName: item_potion
+  Shape:
+    _occupiedOffsets:
+    - X: 0
+      Y: 0
+    _synergyStarOffsets:
+    - X: 0
+      Y: -1
+    - X: 0
+      Y: 1
+  CooldownTurns: 2
+  BasePhysicalDamage: 0
+  BaseMagicDamage: 0
+  BaseShield: 0
+  BaseHeal: 12
+  BasePoison: 0
+  BaseBleed: 0
+  BaseStun: 0
+  TargetAllEnemies: 0
+  HealLowestAlly: 1
+  PassiveBonusSpeed: 0
+  PassiveBonusMaxHp: 0
+  SynergyTargetCategory: 1
+  SynergyTargetsAnyCategory: 0
+  StarBonusDamage: 0
+  StarBonusShield: 4
+  StarBonusHeal: 0
+  StarBonusPoison: 0
+  StarBonusBleed: 0
+  StarCooldownReduction: 0
+  StarBonusSpeed: 0

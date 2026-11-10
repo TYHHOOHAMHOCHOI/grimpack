@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 029cc0d30a556d34db12e1c31fdcd62e, type: 3}
+  m_Name: hero_crusader
+  m_EditorClassIdentifier: Project05.Runtime::Project05.Data.HeroDefinitionSO
+  HeroId: hero_crusader
+  HeroName: "K\u1EF5 S\u0129 H\u1EAFc Quang"
+  RoleTitle: "Ti\u1EC1n Tuy\u1EBFn \u2022 Chi\u1EBFn Binh / \u0110\u1EE1 \u0110\xF2n"
+  LoreDescription: "Chi\u1EBFn binh kho\xE1c gi\xE1p c\u1ED5 x\u01B0a, kh\u1EDFi \u0111\u1EA7u h\xE0nh tr\xECnh \u0111\u01A1n \u0111\u1ED9c gi\u1EEFa ph\u1EBF t\xEDch h\u1EAFc \xE1m."
+  PreferredPosition: 0
+  SpriteName: hero_crusader
+  MaxHP: 110
+  BaseSpeed: 22
+  StartingShield: 6
+  BackpackWidth: 5
+  BackpackHeight: 4
+  InitialUnlockedRows: 3
+  InitialUnlockedCols: 4
+  StartingItemIds:
+  - item_iron_sword
+  - item_whetstone
+  - item_buckler

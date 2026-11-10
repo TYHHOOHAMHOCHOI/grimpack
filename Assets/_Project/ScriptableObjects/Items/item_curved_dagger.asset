@@ -1,0 +1,51 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 822bd5ebc0403b745beebc331017a27d, type: 3}
+  m_Name: item_curved_dagger
+  m_EditorClassIdentifier: Project05.Runtime::Project05.Data.ItemDefinitionSO
+  ItemId: item_curved_dagger
+  DisplayName: "\u0110o\u1EA3n \u0110ao B\xF3ng \u0110\xEAm"
+  Description: "G\xE2y 7 S\xE1t th\u01B0\u01A1ng V\u1EADt l\xFD + 2 Ch\u1EA3y m\xE1u m\u1ED7i l\u01B0\u1EE3t. T\u0103ng +3 T\u1ED1c \u0111\u1ED9 cho ng\u01B0\u1EDDi mang."
+  Category: 0
+  RarityTier: 0
+  GoldCost: 12
+  SpriteName: item_dagger
+  Shape:
+    _occupiedOffsets:
+    - X: 0
+      Y: 0
+    _synergyStarOffsets:
+    - X: 0
+      Y: -1
+    - X: 0
+      Y: 1
+  CooldownTurns: 1
+  BasePhysicalDamage: 7
+  BaseMagicDamage: 0
+  BaseShield: 0
+  BaseHeal: 0
+  BasePoison: 0
+  BaseBleed: 2
+  BaseStun: 0
+  TargetAllEnemies: 0
+  HealLowestAlly: 0
+  PassiveBonusSpeed: 3
+  PassiveBonusMaxHp: 0
+  SynergyTargetCategory: 0
+  SynergyTargetsAnyCategory: 0
+  StarBonusDamage: 2
+  StarBonusShield: 0
+  StarBonusHeal: 0
+  StarBonusPoison: 0
+  StarBonusBleed: 0
+  StarCooldownReduction: 0
+  StarBonusSpeed: 0

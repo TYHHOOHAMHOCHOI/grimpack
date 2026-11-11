@@ -60,7 +60,7 @@ For duration, `a₀` is the target's number of completed actions at the start of
 | Case | Handling |
 |---|---|
 | A second Ấn application arrives while another is active | Add the full new contribution with its own expiry. Do not refresh the older source. |
-| A detonation asks for more than the target holds | Consume all active sources oldest first and use actual consumption for damage. An empty ledger yields no detonation. |
+| A detonation asks for more than the target holds | Consume all active sources oldest first and use actual consumption for damage. An empty ledger yields no detonation and System 3 publishes `DetonationEmpty(no_available_units)`. |
 | Baseline and applied sources are both active | Process baseline sources by stable ID before application events in sequence order. |
 | A source is duplicate, stale, cross-encounter or belongs to another target/status | Reject the pending request and leave state, sequence and committed trace unchanged. |
 | Multiple sources expire at the same boundary | Remove the actual remaining amounts in one `StatusExpired` event per target/status, with sources in the same stable order. |

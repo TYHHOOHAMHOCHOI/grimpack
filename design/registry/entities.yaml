@@ -238,6 +238,16 @@ constants:
     added: 2026-11-11
     revised: ""
 
+  - name: trace_record_ceiling
+    status: active
+    source: design/gdd/event-log.md
+    referenced_by:
+      - design/gdd/event-log.md
+    value: 20000
+    unit: records per encounter (provisional, to be measured in the combat spike)
+    added: 2026-11-11
+    revised: ""
+
   - name: damage_permille_scale
     status: active
     source: design/gdd/effect-resolution-model.md

@@ -80,6 +80,7 @@ Check intermediate arithmetic before narrowing or publication. Use a wider inter
 | 2 Game Data Definitions | Designed, pending review. Supplies immutable catalog, stable definition IDs and authored parameters. |
 | 1 Seeded RNG | In Review. Owns seed, stream state and its restore contract; System 5 coordinates the complete snapshot. |
 | 4 Event Log | In Review. Owns event kinds, causes, sequence and trace retention. State/event publication and per-event views must align with it. |
+| 8 Grid Backpack | Designed ([grid-backpack.md](grid-backpack.md)). Supplies the frozen arrangement view and the placement baseline (one row per hero-grid item instance) used to open an encounter. |
 | 3 Effect Resolution | Designed. Owns the queue, effect ordering and damage calculations; submits requests and origins. Damage is capped at 2,147,483,647 so it fits the 32-bit HP and shield domain. System 3 holds no state across actions; checkpoint and resume remain outside this spike. |
 | 11, 12, 13, 14 | Turn Order selects actors; Combat Resolution owns lifecycle/outcome; Status Effects defines contribution policy; Enemy and Intent supplies binding intents. Systems 12 and 13 are In Review; 11 and 14 have no GDD yet. |
 | 5, 8, 10 | Run State owns the whole snapshot. Grid and Adjacency provide the final frozen arrangement and modifiers at encounter start. Their GDDs are pending. |

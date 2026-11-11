@@ -89,6 +89,7 @@ A scheduled actor whose effects all become no-ops still increments `a` after the
 | 36 Combat State and Step Model | In Review. Owns mutable state, validation, atomic mutation and historical views, including life state used by outcome checks. |
 | 4 Event Log | In Review. Owns structured committed events, causal links and trace retention. |
 | 1 Seeded RNG | In Review. System 14 owns the binding intent draw from `intents`; playback and preview do not draw. |
+| 8 Grid Backpack | Designed ([grid-backpack.md](grid-backpack.md)). System 12 freezes the arrangement when an encounter starts, which destroys any items still in the reward tray, and thaws it after the encounter; rewards (create items, unlock cells) are granted after Thaw. Before calling Freeze with a non-empty tray System 12 and System 25 ask the player to confirm ("Leave behind: X, Y?"), and no encounter starts while an item is being dragged. Combat reads only the frozen hero grids. |
 | 10 Adjacency and Synergy | No GDD yet. Supplies pure arrangement previews and the matching immutable adjacency context frozen at start. |
 | 5, 16–18 | Run flow owns outcome handoff. Encounter and reward systems define setup and rewards; their GDDs are pending. |
 | 27, 29, 30, 35 | HUD, payoff and breakdown consume committed facts and historical views. Harness supplies deterministic scenarios. |

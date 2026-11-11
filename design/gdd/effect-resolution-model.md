@@ -173,6 +173,7 @@ The damage formula has no overflow path: `B` and `Raw` saturate at `RawMax`, `P`
 | 2 Game Data Definitions | Draft GDD supplies plain C# definitions and stable identities. Structured effect payloads and units still need a shared contract. |
 | 4 Event Log | In Review. Defines mutation events, origins, status links and atomic shield/HP batch, plus the per-effect resolution stamps, the `Damage` record and the `ChainLimit`, `ListenerSuppressed`, `EffectSkipped` and `DetonationEmpty` facts that System 3 requests (revised 2026-11-11). Its re-review remains pending. |
 | 1 Seeded RNG | In Review. Existing streams are not a source for random combat effects. Algorithm and stream derivation require an ADR. |
+| 8 Grid Backpack | Designed ([grid-backpack.md](grid-backpack.md)). Defines the anchor cell and the reading order that the Canonical Order Contract uses for ready items, and the frozen arrangement view. System 3 reads it through Systems 9 and 10. |
 | 10 Adjacency and Synergy | No GDD yet. Supplies immutable encounter modifiers and their stable ordering and origins. |
 | 36 Combat State and Step Model | In Review. Owns mutable state, mutation validation, atomic commit and historical views. |
 | 9, 11, 13, 14 | Define trigger order and cooldown, turn order, status lifecycle and contribution selection, and enemy intent/action inputs respectively. System 13 is In Review; the others have no GDD yet. |

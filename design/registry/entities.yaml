@@ -248,6 +248,67 @@ constants:
     added: 2026-11-11
     revised: ""
 
+  - name: hero_grid_start_cells
+    status: active
+    source: design/gdd/grid-backpack.md
+    referenced_by:
+      - design/gdd/grid-backpack.md
+    value: 16
+    unit: open cells per hero at run start (4x4 block)
+    added: 2026-11-11
+    revised: ""
+
+  - name: hero_grid_bound_normal
+    status: active
+    source: design/gdd/grid-backpack.md
+    referenced_by:
+      - design/gdd/grid-backpack.md
+    value: 6
+    unit: cells per side (hero grid maximum before a bound raise)
+    added: 2026-11-11
+    revised: ""
+
+  - name: hero_grid_bound_raised
+    status: deprecated
+    source: design/gdd/grid-backpack.md
+    referenced_by:
+      - design/gdd/grid-backpack.md
+    value: 7
+    unit: cells per side (hero grid maximum after a bound raise; deferred to Tier 2, not in the MVP)
+    added: 2026-11-11
+    revised: 2026-11-11
+
+  - name: stash_grid_size
+    status: active
+    source: design/gdd/grid-backpack.md
+    referenced_by:
+      - design/gdd/grid-backpack.md
+    value: 5
+    unit: cells per side (shared stash, all open)
+    added: 2026-11-11
+    revised: 2026-11-11
+
+  - name: footprint_box_max
+    status: active
+    source: design/gdd/grid-backpack.md
+    referenced_by:
+      - design/gdd/grid-backpack.md
+      - design/gdd/game-data-definitions.md
+    value: 3
+    unit: cells per side (largest item footprint box)
+    added: 2026-11-11
+    revised: ""
+
+  - name: grid_undo_depth
+    status: active
+    source: design/gdd/grid-backpack.md
+    referenced_by:
+      - design/gdd/grid-backpack.md
+    value: 1
+    unit: operations
+    added: 2026-11-11
+    revised: ""
+
   - name: damage_permille_scale
     status: active
     source: design/gdd/effect-resolution-model.md

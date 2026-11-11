@@ -53,7 +53,7 @@ The 37 systems fall into five groups.
 | 5 | Run State and Flow (inferred) | Core | MVP | Not Started | — | 1, 2 |
 | 6 | Input and Focus (inferred) | Core | MVP | Not Started | — | — |
 | 7 | Localization and Text | Core | MVP | Not Started | — | — |
-| 8 | Grid Backpack | Gameplay | MVP | Not Started | — | 2 |
+| 8 | Grid Backpack | Gameplay | MVP | In Review | [GDD](grid-backpack.md) | 2 |
 | 9 | Item Trigger and Cooldown | Gameplay | MVP | Not Started | — | 3, 8, 11, 36 |
 | 10 | Adjacency and Synergy | Gameplay | MVP | Not Started | — | 8, 2 |
 | 11 | Turn Order (speed gauge) | Gameplay | MVP | Not Started | — | 2, 4, 36 |
@@ -260,10 +260,10 @@ Combining the dependency sort with the priority tiers. Systems 3 and 12 are desi
 | Metric | Count |
 |--------|-------|
 | Total systems identified | 37 |
-| Design docs started | 7 |
+| Design docs started | 8 |
 | Design docs reviewed | 5 |
 | Design docs approved | 0 |
-| MVP systems designed | 6/28 |
+| MVP systems designed | 7/28 |
 | Vertical Slice systems designed | 0/5 |
 
 ---

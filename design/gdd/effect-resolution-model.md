@@ -15,7 +15,7 @@ Effect Resolution turns the items and enemy moves in a fight into an ordered seq
 
 ## Overview
 
-System 3 resolves authored effects and their reactions using a deterministic queue, integer calculations and explicit causal context. System 36 owns mutable combat state and its mutation API, System 4 owns event records, and System 12 owns encounter lifecycle and outcomes. Enemy moves, item effects, status ticks and detonations all use this resolution path. Systems 1, 2 and 4 have draft GDDs, System 36 is In Review and System 10 has no GDD yet. Their interfaces below remain provisional.
+System 3 resolves authored effects and their reactions using a deterministic queue, integer calculations and explicit causal context. System 36 owns mutable combat state and its mutation API, System 4 owns event records, and System 12 owns encounter lifecycle and outcomes. Enemy moves, item effects, status ticks and detonations all use this resolution path. Systems 1, 2 and 4 have draft GDDs, System 36 is In Review and System 10 is Designed (pending review). Their interfaces below remain provisional.
 
 The MVP proof is an engine-free combat spike in which one hero applies a status and another detonates it. Identical inputs must yield the same event log and historical state in Unity, headless simulation and tests. Prototype code applies several effects directly, uses Unity types and has no detonation model. Its current values and order are migration evidence, not adopted rules.
 
@@ -174,7 +174,7 @@ The damage formula has no overflow path: `B` and `Raw` saturate at `RawMax`, `P`
 | 4 Event Log | In Review. Defines mutation events, origins, status links and atomic shield/HP batch, plus the per-effect resolution stamps, the `Damage` record and the `ChainLimit`, `ListenerSuppressed`, `EffectSkipped` and `DetonationEmpty` facts that System 3 requests (revised 2026-11-11). Its re-review remains pending. |
 | 1 Seeded RNG | In Review. Existing streams are not a source for random combat effects. Algorithm and stream derivation require an ADR. |
 | 8 Grid Backpack | Designed ([grid-backpack.md](grid-backpack.md)). Defines the anchor cell and the reading order that the Canonical Order Contract uses for ready items, and the frozen arrangement view. System 3 reads it through Systems 9 and 10. |
-| 10 Adjacency and Synergy | No GDD yet. Supplies immutable encounter modifiers and their stable ordering and origins. |
+| 10 Adjacency and Synergy | Designed (pending review). Supplies immutable encounter modifiers and their stable ordering and origins: ordered `DamageFlat` and `DamagePercent` modifiers with source item and rule index. Cooldown and status-amount kinds go to Systems 9 and 13; whether `StatusAmount` joins this contract is open (System 10, Open Questions). |
 | 36 Combat State and Step Model | In Review. Owns mutable state, mutation validation, atomic commit and historical views. |
 | 9, 11, 13, 14 | Define trigger order and cooldown, turn order, status lifecycle and contribution selection, and enemy intent/action inputs respectively. System 13 is In Review; the others have no GDD yet. |
 | 12 Combat Resolution | In Review. Owns encounter lifecycle, victory, defeat, draw and technical stop. After the action queue drains, System 12 processes due expiry and checks outcomes. The spike's turn cap belongs to System 12. |

@@ -76,6 +76,7 @@ For duration, `a₀` is the target's number of completed actions at the start of
 | 36 Combat State and Step Model | In Review. Owns status ledger, validation, mutations, atomic commit and historical views. |
 | 4 Event Log | In Review. Defines application, detonation consumption, damage, tick origin and baseline provenance. Defines the spike's grouped expiry record. Cleanse and other future kinds require coordinated design. |
 | 12 Combat Resolution | In Review. Owns completed-action boundaries, outcome and technical stops. Due expiry is processed after the current queue drains and before outcome. |
+| 10 Adjacency and Synergy | Designed, pending review. May add a `StatusAmount` modifier to the quantity an item applies; units, range and the handling of a non-positive total belong to System 13 (open). |
 | 9, 11, 14, 15 | Trigger, turn-order, enemy action and hero systems supply boundary context under their pending GDDs. |
 | 27, 29, 30, 35 | HUD, payoff and breakdown consume committed historical facts; the harness verifies reproducibility. |
 

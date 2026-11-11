@@ -83,7 +83,7 @@ Check intermediate arithmetic before narrowing or publication. Use a wider inter
 | 8 Grid Backpack | Designed ([grid-backpack.md](grid-backpack.md)). Supplies the frozen arrangement view and the placement baseline (one row per hero-grid item instance) used to open an encounter. |
 | 3 Effect Resolution | Designed. Owns the queue, effect ordering and damage calculations; submits requests and origins. Damage is capped at 2,147,483,647 so it fits the 32-bit HP and shield domain. System 3 holds no state across actions; checkpoint and resume remain outside this spike. |
 | 11, 12, 13, 14 | Turn Order selects actors; Combat Resolution owns lifecycle/outcome; Status Effects defines contribution policy; Enemy and Intent supplies binding intents. Systems 12 and 13 are In Review; 11 and 14 have no GDD yet. |
-| 5, 8, 10 | Run State owns the whole snapshot. Grid and Adjacency provide the final frozen arrangement and modifiers at encounter start. Their GDDs are pending. |
+| 5, 8, 10 | Run State owns the whole snapshot. Grid and Adjacency provide the final frozen arrangement and modifiers at encounter start. The Grid Backpack and Adjacency and Synergy GDDs exist (pending review); System 5's is pending. |
 | 27, 29, 30, 35 | HUD, payoff, breakdown and harness read committed records and the historical state matching their position. |
 
 ## Tuning Knobs

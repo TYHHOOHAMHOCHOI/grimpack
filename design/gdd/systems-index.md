@@ -55,7 +55,7 @@ The 37 systems fall into five groups.
 | 7 | Localization and Text | Core | MVP | Not Started | — | — |
 | 8 | Grid Backpack | Gameplay | MVP | In Review | [GDD](grid-backpack.md) | 2 |
 | 9 | Item Trigger and Cooldown | Gameplay | MVP | Not Started | — | 3, 8, 11, 36 |
-| 10 | Adjacency and Synergy | Gameplay | MVP | Not Started | — | 8, 2 |
+| 10 | Adjacency and Synergy | Gameplay | MVP | Designed | [GDD](adjacency-and-synergy.md) | 8, 2 |
 | 11 | Turn Order (speed gauge) | Gameplay | MVP | Not Started | — | 2, 4, 36 |
 | 12 | Combat Resolution | Gameplay | MVP | In Review | [GDD](combat-resolution.md) | 3, 9, 10, 11, 14, 15, 36, 4, 1 |
 | 13 | Status Effects (inferred) | Gameplay | MVP | In Review | [GDD](status-effects.md) | 3, 2, 36 |
@@ -260,10 +260,10 @@ Combining the dependency sort with the priority tiers. Systems 3 and 12 are desi
 | Metric | Count |
 |--------|-------|
 | Total systems identified | 37 |
-| Design docs started | 8 |
+| Design docs started | 9 |
 | Design docs reviewed | 5 |
 | Design docs approved | 0 |
-| MVP systems designed | 7/28 |
+| MVP systems designed | 8/28 |
 | Vertical Slice systems designed | 0/5 |
 
 ---

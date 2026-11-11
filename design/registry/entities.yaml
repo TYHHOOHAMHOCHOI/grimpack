@@ -54,7 +54,7 @@
 #   in any other shape is reported as unsupported layout, with its number.
 
 version: 1
-last_updated: "2026-11-11"
+last_updated: "2026-11-12"
 
 # ─── ENTITIES ────────────────────────────────────────────────────────────────
 # Named game-world objects: enemies, NPCs, characters, factions, bosses.
@@ -151,6 +151,24 @@ formulas:
     notes: "Integer-only, round half up. P is the summed percent bucket clamped to at least -1000. Detonation uses B = min(c * p, RawMax). Shield absorbs first, then HP. No overflow path: Raw saturates at RawMax."
     added: 2026-11-11
     revised: 2026-11-11
+
+  - name: synergy_modifier_totals
+    status: active
+    source: design/gdd/adjacency-and-synergy.md
+    referenced_by:
+      - design/gdd/adjacency-and-synergy.md
+      - design/gdd/effect-resolution-model.md
+    variables:
+      - F_T
+      - P_T
+      - C_T
+      - A_T
+      - amount
+    output_range: [-6000000, 6000000]
+    expression: "F_T = sum of amount over active DamageFlat links into T; P_T = sum over DamagePercent links; C_T = sum over CooldownReduction links; A_T(s) = sum over StatusAmount links with status s"
+    notes: "Integer sums, not clamped by System 10. System 3 reads F and P and clamps the summed P at -1000 at run time. At most 20 neighbours times 3 rules = 60 links per target, each at most 100000 in magnitude, so no overflow."
+    added: 2026-11-12
+    revised: ""
 
 # Example:
 #
@@ -307,6 +325,26 @@ constants:
     value: 1
     unit: operations
     added: 2026-11-11
+    revised: ""
+
+  - name: synergy_max_rules_per_item
+    status: active
+    source: design/gdd/adjacency-and-synergy.md
+    referenced_by:
+      - design/gdd/adjacency-and-synergy.md
+    value: 3
+    unit: synergy rules per item (provisional; System 2 validates)
+    added: 2026-11-12
+    revised: ""
+
+  - name: synergy_link_buffer_hero_grid
+    status: active
+    source: design/gdd/adjacency-and-synergy.md
+    referenced_by:
+      - design/gdd/adjacency-and-synergy.md
+    value: 360
+    unit: links per hero grid (6x6 bound, 3 rules per item); 504 if the bound becomes 7x7 (Tier 2)
+    added: 2026-11-12
     revised: ""
 
   - name: damage_permille_scale

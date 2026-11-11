@@ -54,7 +54,7 @@
 #   in any other shape is reported as unsupported layout, with its number.
 
 version: 1
-last_updated: ""
+last_updated: "2026-11-11"
 
 # ─── ENTITIES ────────────────────────────────────────────────────────────────
 # Named game-world objects: enemies, NPCs, characters, factions, bosses.
@@ -123,7 +123,34 @@ items: []
 #   output_range[min, max], added
 # Optional: expression (the actual formula), notes
 
-formulas: []
+formulas:
+  - name: effect_damage_formula
+    status: active
+    source: design/gdd/effect-resolution-model.md
+    referenced_by:
+      - design/gdd/effect-resolution-model.md
+      - design/gdd/combat-resolution.md
+      - design/gdd/combat-state-and-step-model.md
+    variables:
+      - B
+      - F
+      - P
+      - c
+      - p
+      - Raw
+      - RawMax
+      - Scaled
+      - Cap
+      - r
+      - q
+      - h
+      - s
+      - l
+    output_range: [0, 2147483647]
+    expression: "Raw = clamp(B + F, 0, RawMax); Scaled = (Raw * (1000 + P) + 500) / 1000; r = clamp(Scaled, 0, Cap); s = min(q, r); l = min(h, r - s)"
+    notes: "Integer-only, round half up. P is the summed percent bucket clamped to at least -1000. Detonation uses B = min(c * p, RawMax). Shield absorbs first, then HP. No overflow path: Raw saturates at RawMax."
+    added: 2026-11-11
+    revised: 2026-11-11
 
 # Example:
 #
@@ -156,7 +183,70 @@ formulas: []
 #
 # Required fields: name, status, source, referenced_by, value, unit, added
 
-constants: []
+constants:
+  - name: reaction_depth_limit
+    status: active
+    source: design/gdd/effect-resolution-model.md
+    referenced_by:
+      - design/gdd/effect-resolution-model.md
+      - design/gdd/combat-resolution.md
+    value: 8
+    unit: depth levels (root = 0)
+    added: 2026-11-11
+    revised: ""
+
+  - name: reaction_effect_limit
+    status: active
+    source: design/gdd/effect-resolution-model.md
+    referenced_by:
+      - design/gdd/effect-resolution-model.md
+      - design/gdd/combat-resolution.md
+    value: 256
+    unit: effects processed per action
+    added: 2026-11-11
+    revised: ""
+
+  - name: damage_cap
+    status: active
+    source: design/gdd/effect-resolution-model.md
+    referenced_by:
+      - design/gdd/effect-resolution-model.md
+      - design/gdd/combat-state-and-step-model.md
+    value: 2147483647
+    unit: HP (signed 32-bit maximum)
+    added: 2026-11-11
+    revised: ""
+
+  - name: damage_raw_max
+    status: active
+    source: design/gdd/effect-resolution-model.md
+    referenced_by:
+      - design/gdd/effect-resolution-model.md
+    value: 1000000000000
+    unit: damage before percent scaling
+    added: 2026-11-11
+    revised: ""
+
+  - name: an_damage_per_unit
+    status: active
+    source: design/gdd/status-effects.md
+    referenced_by:
+      - design/gdd/status-effects.md
+      - design/gdd/effect-resolution-model.md
+    value: 2
+    unit: damage per consumed An unit (working spike fixture)
+    added: 2026-11-11
+    revised: ""
+
+  - name: damage_permille_scale
+    status: active
+    source: design/gdd/effect-resolution-model.md
+    referenced_by:
+      - design/gdd/effect-resolution-model.md
+    value: 1000
+    unit: permille (1000 = 100%)
+    added: 2026-11-11
+    revised: ""
 
 # Example:
 #

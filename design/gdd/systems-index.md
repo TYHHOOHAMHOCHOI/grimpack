@@ -46,10 +46,10 @@ The 37 systems fall into five groups.
 
 | # | System Name | Category | Priority | Status | Design Doc | Depends On |
 |---|-------------|----------|----------|--------|------------|------------|
-| 1 | Seeded RNG | Core | MVP | Not Started | — | — |
-| 2 | Game Data Definitions | Core | MVP | Not Started | — | — |
-| 3 | Effect Resolution Model | Gameplay | MVP | Not Started | — | 2, 4, 1, 10, 36 |
-| 4 | Event Log (inferred) | Core | MVP | Not Started | — | — |
+| 1 | Seeded RNG | Core | MVP | In Review | [GDD](seeded-rng.md) | — |
+| 2 | Game Data Definitions | Core | MVP | Designed | [GDD](game-data-definitions.md) | — |
+| 3 | Effect Resolution Model | Gameplay | MVP | Needs Revision | [GDD](effect-resolution-model.md) | 2, 4, 1, 10, 36 |
+| 4 | Event Log (inferred) | Core | MVP | In Review | [GDD](event-log.md) | — |
 | 5 | Run State and Flow (inferred) | Core | MVP | Not Started | — | 1, 2 |
 | 6 | Input and Focus (inferred) | Core | MVP | Not Started | — | — |
 | 7 | Localization and Text | Core | MVP | Not Started | — | — |
@@ -57,8 +57,8 @@ The 37 systems fall into five groups.
 | 9 | Item Trigger and Cooldown | Gameplay | MVP | Not Started | — | 3, 8, 11, 36 |
 | 10 | Adjacency and Synergy | Gameplay | MVP | Not Started | — | 8, 2 |
 | 11 | Turn Order (speed gauge) | Gameplay | MVP | Not Started | — | 2, 4, 36 |
-| 12 | Combat Resolution | Gameplay | MVP | Not Started | — | 3, 9, 11, 14, 15, 36, 4, 1 |
-| 13 | Status Effects (inferred) | Gameplay | MVP | Not Started | — | 3, 2, 36 |
+| 12 | Combat Resolution | Gameplay | MVP | In Review | [GDD](combat-resolution.md) | 3, 9, 10, 11, 14, 15, 36, 4, 1 |
+| 13 | Status Effects (inferred) | Gameplay | MVP | In Review | [GDD](status-effects.md) | 3, 2, 36 |
 | 14 | Enemy and Intent | Gameplay | MVP | Not Started | — | 2, 1, 3, 36 |
 | 15 | Party and Heroes | Gameplay | MVP | Not Started | — | 2, 8 |
 | 16 | Encounter Generation (inferred) | Gameplay | MVP | Not Started | — | 2, 1, 14 |
@@ -81,7 +81,7 @@ The 37 systems fall into five groups.
 | 33 | Tutorial and Onboarding (inferred) | Meta | Vertical Slice | Not Started | — | 25, 26, 27, 28 |
 | 34 | Accessibility (inferred) | Meta | Vertical Slice | Not Started | — | 6, 7, 29, 31, 37 |
 | 35 | Balance Simulation Harness | Meta | MVP (thin); Vertical Slice (full) | Not Started | — | 1, 2, 3, 5, 8, 10, 12, 15, 16, 17, 18, 36 |
-| 36 | Combat State and Step Model (inferred) | Core | MVP | Not Started | — | 2, 1, 4 |
+| 36 | Combat State and Step Model (inferred) | Core | MVP | In Review | [GDD](combat-state-and-step-model.md) | 2, 1, 4 |
 | 37 | Settings (inferred) | Persistence | MVP | Not Started | — | — |
 
 ---
@@ -150,7 +150,7 @@ Systems are listed in dependency order within each layer. Design and build from 
 1. **Item Trigger and Cooldown (9)** — depends on: 3, 8, 11, 36.
 2. **Status Effects (13)** — depends on: 3, 2, 36.
 3. **Enemy and Intent (14)** — depends on: 2, 1, 3, 36.
-4. **Combat Resolution (12)** — depends on: 3, 9, 11, 14, 15, 36, 4, 1. Encounter lifecycle.
+4. **Combat Resolution (12)** — depends on: 3, 9, 10, 11, 14, 15, 36, 4, 1. Encounter lifecycle.
 5. **Encounter Generation (16)** — depends on: 2, 1, 14.
 6. **Commitment and Drop Model (18)** — depends on: 8, 10, 2, 1.
 7. **Door Generation and Tiers (17)** — depends on: 2, 1, 16, 18.
@@ -260,10 +260,10 @@ Combining the dependency sort with the priority tiers. Systems 3 and 12 are desi
 | Metric | Count |
 |--------|-------|
 | Total systems identified | 37 |
-| Design docs started | 0 |
-| Design docs reviewed | 0 |
+| Design docs started | 7 |
+| Design docs reviewed | 5 |
 | Design docs approved | 0 |
-| MVP systems designed | 0/28 |
+| MVP systems designed | 6/28 |
 | Vertical Slice systems designed | 0/5 |
 
 ---

@@ -79,7 +79,8 @@ For duration, `a₀` is the target's number of completed actions at the start of
 | 10 Adjacency and Synergy | Designed, pending review. May add a `StatusAmount` modifier to the quantity an item applies; units, range and the handling of a non-positive total belong to System 13 (open). |
 | 9 Item Trigger and Cooldown | Designed, pending review. Reaction items use status IDs in their event patterns (`StatusApplied`, `StatusConsumed`). System 9 assumes (provisional) that System 13 owns the stun status that System 12 reads at the start of a hero's action; a stunned action still advances the hero's action ordinal. |
 | 11 Turn Order | Designed, pending review. Reads the effective speed from the combat state. In the MVP no status changes speed (speed comes from the base speed and passive item bonuses); if System 13 adds one later, it supplies flat and percent modifiers with durations counted in the affected unit's own actions. A stun skips a turn but keeps the unit's slot (it costs the action, not the order). |
-| 14, 15 | Enemy action and hero systems supply boundary context under their pending GDDs. |
+| 15 Party and Heroes | Designed, pending review. Heroes are restored before every encounter, so no status carries over between encounters; the baseline holds no active status unless an encounter setup grants one. |
+| 14 Enemy and Intent | Designed, pending review. Enemy moves are damage-only in the MVP, so no enemy applies a status; a stunned enemy (the stun status is System 13's) keeps its bound intent entry and loses only that action. |
 | 27, 29, 30, 35 | HUD, payoff and breakdown consume committed historical facts; the harness verifies reproducibility. |
 
 ## Tuning Knobs

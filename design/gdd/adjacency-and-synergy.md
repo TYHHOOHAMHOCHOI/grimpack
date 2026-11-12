@@ -146,6 +146,7 @@ The bound `20` is the most items that can touch one item: a footprint inside a 3
 - **If `rotationEnabled` is off**: orientation is always 0 and adjacency is computed from those cells; nothing else changes.
 - **If a cell is unlocked or a reward creates an item in the tray**: the view is unchanged until an item is placed.
 - **If a hero's grid is empty at encounter start**: the frozen view for that hero is empty and valid.
+- **If a hero has an innate item** (System 15): it occupies no cell, so it is never adjacent to anything and neither gives nor receives synergy.
 
 > *`systems-designer` not consulted (not requested). Review manually before production.*
 

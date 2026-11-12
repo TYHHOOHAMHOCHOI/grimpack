@@ -82,7 +82,7 @@ Check intermediate arithmetic before narrowing or publication. Use a wider inter
 | 4 Event Log | In Review. Owns event kinds, causes, sequence and trace retention. State/event publication and per-event views must align with it. |
 | 8 Grid Backpack | Designed ([grid-backpack.md](grid-backpack.md)). Supplies the frozen arrangement view and the placement baseline (one row per hero-grid item instance) used to open an encounter. |
 | 3 Effect Resolution | Designed. Owns the queue, effect ordering and damage calculations; submits requests and origins. Damage is capped at 2,147,483,647 so it fits the 32-bit HP and shield domain. System 3 holds no state across actions; checkpoint and resume remain outside this spike. |
-| 11, 12, 13, 14 | Turn Order selects actors; Combat Resolution owns lifecycle/outcome; Status Effects defines contribution policy; Enemy and Intent supplies binding intents. Systems 12 and 13 are In Review; 11 is Designed (pending review); 14 has no GDD yet. |
+| 11, 12, 13, 14 | Turn Order selects actors; Combat Resolution owns lifecycle/outcome; Status Effects defines contribution policy; Enemy and Intent supplies binding intents. Systems 12 and 13 are In Review; 11 and 14 are Designed (pending review). |
 | 5, 8, 10 | Run State owns the whole snapshot. Grid and Adjacency provide the final frozen arrangement and modifiers at encounter start. The Grid Backpack and Adjacency and Synergy GDDs exist (pending review); System 5's is pending. |
 | 27, 29, 30, 35 | HUD, payoff, breakdown and harness read committed records and the historical state matching their position. |
 
@@ -129,5 +129,7 @@ System 36 supplies immutable state views for the combat HUD and breakdown. Syste
 | Question | Owner | Resolve by |
 |---|---|---|
 | ~~Which exact gauge units and transition constraints apply?~~ Answered: cooldown by System 9 (`nextReadyAt` and the action ordinal `a`, 32-bit) and gauge by System 11 (threshold 1000, speed 1 to 200; the action record carries the time advanced `Δ` and the gauge before and after). System 36 must store the gauge and apply `Δ` and the spend in the action transaction. | Systems 11 and 36 | Before System 36 is re-reviewed. |
+| Does System 36 accept the combat baseline per hero from System 15 (instance ID, definition ID, slot, max HP, HP equal to max HP, initial shield, base speed, speed sum and the innate item instance), with every hero restored before each encounter? | Systems 15 and 36 | Before System 36 is re-reviewed. |
+| Does System 36 accept the bound intent sequences from System 14 in its baseline (per enemy: instance ID, slot, action ordinal `e`, intent index `n`, and the sequence of move and target), with `n` advancing only on a non-stunned action? ([enemy-and-intent.md](enemy-and-intent.md)) | Systems 14 and 36 | Before System 36 is re-reviewed. |
 | Which consistent checkpoint boundaries and validation rules are needed for persistent resume? | Systems 1, 3, 4, 5, 12, 24 and 36 | Before post-MVP save integration. |
 | How are views and request receipts stored within measured memory and latency budgets? | Technical Director, Systems 4, 27, 29 and 36 | Architecture review and combat core spike. |

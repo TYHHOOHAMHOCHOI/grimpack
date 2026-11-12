@@ -178,7 +178,7 @@ If the owner is stunned on `a = 3`, `IT-A` stays ready and fires on `a = 4` (the
 | 25 Backpack UI | Downstream | Hard | Forecast, numerals, cooldown numbers, remaining waits. | Not designed. |
 | 26 Hover Popup | Downstream | Soft | Trigger text for the popup. | Not designed. |
 | 35 Balance Simulation Harness | Downstream | Soft | Calls `Forecast`. | Not designed. |
-| 15 Party and Heroes | Peer | Soft | Party slot; stat bonuses from passive items (open). | Not designed. |
+| 15 Party and Heroes | Peer | Soft | Party slot; stat bonuses from passive items (`hpBonus`, `speedBonus`); each hero's innate item. System 15 is Designed ([party-and-heroes.md](party-and-heroes.md), pending review). | Present (System 15, Dependencies). |
 | 14 Enemy and Intent | None | n/a | Enemy actions are System 14's; this system never schedules them. | No change. |
 
 **Constraints System 9 requires System 2 to validate:** (1) each item has exactly one trigger kind; (2) a passive or combat-start item has no `N`; a cooldown item has `N` and `S`; a reaction item has `N` and a pattern; (3) a passive item has no effects and every other item has one to `MaxEffectsPerItem`; (4) `N` and `S` are in range; (5) `36 × MaxEffectsPerItem ≤ L − R` (Formula 6); (6) a pattern names a known event kind and, where used, a known status ID; (7) no deferred effect kind appears. System 9 does not duplicate these checks.
@@ -314,3 +314,4 @@ If the owner is stunned on `a = 3`, `IT-A` stays ready and fires on `a = 4` (the
 | Balance: reaction `N` values, the break-even of hero speed against cooldown value, the dead zones of `N` and `S` against fights of about 10 actions, and the wasted synergy at the floor. | systems-designer, System 35 | First balance simulation and the combat spike. |
 | Lens modes, a party-order strip and a "because of…" readout on focus are not specified. | UX designer | `/ux-design` for the arrangement screen. |
 | Passive and combat-start items: should a hero that can never act (no cooldown and no combat-start item) get a pre-fight warning? | UX designer | `/ux-design`. |
+| System 15 gives each hero one innate item that occupies no cell. It must be accepted with the ordering key anchor row `−1`, anchor column `0` (so it fires and reacts before the grid items), with a trigger of `Cooldown`, `Reaction` or `CombatStart`, and a place in the firing rank of Formula 5. | Systems 9 and 15 | Before System 9 is re-reviewed. |

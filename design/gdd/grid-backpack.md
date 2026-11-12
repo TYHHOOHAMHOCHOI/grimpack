@@ -155,7 +155,7 @@ Output range: `|F_o| = |F|`, and the box stays at most 3×3. The number of disti
 |---|---|---|---|
 | 2 Game Data Definitions | Upstream | Hard | Footprints (connected, at most 3×3, 1 to 9 cells), hero backpack profile (bound, start block, unlock sequence), `rotationEnabled` flag. **Provisional:** System 2's GDD does not yet carry these fields or their validation (follow-up in its Open Questions). System 8 treats a malformed input as a contract violation. |
 | 5 Run State and Flow | Injected | Soft | System 8 defines the item-ID source interface that System 5 implements with its run-scoped deterministic counter. System 8 holds no reference to System 5. System 5 stores System 8's snapshot slice. |
-| 15 Party and Heroes | Downstream | Soft | Supplies hero instance IDs and the party-slot order of the grids in the view; System 8 treats hero IDs as opaque. System 15 uses System 8 to give a hero its starting items. |
+| 15 Party and Heroes | Downstream | Soft | Supplies hero instance IDs and the party-slot order of the grids in the view; System 8 treats hero IDs as opaque. System 15 uses System 8 to give a hero its starting items. System 15 is Designed ([party-and-heroes.md](party-and-heroes.md)): the slot order is the order in which the player picked the heroes, and each hero's innate item lives outside the grid and is not in the arrangement view's grid items. |
 | 10 Adjacency and Synergy | Downstream | Hard | Reads the arrangement view. **System 10 provides the pure adjacency-preview query** (`PreviewPlacement`, Designed, pending review) for a candidate placement, which System 25 shows while the player drags; the Player Fantasy depends on it. In the MVP System 10 uses only the occupied cells (edge contact), not authored offsets, so the `Cells(item, offsets)` service stays available for later use. |
 | 9 Item Trigger and Cooldown, 11 Turn Order | Downstream | Hard | Use the reading order and `readingIndex` within a grid. **Systems 9 and 11 provide the party-wide firing position** (System 9 is Designed: Formula 5 of [item-trigger-and-cooldown.md](item-trigger-and-cooldown.md), built on System 11's `GlobalIndex`, [turn-order.md](turn-order.md)) of a placed item (composed from the party turn order) so that System 25 can show it on the plate. |
 | 3 Effect Resolution | Downstream | Hard | Takes root-effect order from the reading order (Canonical Order Contract) and the anchor-cell definition. |
@@ -164,7 +164,7 @@ Output range: `|F_o| = |F|`, and the box stays at most 3×3. The number of disti
 | 25 Backpack UI, 26 Hover Popup | Downstream | Hard | Operations, `Preview`, Undo, the arrangement view, the tray list and destroyed IDs. |
 | 17, 18, 20, 21, 24, 29, 30, 35 | Downstream | Soft | Later systems: create items and unlock cells after Thaw (17, 18, 20, 21), persist the slice (24), read placements and the baseline (29, 30), drive operations and record capacity pressure (35). They must list System 8 when designed. |
 
-**Bidirectional status:** Systems 2, 3, 4, 12 and 36 mention System 8. System 2 needs a follow-up addition for the fields above (recorded in its Open Questions). Systems 9, 10, 11, 15, 25, 26 and the later systems above have no GDD yet and must list System 8 when designed.
+**Bidirectional status:** Systems 2, 3, 4, 12 and 36 mention System 8. System 2 needs a follow-up addition for the fields above (recorded in its Open Questions). Systems 9, 10, 11 and 15 mention System 8 (all Designed). Systems 25, 26 and the later systems above have no GDD yet and must list System 8 when designed.
 
 ## Tuning Knobs
 

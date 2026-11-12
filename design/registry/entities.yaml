@@ -204,6 +204,51 @@ formulas:
     added: 2026-11-12
     revised: 2026-11-12
 
+  - name: hero_max_hp
+    status: active
+    source: design/gdd/party-and-heroes.md
+    referenced_by:
+      - design/gdd/party-and-heroes.md
+    variables:
+      - h
+      - B_perm
+      - H
+      - HP_cap
+    output_range: [1, 10000]
+    expression: "maxHP = clamp(h + B_perm + H, 1, HP_cap); H = clamp(sum of hpBonus of passive items in the frozen grid, -50, 200)"
+    notes: "Integer. h is the hero's base max HP (40..300, provisional); B_perm is permanent growth from rewards (0..1000). Items in the stash or tray do not count. Every hero is restored to maxHP and its initial shield before each encounter."
+    added: 2026-11-13
+    revised: ""
+
+  - name: enemy_scaled_hp
+    status: active
+    source: design/gdd/enemy-and-intent.md
+    referenced_by:
+      - design/gdd/enemy-and-intent.md
+    variables:
+      - HP
+      - m_hp
+    output_range: [1, 1000000]
+    expression: "ScaledHP = clamp((HP * m_hp + 500) / 1000, 1, 1000000); m_hp in 500..10000 permille (1000 = identity)"
+    notes: "Integer, round half up. m_hp is set per encounter by System 16 and baked into the encounter instance before intents are bound. Speed, hit count and status amounts are never scaled."
+    added: 2026-11-13
+    revised: ""
+
+  - name: enemy_scaled_damage
+    status: active
+    source: design/gdd/enemy-and-intent.md
+    referenced_by:
+      - design/gdd/enemy-and-intent.md
+      - design/gdd/effect-resolution-model.md
+    variables:
+      - B
+      - m_dmg
+    output_range: [1, 100000]
+    expression: "ScaledB = clamp((B * m_dmg + 500) / 1000, 1, 100000); m_dmg in 500..5000 permille (1000 = identity)"
+    notes: "Integer, round half up; the floor of 1 keeps a hit from becoming a no-op. The intent tab shows the resolved damage of effect_damage_formula with ScaledB as base (damage before shield), as r or r x hits."
+    added: 2026-11-13
+    revised: ""
+
 # Example:
 #
 # formulas:
@@ -264,6 +309,7 @@ constants:
     referenced_by:
       - design/gdd/effect-resolution-model.md
       - design/gdd/combat-state-and-step-model.md
+      - design/gdd/enemy-and-intent.md
     value: 2147483647
     unit: HP (signed 32-bit maximum)
     added: 2026-11-11
@@ -453,6 +499,48 @@ constants:
     value: 60
     unit: gauge units per time step (largest authored base speed; provisional, System 2 validates)
     added: 2026-11-12
+    revised: ""
+
+  - name: party_size_mvp
+    status: active
+    source: design/gdd/party-and-heroes.md
+    referenced_by:
+      - design/gdd/party-and-heroes.md
+      - design/gdd/turn-order.md
+    value: 3
+    unit: heroes per party (the player picks 3 of the 4 MVP heroes; the contract allows 1 to 3; more needs an art-bible change)
+    added: 2026-11-13
+    revised: ""
+
+  - name: hero_hp_cap
+    status: active
+    source: design/gdd/party-and-heroes.md
+    referenced_by:
+      - design/gdd/party-and-heroes.md
+    value: 10000
+    unit: HP (largest max HP of a hero; provisional)
+    added: 2026-11-13
+    revised: ""
+
+  - name: intent_sequence_length
+    status: active
+    source: design/gdd/enemy-and-intent.md
+    referenced_by:
+      - design/gdd/enemy-and-intent.md
+    value: 12
+    unit: bound intent entries per enemy (drawn at room entry; the sequence wraps after the last entry; safe range 6 to 20)
+    added: 2026-11-13
+    revised: ""
+
+  - name: encounter_enemy_max
+    status: active
+    source: design/gdd/enemy-and-intent.md
+    referenced_by:
+      - design/gdd/enemy-and-intent.md
+      - design/gdd/turn-order.md
+    value: 6
+    unit: enemies per encounter (two lines of three, art bible 7.4a; System 16 may cap lower)
+    added: 2026-11-13
     revised: ""
 
   - name: damage_permille_scale

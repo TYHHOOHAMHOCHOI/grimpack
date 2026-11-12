@@ -59,8 +59,8 @@ The 37 systems fall into five groups.
 | 11 | Turn Order (speed gauge) | Gameplay | MVP | In Review | [GDD](turn-order.md) | 2, 4, 36, 14, 15 (13 soft, for later speed statuses) |
 | 12 | Combat Resolution | Gameplay | MVP | In Review | [GDD](combat-resolution.md) | 3, 9, 10, 11, 14, 15, 36, 4, 1 |
 | 13 | Status Effects (inferred) | Gameplay | MVP | In Review | [GDD](status-effects.md) | 3, 2, 36 |
-| 14 | Enemy and Intent | Gameplay | MVP | Not Started | — | 2, 1, 3, 36 |
-| 15 | Party and Heroes | Gameplay | MVP | Not Started | — | 2, 8 |
+| 14 | Enemy and Intent | Gameplay | MVP | Designed | [GDD](enemy-and-intent.md) | 2, 1, 3, 36, 15 (13 soft) |
+| 15 | Party and Heroes | Gameplay | MVP | Designed | [GDD](party-and-heroes.md) | 2, 8 |
 | 16 | Encounter Generation (inferred) | Gameplay | MVP | Not Started | — | 2, 1, 14 |
 | 17 | Door Generation and Tiers | Gameplay | MVP | Not Started | — | 2, 1, 16, 18 |
 | 18 | Commitment and Drop Model | Economy | MVP | Not Started | — | 8, 10, 2, 1 |
@@ -260,10 +260,10 @@ Combining the dependency sort with the priority tiers. Systems 3 and 12 are desi
 | Metric | Count |
 |--------|-------|
 | Total systems identified | 37 |
-| Design docs started | 11 |
+| Design docs started | 13 |
 | Design docs reviewed | 5 |
 | Design docs approved | 0 |
-| MVP systems designed | 10/28 |
+| MVP systems designed | 12/28 |
 | Vertical Slice systems designed | 0/5 |
 
 ---

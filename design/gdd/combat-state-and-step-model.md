@@ -56,7 +56,7 @@ Hero A applies 3 units of Ấn and hero B applies 2. A detonation requesting 4 s
 |---|---|
 | Maximum HP | Signed 32-bit storage, range `1..2,147,483,647`. |
 | HP | Signed 32-bit storage, range `0..maximum HP`. Derived alive is `HP > 0`. A lethal HP event immediately exposes downed state in its view. |
-| Shield, gauge, cooldown | Signed 32-bit storage, range `0..2,147,483,647`. Gauge and cooldown units and gameplay restrictions belong to Systems 11 and 9. |
+| Shield, gauge, cooldown | Signed 32-bit storage, range `0..2,147,483,647`. Gauge units belong to System 11 ([turn-order.md](turn-order.md), pending review): the threshold is 1000 and a stored gauge never exceeds `G_max = T + V_max − 1` (1199 with the defaults). Cooldown is stored as `nextReadyAt` (an owner action ordinal) with the hero's action ordinal `a`, defined in System 9 ([item-trigger-and-cooldown.md](item-trigger-and-cooldown.md), pending review). |
 | Active status amounts and event sequence | Signed 64-bit storage. Active contribution amounts and event sequence positions are positive. The empty trace cursor is 0. Use checked addition for totals and batch sequence allocation. |
 
 Check intermediate arithmetic before narrowing or publication. Use a wider intermediate where required or checked arithmetic at the stated width. Reject overflow and out-of-domain changes rather than wrapping or clamping them. Gameplay saturation defined by a rule, such as HP damage stopping at zero, is applied deliberately by that rule before validating the resulting field. The absence of a gameplay stack cap does not relax representation bounds.
@@ -82,7 +82,7 @@ Check intermediate arithmetic before narrowing or publication. Use a wider inter
 | 4 Event Log | In Review. Owns event kinds, causes, sequence and trace retention. State/event publication and per-event views must align with it. |
 | 8 Grid Backpack | Designed ([grid-backpack.md](grid-backpack.md)). Supplies the frozen arrangement view and the placement baseline (one row per hero-grid item instance) used to open an encounter. |
 | 3 Effect Resolution | Designed. Owns the queue, effect ordering and damage calculations; submits requests and origins. Damage is capped at 2,147,483,647 so it fits the 32-bit HP and shield domain. System 3 holds no state across actions; checkpoint and resume remain outside this spike. |
-| 11, 12, 13, 14 | Turn Order selects actors; Combat Resolution owns lifecycle/outcome; Status Effects defines contribution policy; Enemy and Intent supplies binding intents. Systems 12 and 13 are In Review; 11 and 14 have no GDD yet. |
+| 11, 12, 13, 14 | Turn Order selects actors; Combat Resolution owns lifecycle/outcome; Status Effects defines contribution policy; Enemy and Intent supplies binding intents. Systems 12 and 13 are In Review; 11 is Designed (pending review); 14 has no GDD yet. |
 | 5, 8, 10 | Run State owns the whole snapshot. Grid and Adjacency provide the final frozen arrangement and modifiers at encounter start. The Grid Backpack and Adjacency and Synergy GDDs exist (pending review); System 5's is pending. |
 | 27, 29, 30, 35 | HUD, payoff, breakdown and harness read committed records and the historical state matching their position. |
 
@@ -128,6 +128,6 @@ System 36 supplies immutable state views for the combat HUD and breakdown. Syste
 
 | Question | Owner | Resolve by |
 |---|---|---|
-| Which exact gauge and cooldown units and transition constraints apply? | Systems 9, 11 and 36 | Before integrating those producers. |
+| ~~Which exact gauge units and transition constraints apply?~~ Answered: cooldown by System 9 (`nextReadyAt` and the action ordinal `a`, 32-bit) and gauge by System 11 (threshold 1000, speed 1 to 200; the action record carries the time advanced `Δ` and the gauge before and after). System 36 must store the gauge and apply `Δ` and the spend in the action transaction. | Systems 11 and 36 | Before System 36 is re-reviewed. |
 | Which consistent checkpoint boundaries and validation rules are needed for persistent resume? | Systems 1, 3, 4, 5, 12, 24 and 36 | Before post-MVP save integration. |
 | How are views and request receipts stored within measured memory and latency budgets? | Technical Director, Systems 4, 27, 29 and 36 | Architecture review and combat core spike. |

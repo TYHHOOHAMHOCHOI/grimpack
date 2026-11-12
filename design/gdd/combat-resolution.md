@@ -83,7 +83,8 @@ A scheduled actor whose effects all become no-ops still increments `a` after the
 | System | Contract and status |
 |---|---|
 | 3 Effect Resolution | Designed. Owns effect order, reaction queue and damage formulas. FIFO queue, reaction limits `D = 8` and `N = 256` (reaching one ends the action with a `ChainLimit` fact and the encounter continues) and the rule that System 3 holds no state across actions are settled there. A technical failure follows the stop policy here. |
-| 9, 11 | No GDDs yet. Own hero trigger/cooldown input and next-actor selection plus pure forecast. |
+| 9 Item Trigger and Cooldown | Designed ([item-trigger-and-cooldown.md](item-trigger-and-cooldown.md), pending review). Supplies the ready items of a hero action in the call order of its Rule 5 (actor, stun check against System 13, ready list, one transaction with `ActionStarted` and `ItemFired`, root effects). Asks System 12 to run one pre-fight action per hero that has combat-start items (not counted in the 200 limit, with an outcome check after each) and to advance each hero's action ordinal on every scheduled action, skipped or not. |
+| 11 Turn Order | Designed ([turn-order.md](turn-order.md), pending review). Pure `Next` (actor, time advanced `Δ`) and `Forecast`; System 12 commits the result in one System 36 transaction. A living unit always becomes ready in finite time, so "no actor can act again" cannot occur in the MVP. |
 | 14, 15 | No GDDs yet. Own binding enemy intents and party/hero definitions and action inputs. |
 | 13 Status Effects | In Review. Defines the spike debuff lifetime and expiry at the target's action boundary. Status effects resolve via System 3; System 36 commits the changes. |
 | 36 Combat State and Step Model | In Review. Owns mutable state, validation, atomic mutation and historical views, including life state used by outcome checks. |
@@ -136,6 +137,7 @@ System 12 provides readiness, encounter status and outcome facts to the combat H
 | Question | Owner | Resolve by |
 |---|---|---|
 | What legal roster and baseline inputs can encounter generation supply? | Systems 12, 16 and 36 | Before implementing encounter preparation. |
-| How does System 11 distinguish a temporarily unready actor from a permanent gameplay inability to act and from a technical error? | Systems 11, 12 and 36 | Before implementing actor selection integration. |
-| Does System 9 confirm the root order in the System 3 Canonical Order Contract (anchor-cell reading order)? Reaction limits are settled (`D = 8`, `N = 256`). | Systems 3, 9 and 12 | Before combat spike implementation. |
+| ~~How does System 11 distinguish a temporarily unready actor from a permanent gameplay inability to act and from a technical error?~~ Answered by System 11 (2026-11-12): a waiting unit is never unable to act because the effective speed is at least 1; `NoLivingUnit` and `ContractViolation` are separate codes. Outcome row 5 stays as a guard that cannot occur in the MVP. | Systems 11, 12 and 36 | Closed. |
+| ~~Does System 9 confirm the root order in the System 3 Canonical Order Contract (anchor-cell reading order)?~~ Answered by System 9 (2026-11-12): yes, Rule 7. Reaction limits are settled (`D = 8`, `N = 256`). | Systems 3, 9 and 12 | Closed. |
+| Does System 12 accept the call order of System 9 Rule 5, the pre-fight action (one root action per hero with combat-start items, in party-slot order, outside the 200 limit, with an outcome check afterwards) and the increment of each hero's action ordinal on every scheduled action? Does a skipped action (`stunned`, `no_ready_item`) count toward the 200 limit? | Systems 9 and 12 | Before System 12 is re-reviewed. |
 | How does System 5 wire the single terminal handoff and technical return to menu? | Systems 5, 12 and 31 | Before live run integration. |

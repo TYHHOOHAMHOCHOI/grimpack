@@ -77,7 +77,9 @@ For duration, `a₀` is the target's number of completed actions at the start of
 | 4 Event Log | In Review. Defines application, detonation consumption, damage, tick origin and baseline provenance. Defines the spike's grouped expiry record. Cleanse and other future kinds require coordinated design. |
 | 12 Combat Resolution | In Review. Owns completed-action boundaries, outcome and technical stops. Due expiry is processed after the current queue drains and before outcome. |
 | 10 Adjacency and Synergy | Designed, pending review. May add a `StatusAmount` modifier to the quantity an item applies; units, range and the handling of a non-positive total belong to System 13 (open). |
-| 9, 11, 14, 15 | Trigger, turn-order, enemy action and hero systems supply boundary context under their pending GDDs. |
+| 9 Item Trigger and Cooldown | Designed, pending review. Reaction items use status IDs in their event patterns (`StatusApplied`, `StatusConsumed`). System 9 assumes (provisional) that System 13 owns the stun status that System 12 reads at the start of a hero's action; a stunned action still advances the hero's action ordinal. |
+| 11 Turn Order | Designed, pending review. Reads the effective speed from the combat state. In the MVP no status changes speed (speed comes from the base speed and passive item bonuses); if System 13 adds one later, it supplies flat and percent modifiers with durations counted in the affected unit's own actions. A stun skips a turn but keeps the unit's slot (it costs the action, not the order). |
+| 14, 15 | Enemy action and hero systems supply boundary context under their pending GDDs. |
 | 27, 29, 30, 35 | HUD, payoff and breakdown consume committed historical facts; the harness verifies reproducibility. |
 
 ## Tuning Knobs

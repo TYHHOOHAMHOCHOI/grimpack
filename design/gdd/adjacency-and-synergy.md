@@ -70,7 +70,7 @@ In combat the same bridges fire and the player recognises them: "that is the whe
 | 2 Game Data Definitions | Item tags, synergy rules, effect kinds present on each item | None | System 2 owns the fields and their validation (provisional: see Dependencies). |
 | 8 Grid Backpack | Arrangement view: hero grids, items in reading order, occupied cells, anchor, `readingIndex`; Frozen state | None | System 8 owns geometry; System 10 owns meaning. |
 | 3 Effect Resolution | None | For each target item, ordered `DamageFlat` and `DamagePercent` modifiers with source item, rule index and origin | System 3 owns the sums and the damage formula. |
-| 9 Item Trigger and Cooldown | None | Cooldown modifiers and status-amount modifiers per target | System 9 owns firing and the cooldown floor. |
+| 9 Item Trigger and Cooldown | None | Cooldown modifiers and status-amount modifiers per target | System 9 ([item-trigger-and-cooldown.md](item-trigger-and-cooldown.md), pending review) owns firing and the cooldown floor (1) and ceiling (99). |
 | 12, 36 | Freeze and Thaw | Frozen view per hero grid | System 12 owns the calls. |
 | 25, 26 | Preview request | Links with seams and sources, preview delta, per-target totals | System 25 owns the bridge drawing; System 26 the explanation text. |
 | 4 Event Log | None | Modifiers actually applied are recorded by System 3 on the origin | System 4 owns the schema. |
@@ -156,7 +156,7 @@ The bound `20` is the most items that can touch one item: a footprint inside a 3
 | 2 Game Data Definitions | Upstream | Hard | Item tags, effect kinds per item, synergy rules (`targetTags`, `kind`, `amount`, `statusId`), `MaxRulesPerItem` and the amount ranges. Provisional: System 2 has no synergy fields yet. | A row is added to System 2's Open Questions at sync. |
 | 8 Grid Backpack | Upstream | Hard | Arrangement view (grids, items in reading order, occupied cells, anchor, `readingIndex`) and the Frozen state. System 8 already lists this system as downstream and requires the preview query. | Present (System 8, Dependencies). |
 | 3 Effect Resolution | Downstream | Hard | Ordered `DamageFlat` and `DamagePercent` modifiers with source, rule index and origin. | System 3 said "No GDD yet"; updated at sync. |
-| 9 Item Trigger and Cooldown | Downstream | Hard (provisional) | Cooldown and status-amount modifiers per target. System 9 has no GDD yet. | None yet; System 9 must cite this when designed. |
+| 9 Item Trigger and Cooldown | Downstream | Hard (provisional) | Cooldown and status-amount modifiers per target. System 9 is Designed (pending review) and reads the cooldown total. | Present (System 9, Dependencies). The status-amount kind is still open. |
 | 12 Combat Resolution | Downstream | Hard | Takes the frozen view at Freeze and releases it at Thaw. | System 12 said "No GDD yet"; updated at sync. |
 | 36 Combat State and Step Model | Downstream (via 12) | Soft | Receives the frozen arrangement and adjacency context at encounter start. | Wording updated at sync. |
 | 25 Backpack UI, 26 Hover Popup | Downstream | Hard for 25, soft for 26 | Links with seams and sources, preview delta, per-target totals. | Not designed. |
@@ -236,7 +236,7 @@ The bound `20` is the most items that can touch one item: a footprint inside a 3
 - `SWORD`: footprint `{(0,0),(1,0)}`, tag `weapon`, cooldown trigger 3, one Damage effect `B = 10`. `WHETSTONE`: 1×1, rule 0 `DamageFlat +3`, `targetTags {weapon}`. `RUNE`: 1×1, rule 0 `DamagePercent +250`, `targetTags ∅`. `SHIELD`: 1×1, tag `armor`, a Shield effect only. `HASTE`: 1×1, rule 0 `CooldownReduction 1`, `{weapon}`. `STING`: 1×1, rule 0 `StatusAmount +1`, status `an`, `{weapon}`. `ANBLADE`: 1×1, tag `weapon`, cooldown trigger 2, one `ApplyStatus(an)` effect.
 - `ARR-W` on `GRID-4`: `SWORD` at `(2,1)`, `WHETSTONE` at `(1,1)`, `RUNE` at `(2,2)`, `SHIELD` at `(1,2)`.
 
-Logic tests live under `Assets/Tests/EditMode/AdjacencyAndSynergy/`.
+Logic tests live under `Assets/_Project/Tests/EditMode/AdjacencyAndSynergy/`, in the existing `Project05.EditModeTests` assembly.
 
 1. **Scope (Rule 1).** **Given** `WHETSTONE` in the stash at `(1,1)` and `SWORD` in a hero grid at `(2,1)`, and a second hero grid with a `SWORD` at the same cells as the first, **when** the views are evaluated, **then** no link exists between grids or from the stash or tray, and each grid's view contains only its own items.
 2. **Adjacency (Rule 2, Formula 1).** **Given** `ARR-W`, **when** adjacency is evaluated, **then** `SWORD`–`WHETSTONE` and `SWORD`–`RUNE` are adjacent, `WHETSTONE`–`RUNE` (diagonal) is not, and `WHETSTONE`–`SHIELD` is adjacent.
@@ -274,7 +274,7 @@ Logic tests live under `Assets/Tests/EditMode/AdjacencyAndSynergy/`.
 | Question | Owner | Resolve by |
 |---|---|---|
 | Where do synergy rules, the tag vocabulary and `MaxRulesPerItem` live in System 2's records, and who validates "applicable" (it needs each item's effect kinds)? | System 2, System 10 | Next System 2 revision. |
-| How does System 9 apply the cooldown total (floor, rounding, from the first firing or later) and does it accept a negative reduction (lengthening)? | System 9 | When System 9 is designed. |
+| ~~How does System 9 apply the cooldown total (floor, rounding, from the first firing or later) and does it accept a negative reduction (lengthening)?~~ Answered by System 9 (2026-11-12): `N_eff = clamp(N − C, 1, 99)`, a negative total lengthens, applied from the first firing because the view is frozen. | System 9 | Closed. |
 | Does `StatusAmount` become a modifier kind in System 3's contract, who owns its units and range, and how is a non-positive result handled? System 3 today carries only `F` and `P`. | Systems 3 and 13 | Before System 3 is re-reviewed. |
 | Is the bridge directional (a chevron toward the target) and how are two mutual links at one seam drawn? How many bridges may pulse at once under the lit budget? | art-director | Art bible follow-up (the open line about adjacency, 3.7 and 7.6). |
 | Does an empty `targetTags` need an explicit "any neighbour" flag to avoid accidental global rules? | System 2 | Next System 2 revision. |

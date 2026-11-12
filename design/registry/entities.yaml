@@ -158,6 +158,7 @@ formulas:
     referenced_by:
       - design/gdd/adjacency-and-synergy.md
       - design/gdd/effect-resolution-model.md
+      - design/gdd/item-trigger-and-cooldown.md
     variables:
       - F_T
       - P_T
@@ -169,6 +170,39 @@ formulas:
     notes: "Integer sums, not clamped by System 10. System 3 reads F and P and clamps the summed P at -1000 at run time. At most 20 neighbours times 3 rules = 60 links per target, each at most 100000 in magnitude, so no overflow."
     added: 2026-11-12
     revised: ""
+
+  - name: item_effective_cooldown
+    status: active
+    source: design/gdd/item-trigger-and-cooldown.md
+    referenced_by:
+      - design/gdd/item-trigger-and-cooldown.md
+      - design/gdd/adjacency-and-synergy.md
+    variables:
+      - N
+      - C
+      - N_eff
+    output_range: [1, 99]
+    expression: "N_eff = clamp(N - C, 1, 99); nextReadyAt = a + N_eff after a firing on owner action a; ready when a >= nextReadyAt"
+    notes: "Cooldown is counted in the owner hero's own actions (a), including skipped ones. Applies to cooldown items and to reaction items. C is the CooldownReduction total from System 10 (negative lengthens). The floor 1 means an item fires at most once per action. The ceiling 99 is a representation guard, not a gameplay lever."
+    added: 2026-11-12
+    revised: 2026-11-12
+
+  - name: effective_speed
+    status: active
+    source: design/gdd/turn-order.md
+    referenced_by:
+      - design/gdd/turn-order.md
+    variables:
+      - s
+      - F
+      - P
+      - v
+      - V_max
+    output_range: [1, 200]
+    expression: "v = clamp((max(0, s + F) * (1000 + P) + 500) / 1000, 1, V_max)"
+    notes: "Integer, round half up; same additive percent bucket and rounding as effective_damage_formula. s is the base speed (5..60, provisional). F is the clamped sum (-50..50) of passive item speed bonuses of a hero (0 for an enemy); P is the clamped sum (-1000..1000) of future status modifiers and is 0 in the MVP. Gauge fills by v per time step; a unit acts when its gauge reaches gauge_threshold. Stored gauge never exceeds gauge_threshold + speed_effective_max - 1 (1199)."
+    added: 2026-11-12
+    revised: 2026-11-12
 
 # Example:
 #
@@ -344,6 +378,80 @@ constants:
       - design/gdd/adjacency-and-synergy.md
     value: 360
     unit: links per hero grid (6x6 bound, 3 rules per item); 504 if the bound becomes 7x7 (Tier 2)
+    added: 2026-11-12
+    revised: ""
+
+  - name: item_cooldown_effective_ceiling
+    status: active
+    source: design/gdd/item-trigger-and-cooldown.md
+    referenced_by:
+      - design/gdd/item-trigger-and-cooldown.md
+      - design/gdd/adjacency-and-synergy.md
+    value: 99
+    unit: owner actions (largest effective cooldown after synergy modifiers)
+    added: 2026-11-12
+    revised: ""
+
+  - name: item_max_effects_per_item
+    status: active
+    source: design/gdd/item-trigger-and-cooldown.md
+    referenced_by:
+      - design/gdd/item-trigger-and-cooldown.md
+      - design/gdd/effect-resolution-model.md
+    value: 4
+    unit: effects per item (provisional; safe range 1 to 5; System 2 validates 36 x value <= reaction_effect_limit - item_root_effect_reserve)
+    added: 2026-11-12
+    revised: 2026-11-12
+
+  - name: item_root_effect_reserve
+    status: active
+    source: design/gdd/item-trigger-and-cooldown.md
+    referenced_by:
+      - design/gdd/item-trigger-and-cooldown.md
+      - design/gdd/effect-resolution-model.md
+    value: 64
+    unit: effects of reaction_effect_limit kept free for reactions after the root effects (so max effects per item is at most 5)
+    added: 2026-11-12
+    revised: ""
+
+  - name: gauge_threshold
+    status: active
+    source: design/gdd/turn-order.md
+    referenced_by:
+      - design/gdd/turn-order.md
+      - design/gdd/combat-state-and-step-model.md
+    value: 1000
+    unit: gauge units (a unit acts when its gauge reaches this; the excess is kept)
+    added: 2026-11-12
+    revised: ""
+
+  - name: speed_effective_max
+    status: active
+    source: design/gdd/turn-order.md
+    referenced_by:
+      - design/gdd/turn-order.md
+    value: 200
+    unit: gauge units per time step (largest effective speed, a constant with the invariant value < gauge_threshold; stored gauge never exceeds gauge_threshold + this - 1 = 1199)
+    added: 2026-11-12
+    revised: 2026-11-12
+
+  - name: speed_base_min
+    status: active
+    source: design/gdd/turn-order.md
+    referenced_by:
+      - design/gdd/turn-order.md
+    value: 5
+    unit: gauge units per time step (smallest authored base speed; provisional, System 2 validates)
+    added: 2026-11-12
+    revised: ""
+
+  - name: speed_base_max
+    status: active
+    source: design/gdd/turn-order.md
+    referenced_by:
+      - design/gdd/turn-order.md
+    value: 60
+    unit: gauge units per time step (largest authored base speed; provisional, System 2 validates)
     added: 2026-11-12
     revised: ""
 

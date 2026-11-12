@@ -61,7 +61,7 @@ The 37 systems fall into five groups.
 | 13 | Status Effects (inferred) | Gameplay | MVP | In Review | [GDD](status-effects.md) | 3, 2, 36 |
 | 14 | Enemy and Intent | Gameplay | MVP | Designed | [GDD](enemy-and-intent.md) | 2, 1, 3, 36, 15 (13 soft) |
 | 15 | Party and Heroes | Gameplay | MVP | Designed | [GDD](party-and-heroes.md) | 2, 8 |
-| 16 | Encounter Generation (inferred) | Gameplay | MVP | Not Started | — | 2, 1, 14 |
+| 16 | Encounter Generation | Gameplay | MVP | Designed | [GDD](encounter-generation.md) | 2, 1, 14 (11, 15 soft) |
 | 17 | Door Generation and Tiers | Gameplay | MVP | Not Started | — | 2, 1, 16, 18 |
 | 18 | Commitment and Drop Model | Economy | MVP | Not Started | — | 8, 10, 2, 1 |
 | 19 | Curses and Trade-offs | Gameplay | Vertical Slice | Not Started | — | 17, 3, 2 |
@@ -151,7 +151,7 @@ Systems are listed in dependency order within each layer. Design and build from 
 2. **Status Effects (13)** — depends on: 3, 2, 36.
 3. **Enemy and Intent (14)** — depends on: 2, 1, 3, 36.
 4. **Combat Resolution (12)** — depends on: 3, 9, 10, 11, 14, 15, 36, 4, 1. Encounter lifecycle.
-5. **Encounter Generation (16)** — depends on: 2, 1, 14.
+5. **Encounter Generation (16)** — depends on: 2, 1, 14 (11, 15 soft). Designed (2026-11-13). Its content needs 7 monster types (Hunter, Striker, Swarmer, Sweeper, Brute, Elite Bruiser, Boss), not the 5-6 estimated for the MVP; the two extra are cheap strike-only and multi-hit variants.
 6. **Commitment and Drop Model (18)** — depends on: 8, 10, 2, 1.
 7. **Door Generation and Tiers (17)** — depends on: 2, 1, 16, 18.
 8. **Curses and Trade-offs (19)** — depends on: 17, 3, 2.
@@ -260,10 +260,10 @@ Combining the dependency sort with the priority tiers. Systems 3 and 12 are desi
 | Metric | Count |
 |--------|-------|
 | Total systems identified | 37 |
-| Design docs started | 13 |
+| Design docs started | 14 |
 | Design docs reviewed | 5 |
 | Design docs approved | 0 |
-| MVP systems designed | 12/28 |
+| MVP systems designed | 13/28 |
 | Vertical Slice systems designed | 0/5 |
 
 ---

@@ -69,7 +69,7 @@ A scheduled actor whose effects all become no-ops still increments `a` after the
 
 | Case | Handling |
 |---|---|
-| Invalid setup or invalid roster reference | Stop before combat. Define legal empty-side setup with System 16 and System 36. |
+| Invalid setup or invalid roster reference | Stop before combat. System 16 ([encounter-generation.md](encounter-generation.md)) never produces an empty enemy side (rosters have 1 to 4 enemies in the MVP, the contract cap being 6) and a roster that does not fit the layout is a technical stop. |
 | Lethal effect with pending reactions | Publish the lethal state immediately, then finish the current action's remaining legal reactions. Check both sides once the queue and due expiry complete. |
 | Binding enemy intent loses its target | Skip the affected effect without retargeting. Continue effects with valid targets. |
 | Both sides alive but unable to progress | A confirmed gameplay no-actor result is defeat; a scheduler error stops the run with a diagnostic. |

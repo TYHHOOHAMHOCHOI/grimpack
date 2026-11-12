@@ -225,6 +225,7 @@ formulas:
     source: design/gdd/enemy-and-intent.md
     referenced_by:
       - design/gdd/enemy-and-intent.md
+      - design/gdd/encounter-generation.md
     variables:
       - HP
       - m_hp
@@ -246,6 +247,50 @@ formulas:
     output_range: [1, 100000]
     expression: "ScaledB = clamp((B * m_dmg + 500) / 1000, 1, 100000); m_dmg in 500..5000 permille (1000 = identity)"
     notes: "Integer, round half up; the floor of 1 keeps a hit from becoming a no-op. The intent tab shows the resolved damage of effect_damage_formula with ScaledB as base (damage before shield), as r or r x hits."
+    added: 2026-11-13
+    revised: ""
+
+  - name: encounter_hp_multiplier
+    status: active
+    source: design/gdd/encounter-generation.md
+    referenced_by:
+      - design/gdd/encounter-generation.md
+      - design/gdd/enemy-and-intent.md
+    variables:
+      - r
+      - kick_hp
+    output_range: [1000, 1620]
+    expression: "m_hp = 1000 + 60 * (r - 1) + kick_hp(tier); r in 1..8; kick_hp White 0, Green 0, Blue 100, Purple 200 (provisional); the boss uses 1000"
+    notes: "Permille, passed to System 14 as hpPermille (enemy_scaled_hp). Speed, hit count, status amounts and monster count are never scaled."
+    added: 2026-11-13
+    revised: ""
+
+  - name: encounter_damage_multiplier
+    status: active
+    source: design/gdd/encounter-generation.md
+    referenced_by:
+      - design/gdd/encounter-generation.md
+      - design/gdd/enemy-and-intent.md
+    variables:
+      - r
+      - kick_dmg
+    output_range: [1000, 1380]
+    expression: "m_dmg = 1000 + 40 * (r - 1) + kick_dmg(tier); r in 1..8; kick_dmg White 0, Green 0, Blue 50, Purple 100 (provisional); the boss uses 1000"
+    notes: "Permille, passed to System 14 as damagePermille (enemy_scaled_damage)."
+    added: 2026-11-13
+    revised: ""
+
+  - name: encounter_danger_rating
+    status: active
+    source: design/gdd/encounter-generation.md
+    referenced_by:
+      - design/gdd/encounter-generation.md
+    variables:
+      - T
+      - theta
+    output_range: [1, 5]
+    expression: "danger = 1 + count(k : T >= theta_k), theta = [20, 40, 70, 110] (provisional); T = sum over enemies of ceil(ScaledHP * N_D * v / (1000 * W_m)) with party size 3"
+    notes: "Shown on the door card from total threat, never from the tier label. Computed at catalog build in 64-bit and stored with each (template, room)."
     added: 2026-11-13
     revised: ""
 
@@ -538,8 +583,40 @@ constants:
     referenced_by:
       - design/gdd/enemy-and-intent.md
       - design/gdd/turn-order.md
+      - design/gdd/encounter-generation.md
     value: 6
     unit: enemies per encounter (two lines of three, art bible 7.4a; System 16 may cap lower)
+    added: 2026-11-13
+    revised: ""
+
+  - name: encounter_floor_rooms
+    status: active
+    source: design/gdd/encounter-generation.md
+    referenced_by:
+      - design/gdd/encounter-generation.md
+    value: 8
+    unit: combat rooms before the boss room (MVP floor; doors follow rooms 1 to 7; provisional)
+    added: 2026-11-13
+    revised: ""
+
+  - name: encounter_cell_variants_max
+    status: active
+    source: design/gdd/encounter-generation.md
+    referenced_by:
+      - design/gdd/encounter-generation.md
+    value: 2
+    unit: templates per (room, tier) cell (authored variants; each weight at least 1)
+    added: 2026-11-13
+    revised: ""
+
+  - name: encounter_draws_per_run
+    status: active
+    source: design/gdd/encounter-generation.md
+    referenced_by:
+      - design/gdd/encounter-generation.md
+      - design/gdd/seeded-rng.md
+    value: 22
+    unit: draw calls on doors per run (1 for room 1 plus 3 cards for each of 7 door rows; calls, not RNG words)
     added: 2026-11-13
     revised: ""
 

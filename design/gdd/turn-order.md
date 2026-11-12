@@ -160,7 +160,7 @@ The order is Goblin, Warrior, Support, Tanker, Goblin. After 134 time steps the 
 | 14 Enemy and Intent | Upstream | Hard | Encounter slot (the spawn ordinal equals the slot), monster base speed. No reinforcements in the MVP. System 14 is Designed ([enemy-and-intent.md](enemy-and-intent.md), pending review). | Present (System 14, Dependencies). |
 | 15 Party and Heroes | Upstream | Hard | Party slot (the order of picking), base speed, passive speed bonuses. System 15 is Designed ([party-and-heroes.md](party-and-heroes.md), pending review). | Present (System 15, Dependencies). |
 | 13 Status Effects | Upstream | Soft (provisional) | Later: speed modifiers `F` and `P` with sources and durations counted in the affected unit's own actions. | Updated. |
-| 16 Encounter Generation | Downstream | Soft | Enforces the content lint (Rule 13). | Not designed. |
+| 16 Encounter Generation | Downstream | Soft | Enforces the content lint (Rule 13) for every three-hero subset of the hero pool. | Designed ([encounter-generation.md](encounter-generation.md)). |
 | 12 Combat Resolution | Downstream (caller) | Hard | Calls `Next`, commits the result, owns the 200-action limit and the outcome checks. | Updated. |
 | 9 Item Trigger and Cooldown | Downstream | Hard | `GlobalIndex` and `Schedule` for the party-wide firing rank. | Present (System 9, Dependencies). |
 | 25 Backpack UI | Downstream | Soft | Forecast, schedule and global index for the arrangement screen. | Not designed. |

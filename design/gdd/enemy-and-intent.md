@@ -171,8 +171,8 @@ The number shown is the resolved damage **before** the hero's shield and HP; it 
 | 36 Combat State and Step Model | Peer | Hard | Stores the bound sequences, `e` and `n`; the action transaction. | Updated. |
 | 15 Party and Heroes | Upstream | Hard | Hero instance IDs and party-slot order for targets. | Present (System 15 lists System 14 as a data consumer); updated. |
 | 12 Combat Resolution | Downstream (caller) | Hard | Calls `GetBoundAction`, commits the action, owns the loop and the stun check. | Updated. |
-| 5 Run State and Flow | Downstream (caller) | Hard | At room entry the run flow asks System 16 for the encounter, then binds it with System 14, and stores the preparation record with the RNG state. | Not designed. |
-| 16 Encounter Generation | Downstream (caller) | Hard | Calls the binding with the roster and the multipliers `hpPermille` and `damagePermille`; reads the monster data and the advisory threat. System 14 does not depend on System 16, which would create a cycle. | Not designed. |
+| 5 Run State and Flow | Downstream (caller) | Hard | At room entry the run flow reads the encounter spec it stored when the door was generated (System 16 never redraws it), passes the roster and multipliers to the binding of System 14, and stores the preparation record with the RNG state. | Not designed. |
+| 16 Encounter Generation | Downstream (producer of inputs) | Hard | Produces the roster and the multipliers `hpPermille` and `damagePermille` at door generation, and uses the monster data and the threat of Formula 7 (with scaled values, party size 3) for danger and validation. System 5 hands them to System 14; System 14 does not depend on System 16, which would create a cycle. | Designed ([encounter-generation.md](encounter-generation.md)). |
 | 13 Status Effects | Peer | Soft | The stun status: a stunned enemy keeps its bound entry. | Updated. |
 | 11 Turn Order | Peer | Hard | Encounter slot, base speed `5..60`, the forecast of upcoming enemy actions. There are no reinforcements in the MVP. | Updated. |
 | 4 Event Log | Downstream | Soft | `IntentsBound`; the `EnemyMove` origin with the move ID and the occurrence. | Recorded in System 4's Open Questions. |
@@ -191,7 +191,7 @@ The number shown is the resolved damage **before** the hero's shield and HP; it 
 | Order-strip horizon `K` | 6 (System 11) | 1 to 20 | How many upcoming glyphs the strip shows. | The forecast is long but less reliable. | The player cannot see far enough. |
 | Move weight | per move, `0..100` | 0 to 100 | How often a move is chosen. | One move dominates. | The move never appears. |
 | Hits per move `n` | per move, `0..8` | 0 to 8 | The size and the spread of one action. | A single action nearly decides a fight. | Multi-hit is not worth reading. |
-| Monster stats (provisional, design time) | regular HP `50..80`, speed `16..24`, `B 6..10`; elite `130..180`, `18..24`, `10..14`; boss `300..420`, `20..26`, `12..18` | owned by System 35's measurements | How hard a fight is (Formula 8). | Fights end the run too early. | Fights are trivial. |
+| Monster stats (provisional, design time) | regular HP `40..100`, speed `16..26`, `B 5..14` (widened for System 16's Swarmer, Brute and the room 1 and 2 speed band 18..26); elite `130..180`, `18..24`, `10..14` (plain heavy up to 20); boss `300..420`, `20..26`, `12..18` | owned by System 35's measurements | How hard a fight is (Formula 8). | Fights end the run too early. | Fights are trivial. |
 | `m_hp`, `m_dmg` | 1000 (identity); `500..10,000` and `500..5000` | set by System 16 | Difficulty of an encounter. | Fights are unwinnable. | Fights are trivial. |
 | Enemies per encounter | at most 6 (System 16 may cap lower) | 1 to 6 | Number of simultaneous threats. | The screen is crowded. | Little to read. |
 

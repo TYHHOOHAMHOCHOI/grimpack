@@ -246,4 +246,5 @@ All arithmetic is on 32-bit integers. Nothing here uses floating point, RNG or t
 | Content: the four heroes' innate items, signature items, starting sets and unlock sequences are still to be authored; the effects System 3 allows (damage, apply status, detonate) bound what an innate item can do. | game-designer, systems-designer | Content pass before the first catalog fixture. |
 | Balance: with full restoration, HP is not a resource across fights; confirm that resource pressure comes from items, doors and the grid. | systems-designer, System 35 | First balance simulation. |
 | Pick order decides ties (a small lever) and the target order of area effects; confirm that this is acceptable. | systems-designer | First playtests. |
+| System 16's validator reads the hero pool (base HP for the burst bound, speeds for the lint over every three-hero subset); a change to the roster or to a hero's base HP or speed must re-run it. | Systems 15 and 16 | Hero roster change. |
 | Tier 2: recruiting adds a hero in the next slot; more than three heroes needs an art-bible change. | Producer, art-director | Tier 2 planning. |

@@ -294,6 +294,77 @@ formulas:
     added: 2026-11-13
     revised: ""
 
+  - name: commitment_score
+    status: active
+    source: design/gdd/commitment-and-drop-model.md
+    referenced_by:
+      - design/gdd/commitment-and-drop-model.md
+    variables:
+      - n_g
+      - k_g
+    output_range: [0, 588000]
+    expression: "S_g = 1000 * n_g + 500 * k_g; committed to the leader g1 iff n_g1 >= 3 and S_g1 - S_g2 >= 2000 (a tie is uncommitted)"
+    notes: "n_g counts placed non-innate items carrying direction g in the hero grids; k_g counts distinct System 10 links touching g. Read from the frozen arrangement of the fight just won, before Thaw."
+    added: 2026-11-13
+    revised: ""
+
+  - name: drop_bias_permille
+    status: active
+    source: design/gdd/commitment-and-drop-model.md
+    referenced_by:
+      - design/gdd/commitment-and-drop-model.md
+    variables:
+      - n_g1
+      - room
+    output_range: [0, 1500]
+    expression: "B = min(BiasCap, Btable[min(n_g1, 6)]), Btable = [0, 0, 0, 250, 500, 750, 1000]; B = 0 before room 3 or when uncommitted; F = 1000 + B for items carrying the committed direction"
+    notes: "Never changes the item-tier odds, which the door tier sets. System 17 reads the same function and adds no second multiplier."
+    added: 2026-11-13
+    revised: ""
+
+  - name: drop_candidate_weight
+    status: active
+    source: design/gdd/commitment-and-drop-model.md
+    referenced_by:
+      - design/gdd/commitment-and-drop-model.md
+    variables:
+      - base
+      - F
+      - cf
+    output_range: [500, 250000]
+    expression: "w = base * F * cf / 1000; base 1..100, F 1000..2500, cf 1000 (first copy) or 500 (second copy); exact because F is a multiple of 250 and cf of 500"
+    notes: "Used in the item stage of each slot after the item tier is drawn from the door-tier row."
+    added: 2026-11-13
+    revised: ""
+
+  - name: door_tier_weights
+    status: active
+    source: design/gdd/door-generation-and-tiers.md
+    referenced_by:
+      - design/gdd/door-generation-and-tiers.md
+    variables:
+      - r
+      - tier_1
+      - tier_2
+    output_range: [0, 1000]
+    expression: "row[r] = permille weights [White, Green, Blue, Purple] summing to 1000 and zero below MinRoomForTier; card 3 uses row[r] with the weight of tier_1 zeroed if r >= MinDistinctRoom and tier_1 == tier_2, and Blue and Purple zeroed if r >= SafeCardRoom and both are Blue or Purple"
+    notes: "Rows (provisional): r2 600/400/0/0; r3 500/350/150/0; r4 400/350/250/0; r5 300/300/250/150; r6 250/300/250/200; r7 200/300/300/200; r8 150/300/300/250. Zeros kept, never compacted; a single positive weight is a bound-1 call."
+    added: 2026-11-13
+    revised: ""
+
+  - name: door_buff
+    status: active
+    source: design/gdd/door-generation-and-tiers.md
+    referenced_by:
+      - design/gdd/door-generation-and-tiers.md
+    variables:
+      - tier
+    output_range: [0, 12]
+    expression: "Buff(tier) = (hp, cells): White (4, 0), Green (8, 0), Blue (12, 0), Purple (12, 1); hpGranted = min(hp, DoorHpCap - doorHp_h), cellsGranted = min(cells, DoorCellCap - doorCells, lockedCells_h)"
+    notes: "Certain, no roll; granted on winning the room behind the door to one hero chosen at claim time; raises B_perm (System 15) and opens a cell (System 8, Unlock)."
+    added: 2026-11-13
+    revised: ""
+
 # Example:
 #
 # formulas:
@@ -617,6 +688,110 @@ constants:
       - design/gdd/seeded-rng.md
     value: 22
     unit: draw calls on doors per run (1 for room 1 plus 3 cards for each of 7 door rows; calls, not RNG words)
+    added: 2026-11-13
+    revised: ""
+
+  - name: drop_offer_size
+    status: active
+    source: design/gdd/commitment-and-drop-model.md
+    referenced_by:
+      - design/gdd/commitment-and-drop-model.md
+    value: 3
+    unit: item cards per reward offer (two lean toward the committed direction, one is off-direction; safe range 3 to 4)
+    added: 2026-11-13
+    revised: ""
+
+  - name: commitment_min_items
+    status: active
+    source: design/gdd/commitment-and-drop-model.md
+    referenced_by:
+      - design/gdd/commitment-and-drop-model.md
+    value: 3
+    unit: placed items in the leading direction needed to be committed (provisional; safe range 2 to 4)
+    added: 2026-11-13
+    revised: ""
+
+  - name: commitment_lead_margin
+    status: active
+    source: design/gdd/commitment-and-drop-model.md
+    referenced_by:
+      - design/gdd/commitment-and-drop-model.md
+    value: 2000
+    unit: score points of lead over the runner-up direction (1000 per item, 500 per link; provisional)
+    added: 2026-11-13
+    revised: ""
+
+  - name: drop_bias_cap
+    status: active
+    source: design/gdd/commitment-and-drop-model.md
+    referenced_by:
+      - design/gdd/commitment-and-drop-model.md
+    value: 1000
+    unit: permille added to the weight of an item in the committed direction (1000 = twice the weight; validator ceiling 1500; a multiple of 250)
+    added: 2026-11-13
+    revised: ""
+
+  - name: door_row_card_count
+    status: active
+    source: design/gdd/door-generation-and-tiers.md
+    referenced_by:
+      - design/gdd/door-generation-and-tiers.md
+      - design/gdd/encounter-generation.md
+    value: 3
+    unit: door cards per row (one tier draw and one variant draw each)
+    added: 2026-11-13
+    revised: ""
+
+  - name: door_min_distinct_room
+    status: active
+    source: design/gdd/door-generation-and-tiers.md
+    referenced_by:
+      - design/gdd/door-generation-and-tiers.md
+    value: 3
+    unit: first target room whose third card cannot repeat the tier of cards 1 and 2 (safe range 2 to 4)
+    added: 2026-11-13
+    revised: ""
+
+  - name: door_safe_card_room
+    status: active
+    source: design/gdd/door-generation-and-tiers.md
+    referenced_by:
+      - design/gdd/door-generation-and-tiers.md
+    value: 4
+    unit: first target room from which a row always holds a White or Green card (safe range 3 to 6)
+    added: 2026-11-13
+    revised: ""
+
+  - name: door_hp_cap
+    status: active
+    source: design/gdd/door-generation-and-tiers.md
+    referenced_by:
+      - design/gdd/door-generation-and-tiers.md
+      - design/gdd/party-and-heroes.md
+    value: 100
+    unit: max HP granted to one hero by door buffs per run (the best legal total is 80, so it never binds by default)
+    added: 2026-11-13
+    revised: ""
+
+  - name: door_cell_cap
+    status: active
+    source: design/gdd/door-generation-and-tiers.md
+    referenced_by:
+      - design/gdd/door-generation-and-tiers.md
+    value: 3
+    unit: backpack cells opened by door buffs per run
+    added: 2026-11-13
+    revised: ""
+
+  - name: doors_calls_per_run
+    status: active
+    source: design/gdd/door-generation-and-tiers.md
+    referenced_by:
+      - design/gdd/door-generation-and-tiers.md
+      - design/gdd/encounter-generation.md
+      - design/gdd/seeded-rng.md
+    value: 43
+    unit: draw calls on doors per run (1 for room 1, then 7 rows of 3 tier draws and 3 variant draws; 21 are System 17's and 22 System 16's)
     added: 2026-11-13
     revised: ""
 

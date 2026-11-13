@@ -85,7 +85,7 @@ turn order creates a setup phase and a payoff phase, so *sequence is part of the
 2. **Speed-gauge turn order with three heroes.** Heroes and monsters fill speed gauges and act in order. Turn order is the time axis of the build.
 3. **Enemy intent.** Monsters show their next action. Intent and turn order must be visible *before* combat, while the player can still rearrange.
 4. **Door progression.** After each room the player picks 1 of 3 door cards across 6 colour tiers (White, Green, Blue, Purple, Gold, Red). Higher tier: bigger buff, harder room. Gold and Red carry a curse or trade-off.
-5. **Commitment-biased, capped drop model.** Once the player has committed to a build direction, drops and door buffs lean toward it, with a hard cap on how much.
+5. **Commitment-biased, capped drop model.** Once the player has committed to a build direction, drops and the item offer of every door lean toward it (door buffs are neutral, certain rewards), with a hard cap on how much.
 
 ---
 
@@ -151,8 +151,8 @@ and replay, and higher difficulty levels, are Tier 3.)*
 ## Game Pillars
 
 ### Pillar 1: Luck Follows Commitment
-Once the player has visibly committed to a build direction, drops and door buffs lean
-toward it. The player can still pivot, but pivoting costs something. This pillar owns
+Once the player has visibly committed to a build direction, drops and the item offer
+of every door lean toward it (door buffs are neutral, certain rewards). The player can still pivot, but pivoting costs something. This pillar owns
 the *direction* luck leans, not how much power the player gets.
 
 *Design test*: Debating random drops vs build-weighted drops, we choose build-weighted.

@@ -283,3 +283,4 @@ Logic tests live under `Assets/_Project/Tests/EditMode/AdjacencyAndSynergy/`, in
 | Does System 18 read the synergy view as a signal of commitment? | System 18 | When System 18 is designed. |
 | Is 0.2 ms for `Evaluate` and `PreviewPlacement` realistic on the target machine? | Technical director | Combat spike. |
 | Tier 2: a 7×7 grid raises the buffer to 504, and synergy between neighbouring heroes in party order is deferred; revisit both together. | Systems designer | Tier 2 design. |
+| System 18 reads the `Evaluate` views of the frozen arrangement to count links `k_g` by `(source, rule, target)`; confirm the views expose the item tags and rule indices it needs. | Systems 10 and 18 | Before System 10 is re-reviewed. |

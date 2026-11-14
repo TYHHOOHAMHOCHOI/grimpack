@@ -1,0 +1,9 @@
+file,category,canvas,palette,status,source,tool,model,seed,date,prompt
+Assets/_Project/Art/Environment/env_title_bg_640x360.png,env,640x360,pal_master_v01 subset (INK-0..4 CANDLE CANDLE-D),gen,art-source/ai-raw/env_title_bg_640x360_raw.png + tools/art/quantise.py,Pixellab MCP,pixen,2202,2026-11-15,"pixel art dungeon threshold at night, vast cold dark ink-blue stone hall, empty and hushed, a tall stone archway doorway in the back wall fading into darkness, a single small warm candle lantern sitting on the stone floor at lower left casting a small warm light pool on the flagstones, everything else dark navy and slate blue, no characters, no text, very low contrast, large empty dark space at the top for a title (detail: low; outline: lineless; view: side)"
+Assets/_Project/Art/UI/ui_panel_default_9s.png,ui,16x16,pal_master_v01,gen,tools/art/build_menu_kit.py,code-drawn,n/a,n/a,2026-11-15,generator rule
+Assets/_Project/Art/UI/ui_btn_default_120x28.png,ui,120x28,pal_master_v01,gen,tools/art/build_menu_kit.py,code-drawn,n/a,n/a,2026-11-15,generator rule
+Assets/_Project/Art/UI/ui_btn_hover_120x28.png,ui,120x28,pal_master_v01,gen,tools/art/build_menu_kit.py,code-drawn,n/a,n/a,2026-11-15,generator rule
+Assets/_Project/Art/UI/ui_btn_pressed_120x28.png,ui,120x28,pal_master_v01,gen,tools/art/build_menu_kit.py,code-drawn,n/a,n/a,2026-11-15,generator rule
+Assets/_Project/Art/UI/ui_btn_disabled_120x28.png,ui,120x28,pal_master_v01,gen,tools/art/build_menu_kit.py,code-drawn,n/a,n/a,2026-11-15,generator rule
+Assets/_Project/Art/UI/ui_btn_focus_120x28.png,ui,120x28,pal_master_v01,gen,tools/art/build_menu_kit.py,code-drawn,n/a,n/a,2026-11-15,generator rule
+Assets/_Project/Art/UI/ui_cursor_default_13x13.png,ui,13x13,pal_master_v01,gen,tools/art/build_menu_kit.py,code-drawn,n/a,n/a,2026-11-15,generator rule

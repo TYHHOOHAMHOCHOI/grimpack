@@ -37,7 +37,8 @@ namespace Project05.Editor
         // in code yet. Replace these with keyed lookups when it does.
         private const string LabelHero = "Alchemist";
         private const string LabelStash = "Kho đồ";
-        private const string LabelForecast = "nếu không có gì đổi";
+        private const string LabelForecast = "Lượt tới (dự kiến):";
+        private const string LabelEsc = "Esc";
         private const string LabelSkip = "Bỏ qua";
         private const string LabelSkipArmed = "Đang bỏ qua";
         private const string LabelStart = "Bắt đầu trận";
@@ -49,8 +50,14 @@ namespace Project05.Editor
         private const string LabelSellOver = "Thả để bán";
         private const string LabelSellLocked = "Chỉ bán khi xếp đồ";
 
-        // The sell zone under the stash, in safe-frame px (x right, y down).
-        private static readonly Rect SellRect = new Rect(15, 236, 144, 92);
+        // The sell drawer on the right edge of the stage: the stage clip, the drawer panel inside it (open and closed x are
+        // relative to the clip), and the sell zone inside the panel. Native px, x right, y down.
+        private static readonly Rect StageClip = new Rect(177, 19, 460, 314);
+        private const float DrawerWidth = 168f;
+        private const float DrawerHeight = 160f;
+        private const float DrawerTop = 4f;
+        private const float TabWidth = 14f;
+        private static readonly Rect SellRect = new Rect(12, 40, 144, 92);   // inside the drawer panel
 
         private static TMP_FontAsset _font;
         private static HudSpriteSet _set;
@@ -283,35 +290,36 @@ namespace Project05.Editor
             Num("NameJoin", wb, 8, "num", 12, 24, "2", TopLeft);
             Img("NameChevron", wb, S("UI/ui_chevron-turn_hero_7x4.png"), 24, 26, TopLeft);
             Label("NameLabel", wb, LabelHero, 34, 22, 120, Bone);
-            Fill("GridBed", wb, "ink-2", 7, 40, 80, 80, TopLeft);
-            for (int i = 1; i < 4; i++)
-            {
-                Fill("GridV", wb, "ink-1", 7 + 20 * i, 40, 1, 80, TopLeft);
-                Fill("GridH", wb, "ink-1", 7, 40 + 20 * i, 80, 1, TopLeft);
-            }
+            // Beds are tiled cells, so the hero grid can grow from 4 x 4 to 7 x 7 by a size change; the 8 x 8 stash follows it.
+            Image gridBed = Img("GridBed", wb, S("UI/ui_cell-bed_default_20x20.png"), 0, 0, TopLeft, 20, 20);
+            gridBed.type = Image.Type.Tiled;
+            Image line = Fill("SectionLine", wb, "ink-3", 0, 0, 160, 1, TopLeft);
+            TextMeshProUGUI stashLabel = Label("StashLabel", wb, LabelStash, 0, 0, 100, Bone);
+            Image stashBed = Img("StashBed", wb, S("UI/ui_cell-bed_default_20x20.png"), 0, 0, TopLeft, 20, 20);
+            stashBed.type = Image.Type.Tiled;
 
-            Fill("SectionLine", wb, "ink-3", 7, 128, 160, 1, TopLeft);
-            Label("StashLabel", wb, LabelStash, 7, 134, 100, Bone);
-            Fill("StashBed", wb, "ink-2", 7, 152, 160, 40, TopLeft);
-            for (int i = 1; i < 8; i++) Fill("StashV", wb, "ink-1", 7 + 20 * i, 152, 1, 40, TopLeft);
-            Fill("StashH", wb, "ink-1", 7, 172, 160, 1, TopLeft);
-            SellZoneView sell = BuildSellZone(wb);   // before the plates, so a held plate draws above the zone
+            var view = wb.gameObject.AddComponent<WorkbenchView>();
+            var viewSo = new SerializedObject(view);
+            viewSo.FindProperty("gridBed").objectReferenceValue = gridBed.rectTransform;
+            viewSo.FindProperty("sectionLine").objectReferenceValue = line.rectTransform;
+            viewSo.FindProperty("stashLabel").objectReferenceValue = stashLabel.rectTransform;
+            viewSo.FindProperty("stashBed").objectReferenceValue = stashBed.rectTransform;
+            viewSo.ApplyModifiedPropertiesWithoutUndo();
+            view.Layout(WorkbenchLayout.StartGrid);
+
             PlaceAllItems(wb, popup);
-
             var board = Object.FindAnyObjectByType<ItemBoardController>();
             var so = new SerializedObject(board);
-            so.FindProperty("sellZone").objectReferenceValue = sell;
-            so.FindProperty("sellRect").rectValue = SellRect;
+            so.FindProperty("workbench").objectReferenceValue = view;
             so.ApplyModifiedPropertiesWithoutUndo();
         }
 
         /// <summary>The sell zone: a scale, a framed drop area with a dotted floor, a hint, and the held item's price.</summary>
-        private static SellZoneView BuildSellZone(RectTransform wb)
+        private static SellZoneView BuildSellZone(RectTransform panel, out RectTransform area)
         {
-            RectTransform root = Rect("SellZone", wb, TopLeft, TopLeft);
+            RectTransform root = Rect("SellZone", panel, TopLeft, TopLeft);
             root.anchoredPosition = Vector2.zero;
-            Fill("SectionLine", root, "ink-3", 7, 200, 160, 1, TopLeft);
-            Image scale = Img("Scale", root, S("UI/ui_sell-scale_default_48x28.png"), 63, 206, TopLeft);
+            Image scale = Img("Scale", root, S("UI/ui_sell-scale_default_48x28.png"), (DrawerWidth - 48) / 2, 8, TopLeft);
             Image frame = Img("Frame", root, S("UI/ui_sell-frame_default_9s.png"), SellRect.x, SellRect.y, TopLeft, SellRect.width, SellRect.height, true);
             Image floor = Img("Floor", root, S("UI/ui_sell-tile_default_20x20.png"), SellRect.x + 2, SellRect.y + 2, TopLeft, SellRect.width - 4, SellRect.height - 4);
             floor.type = Image.Type.Tiled;
@@ -320,8 +328,8 @@ namespace Project05.Editor
 
             RectTransform priceRow = Rect("Price", root, TopLeft, TopLeft);
             priceRow.anchoredPosition = Vector2.zero;
-            Img("Coin", priceRow, S("UI/ui_glyph-coin_default_12x12.png"), 72, 334, TopLeft);
-            SpriteNumeralText price = Num("Amount", priceRow, 12, "num", 88, 334, "0", TopLeft);
+            Img("Coin", priceRow, S("UI/ui_glyph-coin_default_12x12.png"), 69, SellRect.yMax + 6, TopLeft);
+            SpriteNumeralText price = Num("Amount", priceRow, 12, "num", 85, SellRect.yMax + 6, "0", TopLeft);
             priceRow.gameObject.SetActive(false);
 
             var view = root.gameObject.AddComponent<SellZoneView>();
@@ -341,11 +349,72 @@ namespace Project05.Editor
             so.FindProperty("overText").stringValue = LabelSellOver;
             so.FindProperty("lockedText").stringValue = LabelSellLocked;
             so.ApplyModifiedPropertiesWithoutUndo();
+            area = frame.rectTransform;
             return view;
         }
 
-        // The arrangement shown in the workbench: the items of hero 2 grid (4 x 4, origin at 7, 40) and the stash
-        // (8 x 2, origin at 7, 152). Chosen so that every synergy rule has a visible neighbour.
+        /// <summary>
+        /// The sell drawer: a clip over the stage, a panel that springs out from the right edge, the pull tab with its arrow at
+        /// the top of the edge, and the sell zone inside. Wires the board to it. Returns the clip's group, which pauses with the screen.
+        /// </summary>
+        private static CanvasGroup BuildSellDrawer(RectTransform safe)
+        {
+            RectTransform clip = ModalKit.Rect("StageClip", safe, StageClip.x, StageClip.y, StageClip.width, StageClip.height);
+            clip.gameObject.AddComponent<RectMask2D>();
+            CanvasGroup group = clip.gameObject.AddComponent<CanvasGroup>();
+
+            float openX = StageClip.width - DrawerWidth;
+            float closedX = StageClip.width;
+            RectTransform panel = ModalKit.Rect("SellDrawer", clip, closedX, DrawerTop, DrawerWidth, DrawerHeight);
+            Image body = panel.gameObject.AddComponent<Image>();
+            body.sprite = S("UI/ui_panel_default_9s.png");
+            body.type = Image.Type.Sliced;
+            body.raycastTarget = true;
+            SellZoneView zone = BuildSellZone(panel, out RectTransform area);
+
+            RectTransform tabRt = ModalKit.Rect("Tab", panel, -TabWidth, 6, TabWidth, 28);
+            Image tabImage = tabRt.gameObject.AddComponent<Image>();
+            tabImage.sprite = S("UI/ui_drawer-tab_default_14x28.png");
+            var tab = tabRt.gameObject.AddComponent<Button>();
+            tab.targetGraphic = tabImage;
+            tab.transition = Selectable.Transition.SpriteSwap;
+            tab.spriteState = new SpriteState
+            {
+                highlightedSprite = S("UI/ui_drawer-tab_hover_14x28.png"),
+                pressedSprite = S("UI/ui_drawer-tab_pressed_14x28.png"),
+                selectedSprite = S("UI/ui_drawer-tab_focus_14x28.png"),
+            };
+            Image arrow = Img("Arrow", tabRt, S("UI/ui_glyph-arrow-left_bone_5x7.png"), 5, 10, TopLeft);
+
+            var drawer = panel.gameObject.AddComponent<SellDrawerView>();
+            var so = new SerializedObject(drawer);
+            so.FindProperty("panel").objectReferenceValue = panel;
+            so.FindProperty("tab").objectReferenceValue = tab;
+            so.FindProperty("arrow").objectReferenceValue = arrow;
+            so.FindProperty("arrowOpen").objectReferenceValue = S("UI/ui_glyph-arrow-left_bone_5x7.png");
+            so.FindProperty("arrowClose").objectReferenceValue = S("UI/ui_glyph-arrow-right_bone_5x7.png");
+            so.FindProperty("openX").floatValue = openX;
+            so.FindProperty("closedX").floatValue = closedX;
+            so.ApplyModifiedPropertiesWithoutUndo();
+
+            // A held plate moves to this layer, so it draws above the stage and the drawer while it is carried.
+            RectTransform dragLayer = Rect("DragLayer", safe, TopLeft, TopLeft);
+            dragLayer.anchoredPosition = Vector2.zero;
+
+            var board = Object.FindAnyObjectByType<ItemBoardController>();
+            var boardSo = new SerializedObject(board);
+            boardSo.FindProperty("sellZone").objectReferenceValue = zone;
+            boardSo.FindProperty("sellArea").objectReferenceValue = area;
+            boardSo.FindProperty("drawer").objectReferenceValue = drawer;
+            boardSo.FindProperty("dragLayer").objectReferenceValue = dragLayer;
+            boardSo.ApplyModifiedPropertiesWithoutUndo();
+            return group;
+        }
+
+        private static readonly WorkbenchRects Start = WorkbenchLayout.For(WorkbenchLayout.StartGrid);
+
+        // The arrangement shown in the workbench: the items of hero 2 grid (4 x 4 at the start of a run) and the 8 x 8 stash.
+        // Chosen so that every synergy rule has a visible neighbour.
         private static readonly (string id, int x, int y)[] GridLayout =
         {
             ("item_iron_sword", 0, 0), ("item_whetstone", 1, 0), ("item_dagger", 1, 1), ("item_war_drum", 2, 0),
@@ -378,7 +447,7 @@ namespace Project05.Editor
             var targets = new List<ItemHoverTarget>();
             foreach ((string container, (string id, int x, int y)[] layout, float ox, float oy) in new[]
             {
-                ("grid", GridLayout, 7f, 40f), ("stash", StashLayout, 7f, 152f),
+                ("grid", GridLayout, Start.GridOrigin.x, Start.GridOrigin.y), ("stash", StashLayout, Start.StashOrigin.x, Start.StashOrigin.y),
             })
             {
                 foreach ((string id, int x, int y) in layout)
@@ -410,8 +479,8 @@ namespace Project05.Editor
             so.FindProperty("ghostCross").objectReferenceValue = S("UI/ui_ghost_cross_20x20.png");
             SerializedProperty views = so.FindProperty("containers");
             views.arraySize = 2;
-            SetContainer(views.GetArrayElementAtIndex(0), "grid", 7, 40, 4, 4, true);
-            SetContainer(views.GetArrayElementAtIndex(1), "stash", 7, 152, 8, 2, false);
+            SetContainer(views.GetArrayElementAtIndex(0), "grid", Start.GridOrigin.x, Start.GridOrigin.y, WorkbenchLayout.StartGrid, WorkbenchLayout.StartGrid, true);
+            SetContainer(views.GetArrayElementAtIndex(1), "stash", Start.StashOrigin.x, Start.StashOrigin.y, WorkbenchLayout.Stash, WorkbenchLayout.Stash, false);
             so.ApplyModifiedPropertiesWithoutUndo();
         }
 
@@ -494,8 +563,11 @@ namespace Project05.Editor
             SpriteNumeralText currency = Num("Currency", hudRt, 8, "num", 18, 4, "120", TopLeft);
             SpriteNumeralText room = Num("Room", hudRt, 8, "num-fog", 52, 4, "3/8", TopLeft);
             Button menuButton = BuildMenuButton(hudRt);
-            Label("ForecastLabel", hudRt, LabelForecast, 276, 2, 150, Fog);
-            OrderStripView orderView = BuildOrderStrip(hudRt);
+            Image esc = Img("EscChip", hudRt, S("UI/ui_chip_base_9s.png"), 596, 2, TopLeft, 22, 12, true);
+            Label("EscLabel", esc.transform, LabelEsc, 0, 0, 22, Fog, TextAlignmentOptions.Top);
+            TextMeshProUGUI forecast = Label("ForecastLabel", hudRt, LabelForecast, 181, 2, 150, Fog);
+            forecast.ForceMeshUpdate();
+            OrderStripView orderView = BuildOrderStrip(hudRt, 181 + Mathf.Ceil(forecast.preferredWidth) + 5);
 
             HeroSlotView[] heroes = new HeroSlotView[3];
             for (int k = 0; k < 3; k++) heroes[k] = BuildHeroSlot(hudRt, k);
@@ -539,7 +611,7 @@ namespace Project05.Editor
             return new HudParts { View = view, Strip = strip, MenuButton = menuButton, HudGroup = hudGo.AddComponent<CanvasGroup>() };
         }
 
-        /// <summary>The menu button in the top strip: a 16 px chip with the three-bar glyph on it.</summary>
+        /// <summary>The menu button in the top strip: a 16 px chip with a cog on it; the Esc chip to its left names its key.</summary>
         private static Button BuildMenuButton(Transform parent)
         {
             RectTransform rt = ModalKit.Rect("MenuButton", parent, 620, 0, 16, 16);
@@ -556,7 +628,7 @@ namespace Project05.Editor
                 selectedSprite = ModalKit.Sprite("ui_chipbtn_focus_9s.png"),
                 disabledSprite = ModalKit.Sprite("ui_chipbtn_disabled_9s.png"),
             };
-            Img("Glyph", rt, S("UI/ui_glyph-menu_bone_8x8.png"), 4, 4, TopLeft);
+            Img("Glyph", rt, S("UI/ui_glyph-cog_bone_8x8.png"), 4, 4, TopLeft);
             return button;
         }
 
@@ -592,6 +664,7 @@ namespace Project05.Editor
             // Modals sit in the middle of the screen (user decision 2026-11-16), so the whole frame is dimmed behind them.
             const float CentreX = IntegerCanvasScale.NativeWidth / 2f;
             const float CentreY = IntegerCanvasScale.NativeHeight / 2f;
+            CanvasGroup drawerGroup = BuildSellDrawer(safe);
             GameObject dim = ModalKit.DimMask(safe, 0, 0, IntegerCanvasScale.NativeWidth, IntegerCanvasScale.NativeHeight);
             PauseMenuView pause = ModalKit.Pause(safe, _font, CentreX, CentreY);
             ConfirmDialogView confirm = ModalKit.Confirm(safe, _font, CentreX, CentreY);
@@ -614,7 +687,7 @@ namespace Project05.Editor
             so.FindProperty("confirm").objectReferenceValue = confirm;
             so.FindProperty("settings").objectReferenceValue = settings;
             so.FindProperty("stageDim").objectReferenceValue = dim;
-            Assign(so.FindProperty("screenGroups"), new[] { hud.HudGroup, workbenchGroup });
+            Assign(so.FindProperty("screenGroups"), new[] { hud.HudGroup, workbenchGroup, drawerGroup });
             so.ApplyModifiedPropertiesWithoutUndo();
         }
 
@@ -624,7 +697,7 @@ namespace Project05.Editor
             for (int i = 0; i < items.Length; i++) array.GetArrayElementAtIndex(i).objectReferenceValue = items[i];
         }
 
-        private static OrderStripView BuildOrderStrip(Transform parent)
+        private static OrderStripView BuildOrderStrip(Transform parent, float startX)
         {
             RectTransform strip = Rect("OrderStrip", parent, TopLeft, TopLeft);
             strip.anchoredPosition = Vector2.zero;
@@ -638,13 +711,16 @@ namespace Project05.Editor
                 SpriteNumeralText numeral = Num("Join", chip.transform, 8, "num", 4, 2, "1", TopLeft);
                 Image glyph = Img("Intent", chip.transform, S("UI/ui_glyph-attack_fog-hi_8x8.png"), 1, 1, TopLeft);
                 Image marker = Fill("Active", chip.transform, "candle", 3, 12, 6, 2, TopLeft);
+                TextMeshProUGUI letter = Label("Letter", chip.transform, "A", 10, 0, 9, Bone);
                 SerializedProperty c = chips.GetArrayElementAtIndex(i);
+                c.FindPropertyRelative("letter").objectReferenceValue = letter;
                 c.FindPropertyRelative("root").objectReferenceValue = chip.gameObject;
                 c.FindPropertyRelative("numeral").objectReferenceValue = numeral;
                 c.FindPropertyRelative("glyph").objectReferenceValue = glyph;
                 c.FindPropertyRelative("marker").objectReferenceValue = marker.gameObject;
             }
 
+            so.FindProperty("startX").floatValue = startX;
             so.ApplyModifiedPropertiesWithoutUndo();
             return view;
         }
@@ -762,6 +838,8 @@ namespace Project05.Editor
             SpriteNumeralText magnitude = Num("Magnitude", tab, 8, "num-fog-hi", 17, 5, "0", TopLeft);
             Img("TargetChip", tab, S("UI/ui_chip_base_9s.png"), 34, 3, TopLeft, 8, 11, true);
             SpriteNumeralText target = Num("Target", tab, 8, "num-fog-hi", 35, 5, "1", TopLeft);
+            Image letterChip = Img("LetterChip", slot, S("UI/ui_chip_base_9s.png"), -38, 6, TopCentre, 12, 12, true);
+            Label("Letter", letterChip.transform, OrderStripView.Letter(i), 0, 0, 12, Bone, TextAlignmentOptions.Top);
             UnitRowsView rows = BuildRows(slot, 60);
 
             var enemy = slot.gameObject.AddComponent<EnemySlotView>();
@@ -914,7 +992,8 @@ namespace Project05.Editor
                 board.RotateHeld();
                 board.SimulatePointer(new Vector2(147f, 182f));         // turned a quarter, over free stash cells
                 Capture(HudFixture.Planning, 2, "drag_rotated");
-                board.SimulatePointer(SellRect.center);                    // over the sell zone
+                Object.FindAnyObjectByType<SellDrawerView>().SnapOpenForCapture();
+                board.SimulatePointer(StageClip.position + new Vector2(StageClip.width - DrawerWidth, DrawerTop) + SellRect.center);
                 Capture(HudFixture.Planning, 2, "drag_sell");
                 board.Cancel();
             }

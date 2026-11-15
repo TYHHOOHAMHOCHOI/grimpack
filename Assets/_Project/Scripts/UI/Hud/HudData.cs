@@ -82,6 +82,9 @@ namespace Project05.UI.Hud
         public bool IsHero;
         public int JoinNumeral;
         public IntentKind Intent;
+
+        /// <summary>For an enemy: its slot (0 = A, 1 = B, ...), the same letter its stage slot shows.</summary>
+        public int EnemySlot;
     }
 
     /// <summary>A number rising from or falling on a unit (art bible 4.6, 7.5).</summary>

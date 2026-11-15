@@ -41,9 +41,14 @@ namespace Project05.UI.Hud
         [SerializeField] private Sprite ghostInvalid;
         [SerializeField] private Sprite ghostCross;
         [SerializeField] private ItemHoverTarget[] items = Array.Empty<ItemHoverTarget>();
-        [Tooltip("Drop area that sells the held item, in safe-frame px (x right, y down).")]
-        [SerializeField] private Rect sellRect;
+        [Tooltip("The sell zone's drop area; a held item released over it is sold.")]
+        [SerializeField] private RectTransform sellArea;
         [SerializeField] private SellZoneView sellZone;
+        [Tooltip("The drawer that holds the sell zone; selling needs it open.")]
+        [SerializeField] private SellDrawerView drawer;
+        [Tooltip("Top layer a held plate moves to, so it draws above the stage and the drawer.")]
+        [SerializeField] private RectTransform dragLayer;
+        [SerializeField] private WorkbenchView workbench;
         [Tooltip("Provisional sell price per tier (White, Green, Blue, Purple, Gold, Red) until Currency and Shop (System 20) exists.")]
         [SerializeField] private int[] sellPriceByTier = { 1, 2, 3, 5, 8, 12 };
 
@@ -66,6 +71,7 @@ namespace Project05.UI.Hud
         private PlaceResult _targetResult = PlaceResult.OutOfBounds;
         private readonly List<(int x, int y)> _bad = new List<(int x, int y)>();
         private bool _overSell;
+        private Transform _heldParent;
         private bool _sellEnabled = true;
 
         /// <summary>Raised when an item is sold, with its record and price. The listener owns the money.</summary>
@@ -192,6 +198,8 @@ namespace Project05.UI.Hud
             _pointerMode = true;
             popup.Suppressed = true;
             popup.Close();
+            _heldParent = target.transform.parent;
+            if (dragLayer != null) target.transform.SetParent(dragLayer, false);   // same top-left origin, so positions hold
             target.transform.SetAsLastSibling();
             Refresh();
         }
@@ -236,8 +244,15 @@ namespace Project05.UI.Hud
         private void End()
         {
             _gesture.Dropped(Time.frameCount);
+            RestoreParent();
             Place(_held, _heldItem);
             Release();
+        }
+
+        private void RestoreParent()
+        {
+            if (_heldParent != null && _held.transform.parent != _heldParent) _held.transform.SetParent(_heldParent, false);
+            _heldParent = null;
         }
 
         /// <summary>Takes the held item off the board and hides its plate; the price goes to whoever listens.</summary>
@@ -248,6 +263,7 @@ namespace Project05.UI.Hud
             _gesture.Dropped(Time.frameCount);
             _board.Remove(_heldItem);
             _map.Remove(_held);
+            RestoreParent();
             _held.gameObject.SetActive(false);
             Release();
             ItemSold?.Invoke(record, price);
@@ -317,11 +333,12 @@ namespace Project05.UI.Hud
         private void SwitchContainer()
         {
             // Tab cycles the containers, then the sell zone when selling is allowed.
-            int stops = containers.Length + (_sellEnabled && sellZone != null ? 1 : 0);
+            int stops = containers.Length + (_sellEnabled && sellArea != null ? 1 : 0);
             int index = _overSell ? containers.Length : Array.FindIndex(containers, c => c.id == _targetContainer);
             int next = (index + 1) % stops;
             _overSell = next == containers.Length;
             _targetContainer = _overSell ? null : containers[next].id;
+            if (_overSell && drawer != null) drawer.Open();
             _targetX = 0;
             _targetY = 0;
             _pointerMode = false;
@@ -337,13 +354,19 @@ namespace Project05.UI.Hud
 
             if (_pointerMode)
             {
-                _overSell = _sellEnabled && sellZone != null && sellRect.Contains(_pointer);
+                // Bringing a held item over the closed drawer's tab opens it, so selling never needs a free hand.
+                if (drawer != null && !drawer.IsOpen && _sellEnabled && FrameMath.RectOf(drawer.TabRect, safeFrame).Contains(_pointer))
+                {
+                    drawer.Open();
+                }
+
+                _overSell = CanSell && SellRect().Contains(_pointer);
             }
 
             if (_overSell)
             {
                 _targetContainer = null;
-                if (!_pointerMode) centre = sellRect.center;
+                if (!_pointerMode) centre = SellRect().center;
             }
             else if (_pointerMode)
             {
@@ -371,6 +394,35 @@ namespace Project05.UI.Hud
             ShowSellZone();
             _held.transform.SetAsLastSibling();
             ghostLayer.SetAsLastSibling();
+        }
+
+        /// <summary>Selling is possible now: allowed by the screen, and the drawer (if any) is open.</summary>
+        private bool CanSell => _sellEnabled && sellArea != null && (drawer == null || drawer.IsOpen);
+
+        private Rect SellRect() => FrameMath.RectOf(sellArea, safeFrame);
+
+        /// <summary>
+        /// Grows or shrinks the hero grid (4 x 4 at the start, up to 7 x 7 later) and moves the stash under it. Refused when an
+        /// item would fall outside the grid. Returns true when the size changed.
+        /// </summary>
+        public bool ResizeHeroGrid(int size)
+        {
+            EnsureBoard();
+            int n = Mathf.Clamp(size, WorkbenchLayout.StartGrid, WorkbenchLayout.MaxGrid);
+            ContainerView grid = Array.Find(containers, c => c.grid);
+            if (grid == null || _held != null || !_board.Resize(grid.id, n, n)) return false;
+
+            WorkbenchRects r = workbench != null ? workbench.Layout(n) : WorkbenchLayout.For(n);
+            grid.cols = n;
+            grid.rows = n;
+            grid.origin = r.GridOrigin;
+            foreach (ContainerView c in containers)
+            {
+                if (!c.grid) c.origin = r.StashOrigin;
+            }
+
+            foreach (KeyValuePair<ItemHoverTarget, BoardItem> pair in _map) Place(pair.Key, pair.Value);
+            return true;
         }
 
         private string ContainerAt(Vector2 point, out ContainerView found)
@@ -408,6 +460,16 @@ namespace Project05.UI.Hud
             rt.pivot = new Vector2(0.5f, 0.5f);
             rt.anchoredPosition = new Vector2(centre.x, -centre.y);
             rt.localEulerAngles = new Vector3(0f, 0f, -90f * rotation);
+        }
+
+        /// <summary>Current hero grid size in cells.</summary>
+        public int HeroGridSize
+        {
+            get
+            {
+                ContainerView grid = Array.Find(containers, c => c.grid);
+                return grid != null ? grid.cols : 0;
+            }
         }
 
         private Vector2 ToFrame(Vector2 screen)

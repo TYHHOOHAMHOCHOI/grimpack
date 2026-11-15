@@ -373,6 +373,49 @@ def save_cursor(c: Cv, name: str) -> None:
         big.save(folder / f"ui_cursor-{name}_x{z}_{c.w * z}x{c.h * z}.png")
 
 
+# ------------------------------------------------------------------ backpack beds, drawer tab, cog (user request 2026-11-16)
+def cell_bed() -> Cv:
+    """One container cell, tiled to any size: an Ink-2 bed with a 1 px Ink-1 line on its top and left (C = 20)."""
+    c = Cv(20, 20)
+    c.rect(0, 0, 20, 20, "INK-2")
+    c.rect(0, 0, 20, 1, "INK-1"); c.rect(0, 0, 1, 20, "INK-1")
+    return c
+
+
+def drawer_tab(state: str) -> Cv:
+    """The pull tab on the right edge of the stage, 14 x 28, open on its right side where it joins the drawer.
+    Hover lifts the frame to Candle; focus adds a 2 px Bone frame, so focus is never shown by colour of the fill alone."""
+    c = Cv(14, 28)
+    edge = {"default": "INK-4", "hover": "CANDLE", "focus": "BONE", "pressed": "CANDLE"}[state]
+    fill = "CANDLE-D" if state == "pressed" else "INK-1"
+    c.rect(0, 0, 14, 28, fill)
+    t = 2 if state == "focus" else 1
+    c.rect(0, 0, 14, t, edge); c.rect(0, 28 - t, 14, t, edge); c.rect(0, 0, t, 28, edge)
+    return c
+
+
+def arrow_glyph(direction: str) -> Cv:
+    """A 5 x 7 Bone arrow for the drawer tab: left means open (points into the stage), right means close."""
+    rows = ["....B", "...BB", "..BBB", ".BBBB", "..BBB", "...BB", "....B"]
+    c = Cv(5, 7)
+    for y, row in enumerate(rows):
+        for x, ch in enumerate(row):
+            if ch == "B":
+                c.px(x if direction == "left" else 4 - x, y, "BONE")
+    return c
+
+
+def cog_glyph() -> Cv:
+    """8 x 8 Bone cog for the menu button (review 2026-11-16: the three bars read as an equals sign)."""
+    rows = ["...BB...", ".B.BB.B.", "..BBBB..", "BBB..BBB", "BBB..BBB", "..BBBB..", ".B.BB.B.", "...BB..."]
+    c = Cv(8, 8)
+    for y, row in enumerate(rows):
+        for x, ch in enumerate(row):
+            if ch == "B":
+                c.px(x, y, "BONE")
+    return c
+
+
 def main() -> int:
     UI.mkdir(parents=True, exist_ok=True)
     for name, c in ghost_cells().items():
@@ -382,6 +425,12 @@ def main() -> int:
         chipbtn(st).save(UI / f"ui_chipbtn_{st}_9s.png")
         start_button(st).save(UI / f"ui_start_{st}_9s.png")
     dim_mask().save(UI / "ui_dim-mask_default_4x4.png")
+    cell_bed().save(UI / "ui_cell-bed_default_20x20.png")
+    for st in ("default", "hover", "focus", "pressed"):
+        drawer_tab(st).save(UI / f"ui_drawer-tab_{st}_14x28.png")
+    arrow_glyph("left").save(UI / "ui_glyph-arrow-left_bone_5x7.png")
+    arrow_glyph("right").save(UI / "ui_glyph-arrow-right_bone_5x7.png")
+    cog_glyph().save(UI / "ui_glyph-cog_bone_8x8.png")
     save_cursor(cursor(CURSOR_ARROW), "arrow")
     save_cursor(cursor(CURSOR_GRAB), "grab")
     for st in ("default", "active"):

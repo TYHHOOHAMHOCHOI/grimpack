@@ -92,7 +92,9 @@ namespace Project05.UI.Hud
 
         private static OrderEntryData H(int join) => new OrderEntryData { IsHero = true, JoinNumeral = join };
 
-        private static OrderEntryData E(IntentKind intent) => new OrderEntryData { IsHero = false, Intent = intent };
+        // In the fixtures the swarmer (multi-hit) is enemy A and the brute (single attack) is enemy B.
+        private static OrderEntryData E(IntentKind intent) =>
+            new OrderEntryData { IsHero = false, Intent = intent, EnemySlot = intent == IntentKind.Multi ? 0 : 1 };
 
         private static List<OrderEntryData> Order(params OrderEntryData[] entries) => new List<OrderEntryData>(entries);
     }

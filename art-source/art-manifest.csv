@@ -416,3 +416,11 @@ Assets/_Project/Art/UI/ui_start_disabled_9s.png,ui,9s,pal_master_v01,gen,tools/a
 Assets/_Project/Art/UI/ui_start_focus_9s.png,ui,9s,pal_master_v01,gen,tools/art/build_combat_ui.py,code-drawn,n/a,n/a,2026-11-15,generator rule
 Assets/_Project/Art/UI/ui_start_hover_9s.png,ui,9s,pal_master_v01,gen,tools/art/build_combat_ui.py,code-drawn,n/a,n/a,2026-11-15,generator rule
 Assets/_Project/Art/UI/ui_start_pressed_9s.png,ui,9s,pal_master_v01,gen,tools/art/build_combat_ui.py,code-drawn,n/a,n/a,2026-11-15,generator rule
+Assets/_Project/Art/UI/ui_cell-bed_default_20x20.png,ui,20x20,pal_master_v01,gen,tools/art/build_combat_ui.py,code-drawn,n/a,n/a,2026-11-15,generator rule
+Assets/_Project/Art/UI/ui_drawer-tab_default_14x28.png,ui,14x28,pal_master_v01,gen,tools/art/build_combat_ui.py,code-drawn,n/a,n/a,2026-11-15,generator rule
+Assets/_Project/Art/UI/ui_drawer-tab_focus_14x28.png,ui,14x28,pal_master_v01,gen,tools/art/build_combat_ui.py,code-drawn,n/a,n/a,2026-11-15,generator rule
+Assets/_Project/Art/UI/ui_drawer-tab_hover_14x28.png,ui,14x28,pal_master_v01,gen,tools/art/build_combat_ui.py,code-drawn,n/a,n/a,2026-11-15,generator rule
+Assets/_Project/Art/UI/ui_drawer-tab_pressed_14x28.png,ui,14x28,pal_master_v01,gen,tools/art/build_combat_ui.py,code-drawn,n/a,n/a,2026-11-15,generator rule
+Assets/_Project/Art/UI/ui_glyph-arrow-left_bone_5x7.png,ui,5x7,pal_master_v01,gen,tools/art/ui_glyphs.py,code-drawn,n/a,n/a,2026-11-15,generator rule
+Assets/_Project/Art/UI/ui_glyph-arrow-right_bone_5x7.png,ui,5x7,pal_master_v01,gen,tools/art/ui_glyphs.py,code-drawn,n/a,n/a,2026-11-15,generator rule
+Assets/_Project/Art/UI/ui_glyph-cog_bone_8x8.png,ui,8x8,pal_master_v01,gen,tools/art/ui_glyphs.py,code-drawn,n/a,n/a,2026-11-15,generator rule

@@ -125,3 +125,13 @@ Spec: `design/ux/combat-screen-buttons.md`. Presentation only; playback is a fix
 | Start is the one filled button (Candle plate, dark text), at the right of the strip, Ctrl+Enter chip to its left, the reason it is off written at the left | Done, captured, driven in Play Mode (holding an item turns it off and shows the reason) | `ui_start_*`, `ActionStripView.SetStartEnabled` |
 | Pixel cursor: arrow, and a closed hand while an item is held; pre-scaled for zoom 1 to 4 | Done on Combat and Title; the look of the hardware cursor was not checked on screen | `PixelCursor`, `Art/UI/Cursors/` |
 | Popup swap between items without waiting or blinking: rows pooled (about 1 ms a swap), 0.2 s grace, 0.5 s warm window | Done, driven in Play Mode. Grace deviates from hover-popup-and-glossary rule 3 (60 ms); the GDD needs the matching change | `ItemPopupController`, `ItemPopupView`, `HoverTiming` |
+
+## Top strip, backpack, sell drawer (added 2026-11-16, user request)
+
+| Requirement | Status | Where |
+|---|---|---|
+| Top strip: the label "Lượt tới (dự kiến):" comes before the order chips; enemy chips carry the enemy's letter, which its stage slot also shows; cog on the menu button with an Esc chip | Done, captured | `OrderStripView`, `EnemySlot` letter chip, `ui_glyph-cog_bone_8x8` |
+| Stash 8 x 8; hero grid 4 x 4 at the start, ready to grow to 7 x 7 (the stash moves down; the column is exactly full at 7 x 7) | Done; growth driven in Play Mode (`ResizeHeroGrid(7)`), refused if it would cut an item | `WorkbenchLayout`, `WorkbenchView`, `ItemBoard.Resize` |
+| Sell moved into a drawer on the right edge of the stage: a tab with an arrow at the top opens it with a spring (about 20 px overshoot, then settles), the tab again tucks it away without a bounce; reduced motion moves it at once | Done, driven in Play Mode (path 460, 365, 304, 279, 272, 277 ... 292) | `SellDrawerView`, `DrawerSpring`, `ui_drawer-tab_*` |
+| Carrying an item over the closed tab opens the drawer; Tab from the keyboard reaches it too; a carried plate draws above the drawer | Done, driven in Play Mode | `ItemBoardController` (drag layer) |
+| The open drawer covers part of the enemy column | Open: acceptable while it is closed by default; revisit with the art director | |

@@ -59,6 +59,30 @@ namespace Project05.Items
             _containers[id] = new Container { Width = width, Height = height, TakesPartInSynergy = takesPartInSynergy };
         }
 
+        /// <summary>
+        /// Changes the size of a container (a hero grid growing from 4 x 4 toward 7 x 7). Refused, changing nothing, when an
+        /// item would end up outside it.
+        /// </summary>
+        public bool Resize(string id, int width, int height)
+        {
+            if (!_containers.TryGetValue(id, out Container c) || width < 1 || height < 1) return false;
+            foreach (BoardItem item in _items)
+            {
+                if (item.Container != id) continue;
+                foreach (CellRecord cell in item.Cells)
+                {
+                    if (item.X + cell.x >= width || item.Y + cell.y >= height) return false;
+                }
+            }
+
+            c.Width = width;
+            c.Height = height;
+            return true;
+        }
+
+        /// <summary>Width and height of a container, or (0, 0) when it does not exist.</summary>
+        public (int width, int height) SizeOf(string id) => _containers.TryGetValue(id, out Container c) ? (c.Width, c.Height) : (0, 0);
+
         /// <summary>True when the container exists and is a hero grid.</summary>
         public bool IsGrid(string container) => _containers.TryGetValue(container, out Container c) && c.TakesPartInSynergy;
 

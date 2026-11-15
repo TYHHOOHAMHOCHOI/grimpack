@@ -125,21 +125,6 @@ namespace Project05.UI.Hud
         }
 
         /// <summary>A rectangle in safe-frame native pixels, x right and y down from the top-left corner.</summary>
-        private Rect ToFrameRect(RectTransform rt)
-        {
-            var corners = new Vector3[4];
-            rt.GetWorldCorners(corners);
-            Vector2 min = new Vector2(float.MaxValue, float.MaxValue);
-            Vector2 max = new Vector2(float.MinValue, float.MinValue);
-            foreach (Vector3 corner in corners)   // all four: a plate turned a quarter turn swaps which corner is lowest
-            {
-                Vector2 p = safeFrame.InverseTransformPoint(corner);
-                min = Vector2.Min(min, p);
-                max = Vector2.Max(max, p);
-            }
-            float halfW = safeFrame.rect.width / 2f;
-            float halfH = safeFrame.rect.height / 2f;
-            return new Rect(min.x + halfW, halfH - max.y, max.x - min.x, max.y - min.y);
-        }
+        private Rect ToFrameRect(RectTransform rt) => FrameMath.RectOf(rt, safeFrame);
     }
 }

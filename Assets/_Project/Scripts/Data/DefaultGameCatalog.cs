@@ -23,7 +23,8 @@ namespace Project05.Data
 
         public static void EnsureInitialized()
         {
-            if (_initialized && Heroes.Count > 0 && Items.Count > 0 && Buffs.Count > 0)
+            // Runtime ScriptableObjects are destroyed when a scene unload frees unused assets, leaving non-empty lists of dead references.
+            if (_initialized && Heroes.Count > 0 && Items.Count > 0 && Buffs.Count > 0 && Heroes[0] != null && Items[0] != null && Buffs[0] != null)
             {
                 return;
             }

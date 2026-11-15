@@ -1,0 +1,1051 @@
+{
+ "items": [
+  {
+   "id": "item_iron_sword",
+   "art": "iron-sword",
+   "tier": "White",
+   "footprint": "1x3",
+   "cells": [
+    {
+     "x": 0,
+     "y": 0
+    },
+    {
+     "x": 0,
+     "y": 1
+    },
+    {
+     "x": 0,
+     "y": 2
+    }
+   ],
+   "tags": [
+    "weapon",
+    "blade"
+   ],
+   "trigger": {
+    "kind": "Cooldown",
+    "n": 2,
+    "s": 0,
+    "eventKind": "",
+    "eventStatus": "",
+    "eventSide": ""
+   },
+   "effects": [
+    {
+     "kind": "Damage",
+     "target": "FirstEnemy",
+     "base": 9,
+     "status": "",
+     "amount": 0,
+     "units": 0,
+     "perUnit": 0
+    }
+   ],
+   "hpBonus": 0,
+   "speedBonus": 0,
+   "synergy": [],
+   "nameVi": "Kiếm Sắt",
+   "nameEn": "Iron Sword",
+   "flavorVi": "Nặng tay, chắc việc.",
+   "flavorEn": "Heavy and dependable."
+  },
+  {
+   "id": "item_dagger",
+   "art": "dagger",
+   "tier": "White",
+   "footprint": "1x1",
+   "cells": [
+    {
+     "x": 0,
+     "y": 0
+    }
+   ],
+   "tags": [
+    "weapon",
+    "blade"
+   ],
+   "trigger": {
+    "kind": "Cooldown",
+    "n": 1,
+    "s": 0,
+    "eventKind": "",
+    "eventStatus": "",
+    "eventSide": ""
+   },
+   "effects": [
+    {
+     "kind": "Damage",
+     "target": "FirstEnemy",
+     "base": 4,
+     "status": "",
+     "amount": 0,
+     "units": 0,
+     "perUnit": 0
+    }
+   ],
+   "hpBonus": 0,
+   "speedBonus": 0,
+   "synergy": [],
+   "nameVi": "Dao Găm",
+   "nameEn": "Dagger",
+   "flavorVi": "Nhỏ, nhanh, hay bị quên.",
+   "flavorEn": "Small, quick, easily forgotten."
+  },
+  {
+   "id": "item_hand_axe",
+   "art": "hand-axe",
+   "tier": "White",
+   "footprint": "l",
+   "cells": [
+    {
+     "x": 0,
+     "y": 0
+    },
+    {
+     "x": 1,
+     "y": 0
+    },
+    {
+     "x": 0,
+     "y": 1
+    }
+   ],
+   "tags": [
+    "weapon",
+    "axe"
+   ],
+   "trigger": {
+    "kind": "Cooldown",
+    "n": 3,
+    "s": 0,
+    "eventKind": "",
+    "eventStatus": "",
+    "eventSide": ""
+   },
+   "effects": [
+    {
+     "kind": "Damage",
+     "target": "FirstEnemy",
+     "base": 12,
+     "status": "",
+     "amount": 0,
+     "units": 0,
+     "perUnit": 0
+    }
+   ],
+   "hpBonus": 0,
+   "speedBonus": 0,
+   "synergy": [],
+   "nameVi": "Rìu Tay",
+   "nameEn": "Hand Axe",
+   "flavorVi": "Cán ngắn, lưỡi dày.",
+   "flavorEn": "Short haft, thick edge."
+  },
+  {
+   "id": "item_seal_ink",
+   "art": "seal-ink",
+   "tier": "White",
+   "footprint": "1x1",
+   "cells": [
+    {
+     "x": 0,
+     "y": 0
+    }
+   ],
+   "tags": [
+    "seal"
+   ],
+   "trigger": {
+    "kind": "Cooldown",
+    "n": 2,
+    "s": 0,
+    "eventKind": "",
+    "eventStatus": "",
+    "eventSide": ""
+   },
+   "effects": [
+    {
+     "kind": "ApplyStatus",
+     "target": "FirstEnemy",
+     "base": 0,
+     "status": "an",
+     "amount": 2,
+     "units": 0,
+     "perUnit": 0
+    }
+   ],
+   "hpBonus": 0,
+   "speedBonus": 0,
+   "synergy": [],
+   "nameVi": "Mực Ấn",
+   "nameEn": "Seal Ink",
+   "flavorVi": "Dấu in chưa khô.",
+   "flavorEn": "The mark is not yet dry."
+  },
+  {
+   "id": "item_whetstone",
+   "art": "whetstone",
+   "tier": "White",
+   "footprint": "1x1",
+   "cells": [
+    {
+     "x": 0,
+     "y": 0
+    }
+   ],
+   "tags": [
+    "tool"
+   ],
+   "trigger": {
+    "kind": "Passive",
+    "n": 0,
+    "s": 0,
+    "eventKind": "",
+    "eventStatus": "",
+    "eventSide": ""
+   },
+   "effects": [],
+   "hpBonus": 0,
+   "speedBonus": 0,
+   "synergy": [
+    {
+     "targetTags": [
+      "blade"
+     ],
+     "kind": "DamageFlat",
+     "amount": 3,
+     "statusId": ""
+    }
+   ],
+   "nameVi": "Đá Mài",
+   "nameEn": "Whetstone",
+   "flavorVi": "Tiếng mài làm lưỡi dao sáng lên.",
+   "flavorEn": "The sound of an edge being made."
+  },
+  {
+   "id": "item_leather_vest",
+   "art": "leather-vest",
+   "tier": "White",
+   "footprint": "2x2",
+   "cells": [
+    {
+     "x": 0,
+     "y": 0
+    },
+    {
+     "x": 1,
+     "y": 0
+    },
+    {
+     "x": 0,
+     "y": 1
+    },
+    {
+     "x": 1,
+     "y": 1
+    }
+   ],
+   "tags": [
+    "armour"
+   ],
+   "trigger": {
+    "kind": "Passive",
+    "n": 0,
+    "s": 0,
+    "eventKind": "",
+    "eventStatus": "",
+    "eventSide": ""
+   },
+   "effects": [],
+   "hpBonus": 12,
+   "speedBonus": 0,
+   "synergy": [],
+   "nameVi": "Áo Da",
+   "nameEn": "Leather Vest",
+   "flavorVi": "Đã sờn, vẫn ấm.",
+   "flavorEn": "Worn, still warm."
+  },
+  {
+   "id": "item_swift_boots",
+   "art": "swift-boots",
+   "tier": "White",
+   "footprint": "l",
+   "cells": [
+    {
+     "x": 0,
+     "y": 0
+    },
+    {
+     "x": 1,
+     "y": 0
+    },
+    {
+     "x": 0,
+     "y": 1
+    }
+   ],
+   "tags": [
+    "boots"
+   ],
+   "trigger": {
+    "kind": "Passive",
+    "n": 0,
+    "s": 0,
+    "eventKind": "",
+    "eventStatus": "",
+    "eventSide": ""
+   },
+   "effects": [],
+   "hpBonus": 0,
+   "speedBonus": 3,
+   "synergy": [],
+   "nameVi": "Giày Gió",
+   "nameEn": "Swift Boots",
+   "flavorVi": "Đế mỏng, bước nhẹ.",
+   "flavorEn": "Thin soles, light steps."
+  },
+  {
+   "id": "item_iron_helm",
+   "art": "iron-helm",
+   "tier": "White",
+   "footprint": "1x1",
+   "cells": [
+    {
+     "x": 0,
+     "y": 0
+    }
+   ],
+   "tags": [
+    "armour"
+   ],
+   "trigger": {
+    "kind": "Passive",
+    "n": 0,
+    "s": 0,
+    "eventKind": "",
+    "eventStatus": "",
+    "eventSide": ""
+   },
+   "effects": [],
+   "hpBonus": 6,
+   "speedBonus": 0,
+   "synergy": [],
+   "nameVi": "Mũ Sắt",
+   "nameEn": "Iron Helm",
+   "flavorVi": "Móp ở một bên.",
+   "flavorEn": "Dented on one side."
+  },
+  {
+   "id": "item_crossbow",
+   "art": "crossbow",
+   "tier": "Green",
+   "footprint": "2x1",
+   "cells": [
+    {
+     "x": 0,
+     "y": 0
+    },
+    {
+     "x": 1,
+     "y": 0
+    }
+   ],
+   "tags": [
+    "weapon",
+    "ranged"
+   ],
+   "trigger": {
+    "kind": "Cooldown",
+    "n": 3,
+    "s": 0,
+    "eventKind": "",
+    "eventStatus": "",
+    "eventSide": ""
+   },
+   "effects": [
+    {
+     "kind": "Damage",
+     "target": "FirstEnemy",
+     "base": 15,
+     "status": "",
+     "amount": 0,
+     "units": 0,
+     "perUnit": 0
+    }
+   ],
+   "hpBonus": 0,
+   "speedBonus": 0,
+   "synergy": [],
+   "nameVi": "Nỏ Gỗ",
+   "nameEn": "Crossbow",
+   "flavorVi": "Một phát, một tiếng cạch.",
+   "flavorEn": "One shot, one click."
+  },
+  {
+   "id": "item_seal_stamp",
+   "art": "seal-stamp",
+   "tier": "Green",
+   "footprint": "1x2",
+   "cells": [
+    {
+     "x": 0,
+     "y": 0
+    },
+    {
+     "x": 0,
+     "y": 1
+    }
+   ],
+   "tags": [
+    "seal"
+   ],
+   "trigger": {
+    "kind": "Cooldown",
+    "n": 2,
+    "s": 0,
+    "eventKind": "",
+    "eventStatus": "",
+    "eventSide": ""
+   },
+   "effects": [
+    {
+     "kind": "ApplyStatus",
+     "target": "FirstEnemy",
+     "base": 0,
+     "status": "an",
+     "amount": 3,
+     "units": 0,
+     "perUnit": 0
+    }
+   ],
+   "hpBonus": 0,
+   "speedBonus": 0,
+   "synergy": [],
+   "nameVi": "Ấn Triện",
+   "nameEn": "Seal Stamp",
+   "flavorVi": "Đóng xuống là không gỡ ra.",
+   "flavorEn": "Press down, and it will not lift."
+  },
+  {
+   "id": "item_breaking_bell",
+   "art": "breaking-bell",
+   "tier": "Green",
+   "footprint": "1x2",
+   "cells": [
+    {
+     "x": 0,
+     "y": 0
+    },
+    {
+     "x": 0,
+     "y": 1
+    }
+   ],
+   "tags": [
+    "detonator",
+    "bell"
+   ],
+   "trigger": {
+    "kind": "Cooldown",
+    "n": 3,
+    "s": 0,
+    "eventKind": "",
+    "eventStatus": "",
+    "eventSide": ""
+   },
+   "effects": [
+    {
+     "kind": "ConsumeDetonate",
+     "target": "FirstEnemy",
+     "base": 0,
+     "status": "an",
+     "amount": 0,
+     "units": 4,
+     "perUnit": 2
+    }
+   ],
+   "hpBonus": 0,
+   "speedBonus": 0,
+   "synergy": [],
+   "nameVi": "Chuông Phá Ấn",
+   "nameEn": "Breaking Bell",
+   "flavorVi": "Mỗi tiếng ngân làm một dấu ấn vỡ.",
+   "flavorEn": "Each ring cracks a seal."
+  },
+  {
+   "id": "item_war_drum",
+   "art": "war-drum",
+   "tier": "Green",
+   "footprint": "1x2",
+   "cells": [
+    {
+     "x": 0,
+     "y": 0
+    },
+    {
+     "x": 0,
+     "y": 1
+    }
+   ],
+   "tags": [
+    "instrument"
+   ],
+   "trigger": {
+    "kind": "Passive",
+    "n": 0,
+    "s": 0,
+    "eventKind": "",
+    "eventStatus": "",
+    "eventSide": ""
+   },
+   "effects": [],
+   "hpBonus": 0,
+   "speedBonus": 0,
+   "synergy": [
+    {
+     "targetTags": [
+      "weapon"
+     ],
+     "kind": "DamagePercent",
+     "amount": 250,
+     "statusId": ""
+    }
+   ],
+   "nameVi": "Trống Chiến",
+   "nameEn": "War Drum",
+   "flavorVi": "Nhịp trống làm vũ khí nặng thêm.",
+   "flavorEn": "The beat lends weight to every weapon."
+  },
+  {
+   "id": "item_ink_pot",
+   "art": "ink-pot",
+   "tier": "Green",
+   "footprint": "1x1",
+   "cells": [
+    {
+     "x": 0,
+     "y": 0
+    }
+   ],
+   "tags": [
+    "tool"
+   ],
+   "trigger": {
+    "kind": "Passive",
+    "n": 0,
+    "s": 0,
+    "eventKind": "",
+    "eventStatus": "",
+    "eventSide": ""
+   },
+   "effects": [],
+   "hpBonus": 0,
+   "speedBonus": 0,
+   "synergy": [
+    {
+     "targetTags": [
+      "seal"
+     ],
+     "kind": "StatusAmount",
+     "amount": 1,
+     "statusId": "an"
+    }
+   ],
+   "nameVi": "Lọ Mực",
+   "nameEn": "Ink Pot",
+   "flavorVi": "Đen đến mức nuốt cả ánh sáng.",
+   "flavorEn": "So black it swallows light."
+  },
+  {
+   "id": "item_heart_charm",
+   "art": "heart-charm",
+   "tier": "Green",
+   "footprint": "1x1",
+   "cells": [
+    {
+     "x": 0,
+     "y": 0
+    }
+   ],
+   "tags": [
+    "charm"
+   ],
+   "trigger": {
+    "kind": "Passive",
+    "n": 0,
+    "s": 0,
+    "eventKind": "",
+    "eventStatus": "",
+    "eventSide": ""
+   },
+   "effects": [],
+   "hpBonus": 10,
+   "speedBonus": 0,
+   "synergy": [],
+   "nameVi": "Bùa Tim",
+   "nameEn": "Heart Charm",
+   "flavorVi": "Còn ấm như vừa rời tay người.",
+   "flavorEn": "Warm, as if just left a hand."
+  },
+  {
+   "id": "item_war_banner",
+   "art": "war-banner",
+   "tier": "Green",
+   "footprint": "1x3",
+   "cells": [
+    {
+     "x": 0,
+     "y": 0
+    },
+    {
+     "x": 0,
+     "y": 1
+    },
+    {
+     "x": 0,
+     "y": 2
+    }
+   ],
+   "tags": [
+    "banner"
+   ],
+   "trigger": {
+    "kind": "CombatStart",
+    "n": 0,
+    "s": 0,
+    "eventKind": "",
+    "eventStatus": "",
+    "eventSide": ""
+   },
+   "effects": [
+    {
+     "kind": "ApplyStatus",
+     "target": "AllEnemies",
+     "base": 0,
+     "status": "an",
+     "amount": 2,
+     "units": 0,
+     "perUnit": 0
+    }
+   ],
+   "hpBonus": 0,
+   "speedBonus": 0,
+   "synergy": [],
+   "nameVi": "Cờ Chiến",
+   "nameEn": "War Banner",
+   "flavorVi": "Kéo lên trước khi bước vào.",
+   "flavorEn": "Raised before the first step in."
+  },
+  {
+   "id": "item_war_hammer",
+   "art": "war-hammer",
+   "tier": "Blue",
+   "footprint": "t",
+   "cells": [
+    {
+     "x": 0,
+     "y": 0
+    },
+    {
+     "x": 1,
+     "y": 0
+    },
+    {
+     "x": 2,
+     "y": 0
+    },
+    {
+     "x": 1,
+     "y": 1
+    },
+    {
+     "x": 1,
+     "y": 2
+    }
+   ],
+   "tags": [
+    "weapon",
+    "blunt"
+   ],
+   "trigger": {
+    "kind": "Cooldown",
+    "n": 4,
+    "s": 0,
+    "eventKind": "",
+    "eventStatus": "",
+    "eventSide": ""
+   },
+   "effects": [
+    {
+     "kind": "Damage",
+     "target": "FirstEnemy",
+     "base": 28,
+     "status": "",
+     "amount": 0,
+     "units": 0,
+     "perUnit": 0
+    }
+   ],
+   "hpBonus": 0,
+   "speedBonus": 0,
+   "synergy": [],
+   "nameVi": "Búa Chiến",
+   "nameEn": "War Hammer",
+   "flavorVi": "Một nhát, cả hang rung.",
+   "flavorEn": "One blow, and the cave shakes."
+  },
+  {
+   "id": "item_seal_chain",
+   "art": "seal-chain",
+   "tier": "Blue",
+   "footprint": "s",
+   "cells": [
+    {
+     "x": 0,
+     "y": 0
+    },
+    {
+     "x": 1,
+     "y": 0
+    },
+    {
+     "x": 1,
+     "y": 1
+    },
+    {
+     "x": 2,
+     "y": 1
+    }
+   ],
+   "tags": [
+    "seal",
+    "chain"
+   ],
+   "trigger": {
+    "kind": "Cooldown",
+    "n": 3,
+    "s": 0,
+    "eventKind": "",
+    "eventStatus": "",
+    "eventSide": ""
+   },
+   "effects": [
+    {
+     "kind": "ApplyStatus",
+     "target": "AllEnemies",
+     "base": 0,
+     "status": "an",
+     "amount": 2,
+     "units": 0,
+     "perUnit": 0
+    }
+   ],
+   "hpBonus": 0,
+   "speedBonus": 0,
+   "synergy": [],
+   "nameVi": "Xích Ấn",
+   "nameEn": "Seal Chain",
+   "flavorVi": "Mỗi mắt xích một dấu.",
+   "flavorEn": "A mark on every link."
+  },
+  {
+   "id": "item_thunder_gong",
+   "art": "thunder-gong",
+   "tier": "Blue",
+   "footprint": "2x2",
+   "cells": [
+    {
+     "x": 0,
+     "y": 0
+    },
+    {
+     "x": 1,
+     "y": 0
+    },
+    {
+     "x": 0,
+     "y": 1
+    },
+    {
+     "x": 1,
+     "y": 1
+    }
+   ],
+   "tags": [
+    "detonator",
+    "bell"
+   ],
+   "trigger": {
+    "kind": "Cooldown",
+    "n": 4,
+    "s": 0,
+    "eventKind": "",
+    "eventStatus": "",
+    "eventSide": ""
+   },
+   "effects": [
+    {
+     "kind": "ConsumeDetonate",
+     "target": "FirstEnemy",
+     "base": 0,
+     "status": "an",
+     "amount": 0,
+     "units": 10,
+     "perUnit": 3
+    }
+   ],
+   "hpBonus": 0,
+   "speedBonus": 0,
+   "synergy": [],
+   "nameVi": "Chiêng Sấm",
+   "nameEn": "Thunder Gong",
+   "flavorVi": "Tiếng chiêng gọi sấm xuống các dấu ấn.",
+   "flavorEn": "Its voice calls thunder down on the marks."
+  },
+  {
+   "id": "item_hourglass",
+   "art": "hourglass",
+   "tier": "Blue",
+   "footprint": "1x2",
+   "cells": [
+    {
+     "x": 0,
+     "y": 0
+    },
+    {
+     "x": 0,
+     "y": 1
+    }
+   ],
+   "tags": [
+    "relic"
+   ],
+   "trigger": {
+    "kind": "Passive",
+    "n": 0,
+    "s": 0,
+    "eventKind": "",
+    "eventStatus": "",
+    "eventSide": ""
+   },
+   "effects": [],
+   "hpBonus": 0,
+   "speedBonus": 0,
+   "synergy": [
+    {
+     "targetTags": [],
+     "kind": "CooldownReduction",
+     "amount": 1,
+     "statusId": ""
+    }
+   ],
+   "nameVi": "Đồng Hồ Cát",
+   "nameEn": "Hourglass",
+   "flavorVi": "Cát chảy ngược khi không ai nhìn.",
+   "flavorEn": "The sand runs upward when no one looks."
+  },
+  {
+   "id": "item_echo_charm",
+   "art": "echo-charm",
+   "tier": "Blue",
+   "footprint": "1x1",
+   "cells": [
+    {
+     "x": 0,
+     "y": 0
+    }
+   ],
+   "tags": [
+    "charm"
+   ],
+   "trigger": {
+    "kind": "Reaction",
+    "n": 2,
+    "s": 0,
+    "eventKind": "StatusApplied",
+    "eventStatus": "an",
+    "eventSide": "enemy"
+   },
+   "effects": [
+    {
+     "kind": "Damage",
+     "target": "FirstEnemy",
+     "base": 4,
+     "status": "",
+     "amount": 0,
+     "units": 0,
+     "perUnit": 0
+    }
+   ],
+   "hpBonus": 0,
+   "speedBonus": 0,
+   "synergy": [],
+   "nameVi": "Bùa Vang",
+   "nameEn": "Echo Charm",
+   "flavorVi": "Nghe thấy dấu ấn, nó đáp lại.",
+   "flavorEn": "It answers when a seal is set."
+  },
+  {
+   "id": "item_void_censer",
+   "art": "void-censer",
+   "tier": "Purple",
+   "footprint": "2x3",
+   "cells": [
+    {
+     "x": 0,
+     "y": 0
+    },
+    {
+     "x": 1,
+     "y": 0
+    },
+    {
+     "x": 0,
+     "y": 1
+    },
+    {
+     "x": 1,
+     "y": 1
+    },
+    {
+     "x": 0,
+     "y": 2
+    },
+    {
+     "x": 1,
+     "y": 2
+    }
+   ],
+   "tags": [
+    "detonator",
+    "incense"
+   ],
+   "trigger": {
+    "kind": "Cooldown",
+    "n": 5,
+    "s": 0,
+    "eventKind": "",
+    "eventStatus": "",
+    "eventSide": ""
+   },
+   "effects": [
+    {
+     "kind": "ConsumeDetonate",
+     "target": "FirstEnemy",
+     "base": 0,
+     "status": "an",
+     "amount": 0,
+     "units": 99,
+     "perUnit": 4
+    }
+   ],
+   "hpBonus": 0,
+   "speedBonus": 0,
+   "synergy": [],
+   "nameVi": "Lư Hương Hư Vô",
+   "nameEn": "Void Censer",
+   "flavorVi": "Khói của nó nuốt mọi dấu ấn.",
+   "flavorEn": "Its smoke swallows every seal."
+  },
+  {
+   "id": "item_scholar_lens",
+   "art": "scholar-lens",
+   "tier": "Purple",
+   "footprint": "1x1",
+   "cells": [
+    {
+     "x": 0,
+     "y": 0
+    }
+   ],
+   "tags": [
+    "relic"
+   ],
+   "trigger": {
+    "kind": "Passive",
+    "n": 0,
+    "s": 0,
+    "eventKind": "",
+    "eventStatus": "",
+    "eventSide": ""
+   },
+   "effects": [],
+   "hpBonus": 0,
+   "speedBonus": 0,
+   "synergy": [
+    {
+     "targetTags": [
+      "seal"
+     ],
+     "kind": "StatusAmount",
+     "amount": 2,
+     "statusId": "an"
+    },
+    {
+     "targetTags": [
+      "detonator"
+     ],
+     "kind": "DamagePercent",
+     "amount": 500,
+     "statusId": ""
+    }
+   ],
+   "nameVi": "Kính Học Giả",
+   "nameEn": "Scholar Lens",
+   "flavorVi": "Nhìn thấy chỗ dấu ấn sẽ vỡ.",
+   "flavorEn": "It shows where the seal will break."
+  },
+  {
+   "id": "item_tower_shield",
+   "art": "tower-shield",
+   "tier": "Purple",
+   "footprint": "2x3",
+   "cells": [
+    {
+     "x": 0,
+     "y": 0
+    },
+    {
+     "x": 1,
+     "y": 0
+    },
+    {
+     "x": 0,
+     "y": 1
+    },
+    {
+     "x": 1,
+     "y": 1
+    },
+    {
+     "x": 0,
+     "y": 2
+    },
+    {
+     "x": 1,
+     "y": 2
+    }
+   ],
+   "tags": [
+    "armour"
+   ],
+   "trigger": {
+    "kind": "Passive",
+    "n": 0,
+    "s": 0,
+    "eventKind": "",
+    "eventStatus": "",
+    "eventSide": ""
+   },
+   "effects": [],
+   "hpBonus": 30,
+   "speedBonus": -2,
+   "synergy": [],
+   "nameVi": "Khiên Tháp",
+   "nameEn": "Tower Shield",
+   "flavorVi": "Đứng sau nó, bạn chậm hơn và sống lâu hơn.",
+   "flavorEn": "Behind it you are slower, and last longer."
+  }
+ ]
+}

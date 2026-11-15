@@ -1,0 +1,130 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 35fdf5b07035ae24194a12ffeb7525b1, type: 3}
+  m_Name: HudSpriteSet
+  m_EditorClassIdentifier: Project05.Runtime::Project05.UI.Hud.HudSpriteSet
+  heroPoses:
+  - {fileID: 21300000, guid: 6c28a14be291d4946a0c08bd5da68b06, type: 3}
+  - {fileID: 21300000, guid: 5698313280d8f1b4784b1880197c5e66, type: 3}
+  - {fileID: 21300000, guid: b703a80c06712b940b51c249fd8a9674, type: 3}
+  - {fileID: 21300000, guid: 84c172b87c70a6349abf7d3fb0d740e6, type: 3}
+  - {fileID: 21300000, guid: d75e801c02466984283c62c190c637a1, type: 3}
+  - {fileID: 21300000, guid: 0d5e39aea1451b2459d4ecb1723bd71c, type: 3}
+  heroNarrow: {fileID: 21300000, guid: ee777eea57247ff4e821547d9d8e01a7, type: 3}
+  pedestalDefault: {fileID: 21300000, guid: 07160788f4ddd684eb37322829f40513, type: 3}
+  pedestalDim: {fileID: 21300000, guid: 3b42c168f6e5af04f9fdf8c187a60125, type: 3}
+  monsters:
+  - name: swarmer
+    bodyHeight: 26
+    poses:
+    - {fileID: 21300000, guid: 0027aab349dc9d141ae95db9826f95fd, type: 3}
+    - {fileID: 21300000, guid: 428ef5e9c6469294fa56f41f365b3ef2, type: 3}
+    - {fileID: 21300000, guid: 91dea336a8f73df4c975d9d14e7b03f3, type: 3}
+    - {fileID: 21300000, guid: ed34c812dfbc84f48a40cf66749d6df2, type: 3}
+    - {fileID: 21300000, guid: 9e546017e22f5a4498d0fd04d89e946c, type: 3}
+    - {fileID: 21300000, guid: e7ef643f77f9b63438b46209e12cd83e, type: 3}
+    eyes:
+    - {fileID: 21300000, guid: ac6f153853444b64db0f949e517e039d, type: 3}
+    - {fileID: 21300000, guid: 418104d7fb3c66f459d2e6bd305ab368, type: 3}
+    - {fileID: 21300000, guid: c2948d85c0d0e924ba2d87c060eaddeb, type: 3}
+  - name: brute
+    bodyHeight: 44
+    poses:
+    - {fileID: 21300000, guid: 057a2da977cb7894388ba349a2d3aa62, type: 3}
+    - {fileID: 21300000, guid: dd5826632d2236c41b01004954e2fc07, type: 3}
+    - {fileID: 21300000, guid: e1bfd8b197a3e124191a657d92aed6ce, type: 3}
+    - {fileID: 21300000, guid: 46b4364e65e899242954c65a7fa5be70, type: 3}
+    - {fileID: 21300000, guid: d30882fa937d49f40a19e28861b35e34, type: 3}
+    - {fileID: 21300000, guid: ff76ac704bcaf304f8729170fadd8569, type: 3}
+    eyes:
+    - {fileID: 21300000, guid: d8c7dfa6a0a35af449858b40f1d88573, type: 3}
+    - {fileID: 21300000, guid: b6457e03f1d30ab479b6604a7cf7f0e2, type: 3}
+    - {fileID: 21300000, guid: e5d5cb7deb76e284a90936b2b6a3d508, type: 3}
+  shadowContact: {fileID: 21300000, guid: 2d52656f431d6ec4486983fd824f3843, type: 3}
+  glyphBone12:
+  - {fileID: 21300000, guid: 8001f418c1f2d024d95bad1d0257269e, type: 3}
+  - {fileID: 21300000, guid: f569f3afb33db2c4ea1806a5118b94c1, type: 3}
+  - {fileID: 21300000, guid: ff99b203f244573408f1ba4718ea3ab6, type: 3}
+  - {fileID: 21300000, guid: bdceb11fece55844cb4e5d6e937a9518, type: 3}
+  - {fileID: 21300000, guid: e93d35d0f0ad5b241806057a3912b578, type: 3}
+  - {fileID: 21300000, guid: a1c43992d4c368845b2b630c83a193c2, type: 3}
+  - {fileID: 21300000, guid: beef3ce6b6a974d4e940f79dc8cd27d0, type: 3}
+  - {fileID: 21300000, guid: 6f748f2e509422b4f9d4fb24df458aab, type: 3}
+  - {fileID: 21300000, guid: 30cbae036ef326e4fbfb5e402a5e7846, type: 3}
+  - {fileID: 21300000, guid: dbac6fa548fda5d45b66730481cb1b77, type: 3}
+  - {fileID: 21300000, guid: 60f188ed4747fed438047a992dc896cd, type: 3}
+  glyphBone8:
+  - {fileID: 21300000, guid: 6f1ff1e1b16362a4ebf2bb8b4793d602, type: 3}
+  - {fileID: 21300000, guid: a48351a18a68db4449ae1fb5215591e5, type: 3}
+  - {fileID: 21300000, guid: 3bd8bcc1c2193144794fc3c8fab69640, type: 3}
+  - {fileID: 21300000, guid: d8cbefcfdc4290a4483876c101e342de, type: 3}
+  - {fileID: 21300000, guid: c529d7294162bf345a8a507ace073002, type: 3}
+  - {fileID: 21300000, guid: 78113028267c98d4190941aedb7611b1, type: 3}
+  - {fileID: 21300000, guid: 4fc11cb3bcfd6154591fb856c3fac3e3, type: 3}
+  - {fileID: 21300000, guid: b87c161da0e4d6b4782d5d81d9bde40a, type: 3}
+  - {fileID: 21300000, guid: 1906782d3f58d3345be57eb15357f8ec, type: 3}
+  - {fileID: 21300000, guid: 1232fa250bbfa3941972ace7be01ef4b, type: 3}
+  - {fileID: 21300000, guid: 6f1c0b8790778e64cb662b03b4c249e2, type: 3}
+  glyphBlood8:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 21300000, guid: d8f09fbed484b8d48900688ca88f8ee8, type: 3}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  glyphFog8:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 21300000, guid: 68808f9438585aa44b6d239fdd89ebf2, type: 3}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  intentFogHi12:
+  - {fileID: 0}
+  - {fileID: 21300000, guid: 51ca2130b4487654f9add31bec26c53a, type: 3}
+  - {fileID: 21300000, guid: 98ee95e2e37240545ab061bb987f0222, type: 3}
+  - {fileID: 21300000, guid: 653dff54c6e57044997096adc5aefc5f, type: 3}
+  - {fileID: 21300000, guid: 7dc566633e36f274da215781a9133126, type: 3}
+  intentFogHi8:
+  - {fileID: 0}
+  - {fileID: 21300000, guid: 370eb8c63105d4e4a9b30d2d7d465111, type: 3}
+  - {fileID: 21300000, guid: f0a81e1cf56643247a4414a726b45fec, type: 3}
+  - {fileID: 21300000, guid: 98a047e3530923b4b901aefd3c74b0f6, type: 3}
+  - {fileID: 21300000, guid: e5b35de92f675494eb06dcc3732b958b, type: 3}
+  plateLift:
+  - {fileID: 21300000, guid: 0f4de3fae9e2eea48a3a05c7efb9a837, type: 3}
+  - {fileID: 21300000, guid: 37891865d21deba40b20a5e280c028fc, type: 3}
+  - {fileID: 21300000, guid: 55919d19e403f394c97cd6e4d0607555, type: 3}
+  - {fileID: 21300000, guid: 113417ada3ff74f4d8b1b63f5a0677cc, type: 3}
+  - {fileID: 21300000, guid: 9a894a3bae16eaa4d97461c98cb0e81b, type: 3}
+  - {fileID: 21300000, guid: be3741d7706ee374ca0322e8038de045, type: 3}
+  plateLiftHi:
+  - {fileID: 21300000, guid: fd4ff2248e057c0418d50ec99b3aad1b, type: 3}
+  - {fileID: 21300000, guid: 251b48800ff52e84798caacffcc397c6, type: 3}
+  - {fileID: 21300000, guid: 9236b6c9a5e735349ba099cb1129949b, type: 3}
+  - {fileID: 21300000, guid: 2dec72913f73c4640abf2c023ef1ba21, type: 3}
+  - {fileID: 21300000, guid: d6f5558f2d43f5f48b55f25dc20b558e, type: 3}
+  - {fileID: 21300000, guid: 2b0a51ebd12d05a4b90da388c911d122, type: 3}
+  chevronTurnHero: {fileID: 21300000, guid: 89215b919932afc40be8cf3ad0b225ab, type: 3}
+  chevronTurnFoe: {fileID: 21300000, guid: 67cc2de1f032a4b4eaa4303bf7f72725, type: 3}
+  segmentDefault: {fileID: 21300000, guid: 9a4da908b6aebe84e983cd46f51801d0, type: 3}
+  segmentSelected: {fileID: 21300000, guid: c10f121f1a6304e439038b407e177834, type: 3}

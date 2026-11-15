@@ -160,7 +160,7 @@ The bound `20` is the most items that can touch one item: a footprint inside a 3
 | 9 Item Trigger and Cooldown | Downstream | Hard (provisional) | Cooldown and status-amount modifiers per target. System 9 is Designed (pending review) and reads the cooldown total. | Present (System 9, Dependencies). The status-amount kind is still open. |
 | 12 Combat Resolution | Downstream | Hard | Takes the frozen view at Freeze and releases it at Thaw. | System 12 said "No GDD yet"; updated at sync. |
 | 36 Combat State and Step Model | Downstream (via 12) | Soft | Receives the frozen arrangement and adjacency context at encounter start. | Wording updated at sync. |
-| 25 Backpack UI, 26 Hover Popup | Downstream | Hard for 25, soft for 26 | Links with seams and sources, preview delta, per-target totals. | Not designed. |
+| 25 Backpack UI, 26 Hover Popup | Downstream | Hard for 25, soft for 26 | Links with seams and sources, preview delta, per-target totals. | Both designed, pending review; cross-hero transfer preview and cross-hero effect-target data remain open. |
 | 13 Status Effects | Peer | Soft | Status IDs for `StatusAmount`; units and range owned by System 13. | System 13 does not yet mention synergy amounts. |
 | 18 Commitment and Drop Model | Downstream | Soft (provisional) | May read the arrangement view as a signal of commitment. | Not designed. |
 | 35 Balance Simulation Harness | Downstream | Soft | Calls `Evaluate`. | Not designed. |
@@ -274,6 +274,7 @@ Logic tests live under `Assets/_Project/Tests/EditMode/AdjacencyAndSynergy/`, in
 
 | Question | Owner | Resolve by |
 |---|---|---|
+| For a cross-hero move, how does preview return all source-grid lost links and destination-grid gained links, and what is the aggregate buffer contract? System 25 cannot claim a complete transfer preview until this is defined. | Systems 10 and 25 | Before cross-hero preview integration. |
 | Where do synergy rules, the tag vocabulary and `MaxRulesPerItem` live in System 2's records, and who validates "applicable" (it needs each item's effect kinds)? | System 2, System 10 | Next System 2 revision. |
 | ~~How does System 9 apply the cooldown total (floor, rounding, from the first firing or later) and does it accept a negative reduction (lengthening)?~~ Answered by System 9 (2026-11-12): `N_eff = clamp(N − C, 1, 99)`, a negative total lengthens, applied from the first firing because the view is frozen. | System 9 | Closed. |
 | Does `StatusAmount` become a modifier kind in System 3's contract, who owns its units and range, and how is a non-positive result handled? System 3 today carries only `F` and `P`. | Systems 3 and 13 | Before System 3 is re-reviewed. |

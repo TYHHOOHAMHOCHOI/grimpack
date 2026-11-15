@@ -159,6 +159,8 @@ formulas:
       - design/gdd/adjacency-and-synergy.md
       - design/gdd/effect-resolution-model.md
       - design/gdd/item-trigger-and-cooldown.md
+      - design/gdd/backpack-ui.md
+      - design/gdd/hover-popup-and-glossary.md
     variables:
       - F_T
       - P_T
@@ -177,6 +179,8 @@ formulas:
     referenced_by:
       - design/gdd/item-trigger-and-cooldown.md
       - design/gdd/adjacency-and-synergy.md
+      - design/gdd/backpack-ui.md
+      - design/gdd/hover-popup-and-glossary.md
     variables:
       - N
       - C
@@ -192,6 +196,7 @@ formulas:
     source: design/gdd/turn-order.md
     referenced_by:
       - design/gdd/turn-order.md
+      - design/gdd/combat-hud.md
     variables:
       - s
       - F
@@ -365,6 +370,77 @@ formulas:
     added: 2026-11-13
     revised: ""
 
+  - name: run_snapshot_checksum
+    status: active
+    source: design/gdd/run-state-and-flow.md
+    referenced_by:
+      - design/gdd/run-state-and-flow.md
+    variables:
+      - body
+    output_range: [0, 18446744073709551615]
+    expression: "FNV-1a 64 over every byte through the LF before the CHECKSUM line: h0 = 14695981039346656037; h = (h XOR b) * 1099511628211 mod 2^64 (unchecked); written as 16 lowercase hex digits"
+    notes: "Never GetHashCode. The empty body hashes to cbf29ce484222325."
+    added: 2026-11-13
+    revised: ""
+
+  - name: intents_calls_per_binding
+    status: active
+    source: design/gdd/run-state-and-flow.md
+    referenced_by:
+      - design/gdd/run-state-and-flow.md
+      - design/gdd/enemy-and-intent.md
+    variables:
+      - E
+    output_range: [24, 144]
+    expression: "calls = 2 * intent_sequence_length * E with intent_sequence_length = 12 and E enemies (1 to 6); 9 bindings per full run (room 1, rooms 2 to 8, the boss)"
+    notes: "At most 864 calls per run with 4 enemies per roster, 1296 at the cap of 6."
+    added: 2026-11-13
+    revised: ""
+
+  - name: curse_stat_terms
+    status: active
+    source: design/gdd/curses-and-trade-offs.md
+    referenced_by:
+      - design/gdd/curses-and-trade-offs.md
+      - design/gdd/party-and-heroes.md
+    variables:
+      - C_hp
+      - C_speed
+    output_range: [-50, 0]
+    expression: "maxHP = clamp(h + B_perm + H + C_hp, 1, HP_cap) with C_hp = -p1 of Frailty or the HP rider of a Pinned curse, outside the clamp of H; F' = clamp(F, -50, 50) + C_speed with C_speed = -p1 of Sluggish or the speed rider of a Pinned curse, added after the clamp of F"
+    notes: "Curse terms are read by HeroStats from the curse list in System 5's snapshot; nothing is written into B_perm or the baseline items."
+    added: 2026-11-13
+    revised: ""
+
+  - name: input_pointer_to_native
+    status: active
+    source: design/gdd/input-and-focus.md
+    referenced_by:
+      - design/gdd/input-and-focus.md
+    variables:
+      - W
+      - H
+      - mouse
+    output_range: [0, 639]
+    expression: "scale = max(1, min(floor(W/640), floor(H/360))); offset = ((W - 640*scale)/2, (H - 360*scale)/2); native = floor((mouse - offset)/scale) with floor division toward negative infinity and y flipped to the top-left origin; hit iff 0 <= x < 640 and 0 <= y < 360"
+    notes: "Truncating division reads a pointer 1 px left of the canvas as a hit; use floor division."
+    added: 2026-11-13
+    revised: ""
+
+  - name: input_key_repeat_count
+    status: active
+    source: design/gdd/input-and-focus.md
+    referenced_by:
+      - design/gdd/input-and-focus.md
+      - design/gdd/settings.md
+    variables:
+      - t
+    output_range: [1, 1000]
+    expression: "n(t) = 1 for t < 400, else 2 + floor((t - 400)/125) (boundary times inclusive; single-step gives 1)"
+    notes: "Repeats are synthesised from Tick(t) by the device layer; the core reads no timer; only arrows and jump keys repeat."
+    added: 2026-11-13
+    revised: ""
+
 # Example:
 #
 # formulas:
@@ -457,6 +533,7 @@ constants:
     source: design/gdd/event-log.md
     referenced_by:
       - design/gdd/event-log.md
+      - design/gdd/post-combat-breakdown.md
     value: 20000
     unit: records per encounter (provisional, to be measured in the combat spike)
     added: 2026-11-11
@@ -477,6 +554,7 @@ constants:
     source: design/gdd/grid-backpack.md
     referenced_by:
       - design/gdd/grid-backpack.md
+      - design/gdd/backpack-ui.md
     value: 6
     unit: cells per side (hero grid maximum before a bound raise)
     added: 2026-11-11
@@ -497,6 +575,7 @@ constants:
     source: design/gdd/grid-backpack.md
     referenced_by:
       - design/gdd/grid-backpack.md
+      - design/gdd/backpack-ui.md
     value: 5
     unit: cells per side (shared stash, all open)
     added: 2026-11-11
@@ -518,6 +597,7 @@ constants:
     source: design/gdd/grid-backpack.md
     referenced_by:
       - design/gdd/grid-backpack.md
+      - design/gdd/backpack-ui.md
     value: 1
     unit: operations
     added: 2026-11-11
@@ -538,6 +618,7 @@ constants:
     source: design/gdd/adjacency-and-synergy.md
     referenced_by:
       - design/gdd/adjacency-and-synergy.md
+      - design/gdd/backpack-ui.md
     value: 360
     unit: links per hero grid (6x6 bound, 3 rules per item); 504 if the bound becomes 7x7 (Tier 2)
     added: 2026-11-12
@@ -582,6 +663,7 @@ constants:
     referenced_by:
       - design/gdd/turn-order.md
       - design/gdd/combat-state-and-step-model.md
+      - design/gdd/combat-hud.md
     value: 1000
     unit: gauge units (a unit acts when its gauge reaches this; the excess is kept)
     added: 2026-11-12
@@ -643,6 +725,8 @@ constants:
     source: design/gdd/enemy-and-intent.md
     referenced_by:
       - design/gdd/enemy-and-intent.md
+      - design/gdd/hover-popup-and-glossary.md
+      - design/gdd/combat-hud.md
     value: 12
     unit: bound intent entries per enemy (drawn at room entry; the sequence wraps after the last entry; safe range 6 to 20)
     added: 2026-11-13
@@ -655,6 +739,7 @@ constants:
       - design/gdd/enemy-and-intent.md
       - design/gdd/turn-order.md
       - design/gdd/encounter-generation.md
+      - design/gdd/combat-hud.md
     value: 6
     unit: enemies per encounter (two lines of three, art bible 7.4a; System 16 may cap lower)
     added: 2026-11-13
@@ -795,6 +880,134 @@ constants:
     added: 2026-11-13
     revised: ""
 
+  - name: run_boss_room_index
+    status: active
+    source: design/gdd/run-state-and-flow.md
+    referenced_by:
+      - design/gdd/run-state-and-flow.md
+      - design/gdd/encounter-generation.md
+    value: 9
+    unit: floor pointer value of the boss room (rooms 1 to 8 are combat rooms with doors; no row or offer after the boss)
+    added: 2026-11-13
+    revised: ""
+
+  - name: run_snapshot_size_limit
+    status: active
+    source: design/gdd/run-state-and-flow.md
+    referenced_by:
+      - design/gdd/run-state-and-flow.md
+    value: 16384
+    unit: bytes (largest run snapshot of the worst-case fixture; provisional)
+    added: 2026-11-13
+    revised: ""
+
+  - name: run_restart_time_target
+    status: active
+    source: design/gdd/run-state-and-flow.md
+    referenced_by:
+      - design/gdd/run-state-and-flow.md
+      - design/gdd/menus-and-screen-flow.md
+    value: 5
+    unit: seconds from the end screen to the pick screen of a new run (at most 2 confirms; provisional)
+    added: 2026-11-13
+    revised: ""
+
+  - name: drops_calls_per_run_max
+    status: active
+    source: design/gdd/run-state-and-flow.md
+    referenced_by:
+      - design/gdd/run-state-and-flow.md
+      - design/gdd/commitment-and-drop-model.md
+    value: 48
+    unit: draw calls on drops per run at most (8 offers of up to 6 calls)
+    added: 2026-11-13
+    revised: ""
+
+  - name: curse_cap_party
+    status: active
+    source: design/gdd/curses-and-trade-offs.md
+    referenced_by:
+      - design/gdd/curses-and-trade-offs.md
+      - design/gdd/door-generation-and-tiers.md
+    value: 2
+    unit: active plus pending curses at most per party (Gold's weight is 0 at the cap; must not exceed the party size)
+    added: 2026-11-13
+    revised: ""
+
+  - name: curse_cap_hero
+    status: active
+    source: design/gdd/curses-and-trade-offs.md
+    referenced_by:
+      - design/gdd/curses-and-trade-offs.md
+    value: 1
+    unit: active curses at most per hero
+    added: 2026-11-13
+    revised: ""
+
+  - name: gold_min_room
+    status: active
+    source: design/gdd/curses-and-trade-offs.md
+    referenced_by:
+      - design/gdd/curses-and-trade-offs.md
+      - design/gdd/door-generation-and-tiers.md
+    value: 6
+    unit: first target room whose row may offer a Gold card (Vertical Slice; safe range 5 to 7)
+    added: 2026-11-13
+    revised: ""
+
+  - name: input_drag_threshold
+    status: active
+    source: design/gdd/input-and-focus.md
+    referenced_by:
+      - design/gdd/input-and-focus.md
+    value: 3
+    unit: native pixels (press excursion above which a press is a drag, not a click-hold; safe range 1 to 8)
+    added: 2026-11-13
+    revised: ""
+
+  - name: input_pointer_move_threshold
+    status: active
+    source: design/gdd/input-and-focus.md
+    referenced_by:
+      - design/gdd/input-and-focus.md
+    value: 3
+    unit: native pixels (pointer move that switches to Pointer mode; safe range 1 to 8)
+    added: 2026-11-13
+    revised: ""
+
+  - name: input_lock_ms
+    status: active
+    source: design/gdd/input-and-focus.md
+    referenced_by:
+      - design/gdd/input-and-focus.md
+      - design/gdd/menus-and-screen-flow.md
+      - design/gdd/door-and-room-panels-ui.md   # commit actions locked after each step
+    value: 250
+    unit: milliseconds (commit-class actions ignored after a run-phase change; a minimum delay, not a deadline; safe range 100 to 500)
+    added: 2026-11-13
+    revised: ""
+
+  - name: input_key_repeat
+    status: active
+    source: design/gdd/input-and-focus.md
+    referenced_by:
+      - design/gdd/input-and-focus.md
+      - design/gdd/settings.md
+    value: 400
+    unit: milliseconds before the first repeat of an arrow or jump key (then every 125 ms; a single-step option disables repeat)
+    added: 2026-11-13
+    revised: ""
+
+  - name: native_canvas_resolution
+    status: active
+    source: design/gdd/input-and-focus.md
+    referenced_by:
+      - design/gdd/input-and-focus.md
+    value: 640
+    unit: native canvas width in pixels (height 360; integer scale only; art bible 640x360)
+    added: 2026-11-13
+    revised: ""
+
   - name: damage_permille_scale
     status: active
     source: design/gdd/effect-resolution-model.md
@@ -803,6 +1016,183 @@ constants:
     value: 1000
     unit: permille (1000 = 100%)
     added: 2026-11-11
+    revised: ""
+
+  - name: text_key_max_length
+    status: active
+    source: design/gdd/localization-and-text.md
+    referenced_by:
+      - design/gdd/localization-and-text.md
+      - design/gdd/game-data-definitions.md   # derives keys <ns>.<id>.<slot>
+    value: 64
+    unit: characters
+    added: 2026-11-13
+    revised: ""
+
+  - name: number_grouping_threshold
+    status: active
+    source: design/gdd/localization-and-text.md
+    referenced_by:
+      - design/gdd/localization-and-text.md
+      - design/art/art-bible.md   # 7.5 and 7.7 show K and M; amended to separators only
+    value: 4
+    unit: digits
+    added: 2026-11-13
+    revised: ""
+
+  - name: text_spare_height_percent
+    status: active
+    source: design/gdd/localization-and-text.md
+    referenced_by:
+      - design/gdd/localization-and-text.md
+      - design/gdd/hover-popup-and-glossary.md   # popup grows within the spare height, never truncates
+    value: 30
+    unit: percent
+    added: 2026-11-13
+    revised: ""
+
+  - name: pseudo_locale_expansion_percent
+    status: active
+    source: design/gdd/localization-and-text.md
+    referenced_by:
+      - design/gdd/localization-and-text.md
+    value: 40
+    unit: percent
+    notes: "Vertical Slice item; debug builds only."
+    added: 2026-11-13
+    revised: ""
+
+  - name: ui_reveal_card_settle_ms
+    status: active
+    source: design/gdd/door-and-room-panels-ui.md
+    referenced_by:
+      - design/gdd/door-and-room-panels-ui.md
+    value: 240
+    unit: milliseconds per card (safe range 160 to 400)
+    added: 2026-11-13
+    revised: ""
+
+  - name: ui_reveal_card_stagger_ms
+    status: active
+    source: design/gdd/door-and-room-panels-ui.md
+    referenced_by:
+      - design/gdd/door-and-room-panels-ui.md
+    value: 80
+    unit: milliseconds between cards (safe range 40 to 120)
+    added: 2026-11-13
+    revised: ""
+
+  - name: ui_receipt_max_chars
+    status: active
+    source: design/gdd/door-and-room-panels-ui.md
+    referenced_by:
+      - design/gdd/door-and-room-panels-ui.md
+    value: 28
+    unit: characters per language (safe range 20 to 36; a budget for System 7)
+    added: 2026-11-13
+    revised: ""
+
+  - name: door_card_pixel_budget
+    status: active
+    source: design/gdd/door-and-room-panels-ui.md
+    referenced_by:
+      - design/gdd/door-and-room-panels-ui.md
+      - design/gdd/door-generation-and-tiers.md
+    value: 131
+    unit: pixels of 132 inner height on the 84 by 140 door card (1 px spare; any added row breaks it)
+    added: 2026-11-13
+    revised: ""
+
+  - name: payoff_ladder_thresholds
+    status: active
+    source: design/gdd/payoff-presentation.md
+    referenced_by:
+      - design/gdd/payoff-presentation.md
+    value: "Chain N>=2 or depth>=1; Surge N>=5 or depth>=3; Detonation: DetonationDamage and (N>=6 or 100*D>=35*Hmax or lethal to the last enemy), or the size route N>=12 or depth>=5"
+    unit: per root action (provisional; tuned from the headless harness; Chain < Surge <= Detonation)
+    added: 2026-11-14
+    revised: ""
+
+  - name: playback_cadence_floor_ms
+    status: active
+    source: design/gdd/payoff-presentation.md
+    referenced_by:
+      - design/gdd/payoff-presentation.md
+    value: 120
+    unit: milliseconds per trigger (cadence = max(120, min(base, 3500 / Q)); safe range 100 to 160)
+    added: 2026-11-14
+    revised: ""
+
+  - name: playback_flash_budget
+    status: active
+    source: design/gdd/payoff-presentation.md
+    referenced_by:
+      - design/gdd/payoff-presentation.md
+    value: "at most 2 flash-class events per rolling 1000 ms, at least 500 ms apart"
+    unit: flash-class events (a rise of 10 percent or more of maximum relative luminance); fixed by art bible 4.12
+    added: 2026-11-14
+    revised: ""
+
+  - name: playback_skip_cut_frames
+    status: active
+    source: design/gdd/payoff-presentation.md
+    referenced_by:
+      - design/gdd/payoff-presentation.md
+    value: 6
+    unit: start frames of the plate sweep for a Skip cut before a Detonation (the final leg uses 20; a cut then lasts at most 202 ms for 36 plates; Formula 5); replaces the removed Skip stamp
+    added: 2026-11-14
+    revised: 2026-11-14
+
+  - name: playback_skip_orient_hold_ms
+    status: active
+    source: design/gdd/payoff-presentation.md
+    referenced_by:
+      - design/gdd/payoff-presentation.md
+    value: 300
+    unit: milliseconds of hold after a Skip cut, with the Skipped-actions line (provisional; safe range 200 to 600)
+    added: 2026-11-14
+    revised: ""
+
+  - name: playback_skip_stamp_ms
+    status: deprecated
+    source: design/gdd/payoff-presentation.md
+    referenced_by:
+      - design/gdd/payoff-presentation.md
+    value: 700
+    unit: milliseconds, removed by the concept fourth review on 2026-11-14 (Skip now plays each Detonation in full); kept only so older references resolve
+    added: 2026-11-14
+    revised: ""
+
+  - name: harness_default_runs
+    status: active
+    source: design/gdd/balance-simulation-harness.md
+    referenced_by:
+      - design/gdd/balance-simulation-harness.md
+    value: 10000
+    unit: runs per experiment cell (minimum 1,100; the 1-in-20 metric needs at least 4,000)
+    added: 2026-11-14
+    revised: ""
+
+  - name: harness_driver_step_cap
+    status: active
+    source: design/gdd/balance-simulation-harness.md
+    referenced_by:
+      - design/gdd/balance-simulation-harness.md
+    value: 2000
+    unit: commands per run before DriverStall (safe range 500 to 5000)
+    added: 2026-11-14
+    revised: ""
+
+  - name: run_defining_damage_share
+    status: active
+    source: design/gdd/balance-simulation-harness.md
+    referenced_by:
+      - design/gdd/balance-simulation-harness.md
+      - design/gdd/payoff-presentation.md
+      - design/gdd/commitment-and-drop-model.md
+    value: 50
+    unit: percent of the boss's max HP dealt by a Detonation-classified root action in the boss fight (safe range 30 to 70, but the effective floor is 35 because the Detonation classifier needs N >= 6, 100*D >= 35*Hmax or a lethal blow to the last enemy; shield lost counts toward D, and the blow must land while the boss still has at least this share left); a run is run-defining when the boss is defeated and this holds. A definition constant, not a tuning lever (concept fourth review, 2026-11-14), so changing it needs the creative director's sign-off
+    added: 2026-11-14
     revised: ""
 
 # Example:

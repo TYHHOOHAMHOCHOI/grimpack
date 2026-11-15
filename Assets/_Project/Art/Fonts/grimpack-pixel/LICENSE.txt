@@ -1,0 +1,4 @@
+Grimpack Pixel (working title) - Body cut, 12 px
+Drawn for this project by tools/art/pixel_font.py. Project-owned artwork:
+embedding in the shipped game is permitted, and the face may be modified.
+No third-party font data is included.

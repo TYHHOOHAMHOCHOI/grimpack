@@ -5,8 +5,9 @@ the cursor, all as RGBA PNGs with binary alpha. Composes the title mock-up over
 the quantised title backdrop and audits it against the palette and the soft
 limits (4.3).
 
-The 5x7 letters are a PLACEHOLDER. The native pixel font is gated by the
-Vietnamese render test (8.9) and does not exist yet; swap them when it does.
+Text in the mock-up and the title wordmark use the project's own pixel face
+(tools/art/pixel_font.py). The wordmark is an art asset drawn from the face's
+capitals at 4x blocks (a logo, not running text), working title only.
 
 Run:  python -I tools/art/build_menu_kit.py
 Needs: Assets/_Project/Art/Environment/env_title_bg_640x360.png
@@ -26,6 +27,7 @@ from PIL import Image
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import palette as P  # noqa: E402
+import pixel_font as PF  # noqa: E402
 
 UI_DIR = ROOT / "Assets/_Project/Art/UI"
 BG = ROOT / "Assets/_Project/Art/Environment/env_title_bg_640x360.png"
@@ -105,32 +107,45 @@ def cursor() -> Img:
     return im
 
 
-GLYPHS = {
-    "A": "01110 10001 10001 11111 10001 10001 10001", "B": "11110 10001 11110 10001 10001 10001 11110",
-    "C": "01111 10000 10000 10000 10000 10000 01111", "D": "11110 10001 10001 10001 10001 10001 11110",
-    "E": "11111 10000 11110 10000 10000 10000 11111", "F": "11111 10000 11110 10000 10000 10000 10000",
-    "G": "01111 10000 10000 10111 10001 10001 01111", "H": "10001 10001 10001 11111 10001 10001 10001",
-    "I": "11111 00100 00100 00100 00100 00100 11111", "J": "00111 00010 00010 00010 10010 10010 01100",
-    "K": "10001 10010 10100 11000 10100 10010 10001", "L": "10000 10000 10000 10000 10000 10000 11111",
-    "M": "10001 11011 10101 10101 10001 10001 10001", "N": "10001 11001 10101 10011 10001 10001 10001",
-    "O": "01110 10001 10001 10001 10001 10001 01110", "P": "11110 10001 10001 11110 10000 10000 10000",
-    "Q": "01110 10001 10001 10001 10101 10010 01101", "R": "11110 10001 10001 11110 10100 10010 10001",
-    "S": "01111 10000 10000 01110 00001 00001 11110", "T": "11111 00100 00100 00100 00100 00100 00100",
-    "U": "10001 10001 10001 10001 10001 10001 01110", "V": "10001 10001 10001 10001 10001 01010 00100",
-    "W": "10001 10001 10001 10101 10101 11011 10001", "X": "10001 10001 01010 00100 01010 10001 10001",
-    "Y": "10001 10001 01010 00100 00100 00100 00100", "Z": "11111 00001 00010 00100 01000 10000 11111",
-    " ": "00000 00000 00000 00000 00000 00000 00000",
-}
+_GLYPHS = PF.build_glyphs()
 
 
-def text(im: Img, s: str, x: int, y: int, colour: str, cell: int = 1, gap: int = 1) -> None:
-    """Placeholder lettering. cell > 1 draws each glyph pixel as a block (never a scaled font)."""
-    for ch in s.upper():
-        for j, row in enumerate(GLYPHS[ch].split()):
-            for i, bit in enumerate(row):
-                if bit == "1":
-                    im.rect(x + i * cell, y + j * cell, cell, cell, colour)
-        x += (5 + gap) * cell
+def text(im: Img, s: str, x: int, y: int, colour: str) -> int:
+    """Draw s with the Body 12 face; (x, y) is the top-left of the 12 px line box. Returns the end x."""
+    for ch in s:
+        bm, adv = _GLYPHS[ord(ch)]
+        for cx, cy in bm.px:
+            im.px(x + cx, y + cy, colour)
+        x += adv
+    return x
+
+
+def wordmark(word: str = "GRIMPACK", block: int = 4) -> Img:
+    """Title wordmark: the face's capitals at block x block pixels, Bone with a 1 px INK-0 outline."""
+    cols = sum(_GLYPHS[ord(c)][1] for c in word) - 1
+    body_rows = 6  # capitals occupy rows 4-9
+    w, h = cols * block + 2, body_rows * block + 2
+    mask = np.zeros((h, w), bool)
+    x = 0
+    for ch in word:
+        bm, adv = _GLYPHS[ord(ch)]
+        for cx, cy in bm.px:
+            if 4 <= cy <= 9:
+                y0 = (cy - 4) * block + 1
+                mask[y0:y0 + block, (x + cx) * block + 1:(x + cx + 1) * block + 1] = True
+        x += adv
+    grown = mask.copy()
+    for dy in (-1, 0, 1):
+        for dx in (-1, 0, 1):
+            grown |= np.roll(np.roll(mask, dy, 0), dx, 1)
+    im = Img(w, h)
+    for yy in range(h):
+        for xx in range(w):
+            if mask[yy, xx]:
+                im.px(xx, yy, "BONE")
+            elif grown[yy, xx]:
+                im.px(xx, yy, "INK-0")
+    return im
 
 
 LABEL_COLOUR = {"default": "BONE", "hover": "BONE", "pressed": "INK-0", "disabled": "INK-3", "focus": "BONE"}
@@ -142,6 +157,8 @@ def main() -> int:
     for st in STATES:
         button(st).save(UI_DIR / f"ui_btn_{st}_{size}.png")
     cursor().save(UI_DIR / "ui_cursor_default_13x13.png")
+    wm = wordmark()
+    wm.save(UI_DIR / f"ui_title-wordmark_default_{wm.w}x{wm.h}.png")
 
     # kit sheet (evidence only)
     sheet = Img(400, 150, "INK-0")
@@ -150,8 +167,8 @@ def main() -> int:
     y = 8
     for st in STATES:
         sheet.paste(button(st), 40, y - BTN_PAD)
-        text(sheet, "PLAY", 40 + BTN_PAD + 8, y + 6, LABEL_COLOUR[st])
-        text(sheet, st, 40 + BTN_PAD + BTN_W + 14, y + 6, "FOG")
+        text(sheet, "Chơi", 40 + BTN_PAD + 10, y + 4, LABEL_COLOUR[st])
+        text(sheet, st, 40 + BTN_PAD + BTN_W + 14, y + 4, "FOG")
         y += 28
     sheet.save(EVIDENCE / f"ui_kit_sheet_{DATE}.png")
 
@@ -162,12 +179,12 @@ def main() -> int:
     t = Img(640, 360)
     t.a[:, :, :3] = np.array(Image.open(BG).convert("RGB"))
     t.a[:, :, 3] = 255
-    text(t, "GRIMPACK", 44, 40, "BONE", cell=4)  # Bone on ink, no glow (2.3.1)
+    t.paste(wordmark(), 44, 40)  # Bone on ink, no glow (2.3.1)
     by = 150
-    for i, label in enumerate(["PLAY", "SETTINGS", "QUIT"]):
+    for i, label in enumerate(["Chơi", "Cài đặt", "Thoát"]):
         st = "focus" if i == 0 else "default"
         t.paste(button(st), 52 - BTN_PAD, by - BTN_PAD)
-        text(t, label, 52 + 10, by + 6, "BONE")
+        text(t, label, 52 + 10, by + 4, "BONE")
         by += 32
     t.paste(cursor(), 330, 220)
     t.save(EVIDENCE / f"title_mock_{DATE}.png")

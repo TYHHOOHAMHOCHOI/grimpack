@@ -39,7 +39,18 @@ namespace Project05.Editor
         private const string LabelStash = "Kho đồ";
         private const string LabelForecast = "nếu không có gì đổi";
         private const string LabelSkip = "Bỏ qua";
-        private const string LabelKey = "Tab";
+        private const string LabelSkipArmed = "Đang bỏ qua";
+        private const string LabelStart = "Bắt đầu trận";
+        private const string LabelStartKey = "Ctrl+Enter";
+        private const string LabelStartHeld = "Đang cầm đồ: đặt xuống trước";
+        private const string LabelSell = "Bán";
+        private const string LabelSellIdle = "Kéo đồ vào đây để bán";
+        private const string LabelSellReady = "Thả vào đây để bán";
+        private const string LabelSellOver = "Thả để bán";
+        private const string LabelSellLocked = "Chỉ bán khi xếp đồ";
+
+        // The sell zone under the stash, in safe-frame px (x right, y down).
+        private static readonly Rect SellRect = new Rect(15, 236, 144, 92);
 
         private static TMP_FontAsset _font;
         private static HudSpriteSet _set;
@@ -50,6 +61,7 @@ namespace Project05.Editor
         {
             AssetDatabase.Refresh();
             ConfigureBorders();
+            ModalKit.ConfigureBorders();
             _font = AssetDatabase.LoadAssetAtPath<TMP_FontAsset>(FontAssetPath);
             if (_font == null) throw new FileNotFoundException("Missing TMP font asset; build the Title scene first", FontAssetPath);
             _set = BuildSpriteSet();
@@ -86,8 +98,9 @@ namespace Project05.Editor
             BuildFrame(safe);
             ItemPopupController popup = BuildPopupController(safe);
             BuildWorkbench(safe, popup);
-            BuildHud(safe);
+            HudParts hudParts = BuildHud(safe);
             BuildPopupView(safe, popup);
+            BuildScreenController(safe, hudParts, popup);
 
             EditorSceneManager.SaveScene(scene, ScenePath);
             EnsureBuildSettings();
@@ -102,6 +115,7 @@ namespace Project05.Editor
             Border(Art + "UI/ui_panel_void_9s.png", new Vector4(4, 4, 4, 4));
             Border(Art + "UI/ui_chip_base_9s.png", new Vector4(3, 0, 3, 0));
             foreach (string s in new[] { "default", "selected" }) Border(Art + "UI/ui_segment_" + s + "_9s.png", new Vector4(6, 6, 6, 6));
+            foreach (string s in new[] { "default", "active", "hover" }) Border(Art + "UI/ui_sell-frame_" + s + "_9s.png", new Vector4(8, 8, 8, 8));
         }
 
         private static void Border(string path, Vector4 border)
@@ -276,13 +290,58 @@ namespace Project05.Editor
                 Fill("GridH", wb, "ink-1", 7, 40 + 20 * i, 80, 1, TopLeft);
             }
 
-            PlaceItems(wb, popup, true);
             Fill("SectionLine", wb, "ink-3", 7, 128, 160, 1, TopLeft);
             Label("StashLabel", wb, LabelStash, 7, 134, 100, Bone);
             Fill("StashBed", wb, "ink-2", 7, 152, 160, 40, TopLeft);
             for (int i = 1; i < 8; i++) Fill("StashV", wb, "ink-1", 7 + 20 * i, 152, 1, 40, TopLeft);
             Fill("StashH", wb, "ink-1", 7, 172, 160, 1, TopLeft);
-            PlaceItems(wb, popup, false);
+            SellZoneView sell = BuildSellZone(wb);   // before the plates, so a held plate draws above the zone
+            PlaceAllItems(wb, popup);
+
+            var board = Object.FindAnyObjectByType<ItemBoardController>();
+            var so = new SerializedObject(board);
+            so.FindProperty("sellZone").objectReferenceValue = sell;
+            so.FindProperty("sellRect").rectValue = SellRect;
+            so.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        /// <summary>The sell zone: a scale, a framed drop area with a dotted floor, a hint, and the held item's price.</summary>
+        private static SellZoneView BuildSellZone(RectTransform wb)
+        {
+            RectTransform root = Rect("SellZone", wb, TopLeft, TopLeft);
+            root.anchoredPosition = Vector2.zero;
+            Fill("SectionLine", root, "ink-3", 7, 200, 160, 1, TopLeft);
+            Image scale = Img("Scale", root, S("UI/ui_sell-scale_default_48x28.png"), 63, 206, TopLeft);
+            Image frame = Img("Frame", root, S("UI/ui_sell-frame_default_9s.png"), SellRect.x, SellRect.y, TopLeft, SellRect.width, SellRect.height, true);
+            Image floor = Img("Floor", root, S("UI/ui_sell-tile_default_20x20.png"), SellRect.x + 2, SellRect.y + 2, TopLeft, SellRect.width - 4, SellRect.height - 4);
+            floor.type = Image.Type.Tiled;
+            Label("Title", root, LabelSell, SellRect.x, SellRect.y + 8, SellRect.width, Bone, TextAlignmentOptions.Top);
+            TextMeshProUGUI hint = Label("Hint", root, LabelSellIdle, SellRect.x, SellRect.y + 72, SellRect.width, Fog, TextAlignmentOptions.Top);
+
+            RectTransform priceRow = Rect("Price", root, TopLeft, TopLeft);
+            priceRow.anchoredPosition = Vector2.zero;
+            Img("Coin", priceRow, S("UI/ui_glyph-coin_default_12x12.png"), 72, 334, TopLeft);
+            SpriteNumeralText price = Num("Amount", priceRow, 12, "num", 88, 334, "0", TopLeft);
+            priceRow.gameObject.SetActive(false);
+
+            var view = root.gameObject.AddComponent<SellZoneView>();
+            var so = new SerializedObject(view);
+            so.FindProperty("scale").objectReferenceValue = scale;
+            so.FindProperty("frame").objectReferenceValue = frame;
+            so.FindProperty("scaleIdle").objectReferenceValue = S("UI/ui_sell-scale_default_48x28.png");
+            so.FindProperty("scaleActive").objectReferenceValue = S("UI/ui_sell-scale_active_48x28.png");
+            so.FindProperty("frameIdle").objectReferenceValue = S("UI/ui_sell-frame_default_9s.png");
+            so.FindProperty("frameReady").objectReferenceValue = S("UI/ui_sell-frame_active_9s.png");
+            so.FindProperty("frameOver").objectReferenceValue = S("UI/ui_sell-frame_hover_9s.png");
+            so.FindProperty("hint").objectReferenceValue = hint;
+            so.FindProperty("priceRow").objectReferenceValue = priceRow.gameObject;
+            so.FindProperty("price").objectReferenceValue = price;
+            so.FindProperty("idleText").stringValue = LabelSellIdle;
+            so.FindProperty("readyText").stringValue = LabelSellReady;
+            so.FindProperty("overText").stringValue = LabelSellOver;
+            so.FindProperty("lockedText").stringValue = LabelSellLocked;
+            so.ApplyModifiedPropertiesWithoutUndo();
+            return view;
         }
 
         // The arrangement shown in the workbench: the items of hero 2 grid (4 x 4, origin at 7, 40) and the stash
@@ -304,38 +363,65 @@ namespace Project05.Editor
             return ItemCatalog.Load(File.ReadAllText("Assets/_Project/Data/items_mvp.json"));
         }
 
-        /// <summary>Places each item as its plate plus its art, at the true size of its footprint, with a hover target.</summary>
-        private static void PlaceItems(Transform parent, ItemPopupController popup, bool grid)
+        /// <summary>
+        /// Places every item as its plate plus its art, at the true size of its footprint, each with a hover and drag handle,
+        /// and wires the board controller that owns dragging, rotating and the ghost footprint.
+        /// </summary>
+        private static void PlaceAllItems(Transform parent, ItemPopupController popup)
         {
             ItemCatalog catalog = LoadCatalog();
-            (string id, int x, int y)[] layout = grid ? GridLayout : StashLayout;
-            float originX = 7, originY = grid ? 40 : 152;
 
-            ItemGridContext context = null;
-            if (grid)
-            {
-                var ctxGo = new GameObject("HeroGrid", typeof(RectTransform));
-                ctxGo.transform.SetParent(parent, false);
-                context = ctxGo.AddComponent<ItemGridContext>();
-            }
+            var boardGo = new GameObject("ItemBoard", typeof(RectTransform));
+            boardGo.transform.SetParent(parent, false);
+            var board = boardGo.AddComponent<ItemBoardController>();
 
             var targets = new List<ItemHoverTarget>();
-            foreach ((string id, int x, int y) in layout)
+            foreach ((string container, (string id, int x, int y)[] layout, float ox, float oy) in new[]
             {
-                ItemRecord item = catalog.Find(id);
-                string plateRel = "Items/Plates/plate_" + item.tier.ToLowerInvariant() + "_rest_" + item.footprint + ".png";
-                MakeReadable(Art + plateRel);
-                Image plate = Img("Item_" + item.art, parent, S(plateRel), originX + 20 * x, originY + 20 * y, TopLeft);
-                plate.raycastTarget = true;
-                plate.alphaHitTestMinimumThreshold = 0.5f;
-                Img("Art", plate.transform, S("Items/Icons/item_" + item.art + "_d_" + item.footprint + ".png"), 2, 2, TopLeft);
-                plate.gameObject.AddComponent<Button>().transition = Selectable.Transition.None;
-                var hover = plate.gameObject.AddComponent<ItemHoverTarget>();
-                hover.Configure(item.id, x, y, context, popup);
-                targets.Add(hover);
+                ("grid", GridLayout, 7f, 40f), ("stash", StashLayout, 7f, 152f),
+            })
+            {
+                foreach ((string id, int x, int y) in layout)
+                {
+                    ItemRecord item = catalog.Find(id);
+                    string plateRel = "Items/Plates/plate_" + item.tier.ToLowerInvariant() + "_rest_" + item.footprint + ".png";
+                    MakeReadable(Art + plateRel);
+                    Image plate = Img("Item_" + item.art, parent, S(plateRel), ox + 20 * x, oy + 20 * y, TopLeft);
+                    plate.raycastTarget = true;
+                    plate.alphaHitTestMinimumThreshold = 0.5f;
+                    Img("Art", plate.transform, S("Items/Icons/item_" + item.art + "_d_" + item.footprint + ".png"), 2, 2, TopLeft);
+                    plate.gameObject.AddComponent<Button>().transition = Selectable.Transition.None;
+                    var hover = plate.gameObject.AddComponent<ItemHoverTarget>();
+                    hover.Configure(item.id, container, x, y, 0, board, popup);
+                    targets.Add(hover);
+                }
             }
 
-            if (context != null) context.SetItems(targets.ToArray());
+            RectTransform ghostLayer = Rect("GhostLayer", parent, TopLeft, TopLeft);
+            ghostLayer.anchoredPosition = Vector2.zero;
+
+            board.SetItems(targets.ToArray());
+            var so = new SerializedObject(board);
+            so.FindProperty("safeFrame").objectReferenceValue = parent.parent;
+            so.FindProperty("popup").objectReferenceValue = popup;
+            so.FindProperty("ghostLayer").objectReferenceValue = ghostLayer;
+            so.FindProperty("ghostValid").objectReferenceValue = S("UI/ui_ghost_valid_20x20.png");
+            so.FindProperty("ghostInvalid").objectReferenceValue = S("UI/ui_ghost_invalid_20x20.png");
+            so.FindProperty("ghostCross").objectReferenceValue = S("UI/ui_ghost_cross_20x20.png");
+            SerializedProperty views = so.FindProperty("containers");
+            views.arraySize = 2;
+            SetContainer(views.GetArrayElementAtIndex(0), "grid", 7, 40, 4, 4, true);
+            SetContainer(views.GetArrayElementAtIndex(1), "stash", 7, 152, 8, 2, false);
+            so.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        private static void SetContainer(SerializedProperty p, string id, float x, float y, int cols, int rows, bool grid)
+        {
+            p.FindPropertyRelative("id").stringValue = id;
+            p.FindPropertyRelative("origin").vector2Value = new Vector2(x, y);
+            p.FindPropertyRelative("cols").intValue = cols;
+            p.FindPropertyRelative("rows").intValue = rows;
+            p.FindPropertyRelative("grid").boolValue = grid;
         }
 
         private static void MakeReadable(string path)
@@ -385,7 +471,16 @@ namespace Project05.Editor
         }
 
         // ------------------------------------------------------------------ HUD
-        private static void BuildHud(RectTransform safe)
+        /// <summary>The pieces of the HUD the screen controller is wired to.</summary>
+        private sealed class HudParts
+        {
+            public CombatHudView View;
+            public ActionStripView Strip;
+            public Button MenuButton;
+            public CanvasGroup HudGroup;
+        }
+
+        private static HudParts BuildHud(RectTransform safe)
         {
             var hudGo = new GameObject("CombatHud", typeof(RectTransform));
             hudGo.transform.SetParent(safe, false);
@@ -398,7 +493,7 @@ namespace Project05.Editor
             Img("Coin", hudRt, S("UI/ui_glyph-coin_default_12x12.png"), 3, 2, TopLeft);
             SpriteNumeralText currency = Num("Currency", hudRt, 8, "num", 18, 4, "120", TopLeft);
             SpriteNumeralText room = Num("Room", hudRt, 8, "num-fog", 52, 4, "3/8", TopLeft);
-            Img("Menu", hudRt, S("UI/ui_glyph-menu_bone_8x8.png"), 624, 4, TopLeft);
+            Button menuButton = BuildMenuButton(hudRt);
             Label("ForecastLabel", hudRt, LabelForecast, 276, 2, 150, Fog);
             OrderStripView orderView = BuildOrderStrip(hudRt);
 
@@ -407,6 +502,7 @@ namespace Project05.Editor
             EnemySlotView[] enemies = new EnemySlotView[6];
             for (int i = 0; i < 6; i++) enemies[i] = BuildEnemySlot(hudRt, i);
             SpeedControlView speedView = BuildSpeedControl(hudRt);
+            ActionStripView strip = BuildActionStrip(hudRt, speedView);
             RectTransform readouts = Rect("Readouts", hudRt, TopLeft, TopLeft);
             readouts.anchoredPosition = Vector2.zero;
 
@@ -439,6 +535,87 @@ namespace Project05.Editor
             var demoSo = new SerializedObject(demo);
             demoSo.FindProperty("hud").objectReferenceValue = view;
             demoSo.ApplyModifiedPropertiesWithoutUndo();
+
+            return new HudParts { View = view, Strip = strip, MenuButton = menuButton, HudGroup = hudGo.AddComponent<CanvasGroup>() };
+        }
+
+        /// <summary>The menu button in the top strip: a 16 px chip with the three-bar glyph on it.</summary>
+        private static Button BuildMenuButton(Transform parent)
+        {
+            RectTransform rt = ModalKit.Rect("MenuButton", parent, 620, 0, 16, 16);
+            var image = rt.gameObject.AddComponent<Image>();
+            image.sprite = ModalKit.Sprite("ui_chipbtn_default_9s.png");
+            image.type = Image.Type.Sliced;
+            var button = rt.gameObject.AddComponent<Button>();
+            button.targetGraphic = image;
+            button.transition = Selectable.Transition.SpriteSwap;
+            button.spriteState = new SpriteState
+            {
+                highlightedSprite = ModalKit.Sprite("ui_chipbtn_hover_9s.png"),
+                pressedSprite = ModalKit.Sprite("ui_chipbtn_pressed_9s.png"),
+                selectedSprite = ModalKit.Sprite("ui_chipbtn_focus_9s.png"),
+                disabledSprite = ModalKit.Sprite("ui_chipbtn_disabled_9s.png"),
+            };
+            Img("Glyph", rt, S("UI/ui_glyph-menu_bone_8x8.png"), 4, 4, TopLeft);
+            return button;
+        }
+
+        /// <summary>The Start button and the speed control share the action strip; only one shows at a time.</summary>
+        private static ActionStripView BuildActionStrip(Transform parent, SpeedControlView speed)
+        {
+            // Start sits at the right end of the strip (art bible 7.3), its key chip to its left, the reason it is off at the left.
+            RectTransform group = ModalKit.Rect("StartGroup", parent, 0, 0, 0, 0);
+            Button start = ModalKit.Primary("StartButton", group, _font, LabelStart, 485, 333, 148, "start", Ink0, out TMP_Text startLabel);
+            Image keyChip = Img("KeyChip", group, S("UI/ui_chip_base_9s.png"), 415, 338, TopLeft, 66, 14, true);
+            Label("KeyLabel", keyChip.transform, LabelStartKey, 0, 1, 66, Fog, TextAlignmentOptions.Top);
+            TextMeshProUGUI reason = Label("Reason", group, string.Empty, 185, 339, 220, Fog);
+
+            RectTransform root = ModalKit.Rect("ActionStrip", parent, 0, 0, 0, 0);
+            var view = root.gameObject.AddComponent<ActionStripView>();
+            var so = new SerializedObject(view);
+            so.FindProperty("startGroup").objectReferenceValue = group.gameObject;
+            so.FindProperty("startButton").objectReferenceValue = start;
+            so.FindProperty("speedGroup").objectReferenceValue = speed.gameObject;
+            so.FindProperty("startLabel").objectReferenceValue = startLabel;
+            so.FindProperty("reasonLabel").objectReferenceValue = reason;
+            so.FindProperty("labelColour").colorValue = Ink0;
+            so.FindProperty("labelDisabledColour").colorValue = Fog;
+            so.FindProperty("heldReason").stringValue = LabelStartHeld;
+            so.ApplyModifiedPropertiesWithoutUndo();
+            speed.gameObject.SetActive(false);   // the scene opens in Planning; the controller swaps groups
+            return view;
+        }
+
+        /// <summary>The modals, the stage dim and the controller that wires every button.</summary>
+        private static void BuildScreenController(RectTransform safe, HudParts hud, ItemPopupController popup)
+        {
+            // Modals sit in the middle of the screen (user decision 2026-11-16), so the whole frame is dimmed behind them.
+            const float CentreX = IntegerCanvasScale.NativeWidth / 2f;
+            const float CentreY = IntegerCanvasScale.NativeHeight / 2f;
+            GameObject dim = ModalKit.DimMask(safe, 0, 0, IntegerCanvasScale.NativeWidth, IntegerCanvasScale.NativeHeight);
+            PauseMenuView pause = ModalKit.Pause(safe, _font, CentreX, CentreY);
+            ConfirmDialogView confirm = ModalKit.Confirm(safe, _font, CentreX, CentreY);
+            SettingsPanelView settings = ModalKit.Settings(safe, _font, CentreX, CentreY);
+
+            Transform workbench = safe.Find("Workbench");
+            CanvasGroup workbenchGroup = workbench.gameObject.AddComponent<CanvasGroup>();
+
+            var go = new GameObject("CombatScreen");
+            var controller = go.AddComponent<CombatScreenController>();
+            PixelCursor cursor = ModalKit.AddCursor(go);
+            var so = new SerializedObject(controller);
+            so.FindProperty("cursor").objectReferenceValue = cursor;
+            so.FindProperty("hud").objectReferenceValue = hud.View;
+            so.FindProperty("board").objectReferenceValue = Object.FindAnyObjectByType<ItemBoardController>();
+            so.FindProperty("popup").objectReferenceValue = popup;
+            so.FindProperty("strip").objectReferenceValue = hud.Strip;
+            so.FindProperty("menuButton").objectReferenceValue = hud.MenuButton;
+            so.FindProperty("pause").objectReferenceValue = pause;
+            so.FindProperty("confirm").objectReferenceValue = confirm;
+            so.FindProperty("settings").objectReferenceValue = settings;
+            so.FindProperty("stageDim").objectReferenceValue = dim;
+            Assign(so.FindProperty("screenGroups"), new[] { hud.HudGroup, workbenchGroup });
+            so.ApplyModifiedPropertiesWithoutUndo();
         }
 
         private static void Assign<T>(SerializedProperty array, T[] items) where T : Object
@@ -610,7 +787,8 @@ namespace Project05.Editor
             strip.anchoredPosition = Vector2.zero;
             var view = strip.gameObject.AddComponent<SpeedControlView>();
             string[] labels = { "1x", "2x", "4x", LabelSkip };
-            int[] widths = { 28, 28, 28, 52 };
+            int[] widths = { 28, 28, 28, 76 };
+            TextMeshProUGUI skipLabel = null;
             var buttons = new Button[4];
             var images = new Image[4];
             float x = 189;
@@ -621,18 +799,19 @@ namespace Project05.Editor
                 Button button = seg.gameObject.AddComponent<Button>();
                 button.targetGraphic = seg;
                 button.transition = Selectable.Transition.None;
-                Label("Label", seg.transform, labels[i], 0, 5, widths[i] + 8, Bone, TextAlignmentOptions.Top);
+                TextMeshProUGUI segLabel = Label("Label", seg.transform, labels[i], 0, 5, widths[i] + 8, Bone, TextAlignmentOptions.Top);
+                if (i == 3) skipLabel = segLabel;
                 buttons[i] = button;
                 images[i] = seg;
                 x += widths[i] + 8;
             }
 
-            Image key = Img("KeyChip", strip, S("UI/ui_chip_base_9s.png"), 598, 338, TopLeft, 30, 14, true);
-            Label("KeyLabel", key.transform, LabelKey, 0, 1, 30, Fog, TextAlignmentOptions.Top);
-
             var so = new SerializedObject(view);
             Assign(so.FindProperty("buttons"), buttons);
             Assign(so.FindProperty("segments"), images);
+            so.FindProperty("skipLabel").objectReferenceValue = skipLabel;
+            so.FindProperty("skipIdleText").stringValue = LabelSkip;
+            so.FindProperty("skipArmedText").stringValue = LabelSkipArmed;
             so.ApplyModifiedPropertiesWithoutUndo();
             return view;
         }
@@ -706,6 +885,92 @@ namespace Project05.Editor
             }
         }
 
+        /// <summary>
+        /// Menu entry: capture the saved Combat scene at zoom 2 while the sword is held, rotated, over a free place
+        /// and over a blocked one, then reload the scene from disk. Refuses to run on unsaved changes.
+        /// </summary>
+        [MenuItem("Project05/Combat/Capture Drag Preview")]
+        public static void CaptureDragPreview()
+        {
+            if (SceneManager.GetActiveScene().isDirty)
+            {
+                Debug.LogWarning("[CombatSceneBuilder] The open scene has unsaved changes; save or discard them, then capture again.");
+                return;
+            }
+
+            EditorSceneManager.OpenScene(ScenePath, OpenSceneMode.Single);
+            try
+            {
+                var board = Object.FindAnyObjectByType<ItemBoardController>();
+                ItemHoverTarget sword = null;
+                foreach (ItemHoverTarget t in Object.FindObjectsByType<ItemHoverTarget>()) if (t.ItemId == "item_war_drum") sword = t;
+                if (sword == null) return;
+
+                board.Pickup(sword, false);
+                board.SimulatePointer(new Vector2(157f, 172f));         // over free stash cells
+                Capture(HudFixture.Planning, 2, "drag_valid");
+                board.SimulatePointer(new Vector2(37f, 70f));           // over placed items: blocked
+                Capture(HudFixture.Planning, 2, "drag_blocked");
+                board.RotateHeld();
+                board.SimulatePointer(new Vector2(147f, 182f));         // turned a quarter, over free stash cells
+                Capture(HudFixture.Planning, 2, "drag_rotated");
+                board.SimulatePointer(SellRect.center);                    // over the sell zone
+                Capture(HudFixture.Planning, 2, "drag_sell");
+                board.Cancel();
+            }
+            finally
+            {
+                EditorSceneManager.OpenScene(ScenePath, OpenSceneMode.Single);
+            }
+        }
+
+        /// <summary>
+        /// Menu entry: capture the saved Combat scene at zoom 2 in Planning (Start shown), in Playback (speed control with
+        /// Skip armed), and with the pause menu, the abandon dialog and the settings panel open, then reload the scene.
+        /// </summary>
+        [MenuItem("Project05/Combat/Capture Button States")]
+        public static void CaptureButtonStates()
+        {
+            if (SceneManager.GetActiveScene().isDirty)
+            {
+                Debug.LogWarning("[CombatSceneBuilder] The open scene has unsaved changes; save or discard them, then capture again.");
+                return;
+            }
+
+            EditorSceneManager.OpenScene(ScenePath, OpenSceneMode.Single);
+            try
+            {
+                var pause = Object.FindAnyObjectByType<PauseMenuView>(FindObjectsInactive.Include);
+                var confirm = Object.FindAnyObjectByType<ConfirmDialogView>(FindObjectsInactive.Include);
+                var settings = Object.FindAnyObjectByType<SettingsPanelView>(FindObjectsInactive.Include);
+                var dim = GameObject.Find("CombatCanvas").transform.Find("SafeFrame/StageDim")?.gameObject;
+                var speed = Object.FindAnyObjectByType<SpeedControlView>(FindObjectsInactive.Include);
+
+                Capture(HudFixture.Planning, 2, "buttons_planning");
+
+                speed.SetSkipArmed(true);
+                Capture(HudFixture.PartyActing, 2, "buttons_skip-armed");
+                speed.SetSkipArmed(false);
+
+                dim.SetActive(true);
+                pause.gameObject.SetActive(true);
+                Capture(HudFixture.PartyActing, 2, "buttons_pause-menu");
+                pause.gameObject.SetActive(false);
+
+                confirm.gameObject.SetActive(true);
+                Capture(HudFixture.PartyActing, 2, "buttons_confirm");
+                confirm.gameObject.SetActive(false);
+
+                settings.Refresh();
+                settings.gameObject.SetActive(true);
+                Capture(HudFixture.PartyActing, 2, "buttons_settings");
+            }
+            finally
+            {
+                EditorSceneManager.OpenScene(ScenePath, OpenSceneMode.Single);
+            }
+        }
+
         private static void Capture(HudFixture fixture, int zoom, string name = null)
         {
             Camera cam = Object.FindAnyObjectByType<Camera>();
@@ -718,6 +983,8 @@ namespace Project05.Editor
             so.FindProperty("fixture").enumValueIndex = (int)fixture;
             so.ApplyModifiedPropertiesWithoutUndo();
             demo.Show();
+            var strip = Object.FindAnyObjectByType<ActionStripView>();
+            if (strip != null) strip.SetPhase(fixture == HudFixture.Planning ? ScreenPhase.Planning : ScreenPhase.Playback);
 
             int w = IntegerCanvasScale.NativeWidth * zoom;
             int h = IntegerCanvasScale.NativeHeight * zoom;

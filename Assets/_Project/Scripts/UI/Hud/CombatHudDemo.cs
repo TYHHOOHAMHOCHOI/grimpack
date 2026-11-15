@@ -12,7 +12,11 @@ namespace Project05.UI.Hud
         [SerializeField] private CombatHudView hud;
         [SerializeField] private HudFixture fixture = HudFixture.PartyActing;
 
-        private void OnEnable() => Show();
+        // In Play Mode the screen controller owns what the HUD shows; this component is for the Editor and captures.
+        private void OnEnable()
+        {
+            if (!Application.isPlaying) Show();
+        }
 
 #if UNITY_EDITOR
         // The HUD creates and destroys children, which is not allowed inside OnValidate: wait for the editor loop.

@@ -206,8 +206,189 @@ def panel_void() -> Cv:
     return c
 
 
+def primary(state: str) -> Cv:
+    """Primary action button 9-slice (Start, art bible 7.3): the segment frame with a Candle 2 px frame. 24 x 24, body at 4..19."""
+    c = Cv(24, 24)
+    edge = "INK-3" if state == "disabled" else "CANDLE"
+    fill = "CANDLE" if state == "pressed" else "INK-1"
+    if state == "hover":
+        c.frame(2, 2, 20, 20, 1, "CANDLE")
+    if state == "focus":
+        c.frame(1, 1, 22, 22, 2, "CANDLE")
+    c.rect(4, 4, 16, 16, fill)
+    c.frame(4, 4, 16, 16, 2, edge)
+    return c
+
+
+def chipbtn(state: str) -> Cv:
+    """Small button on a chip (menu, 12 x 12, border 3). The state shows in the frame, since the top strip leaves no room for rings."""
+    c = Cv(12, 12)
+    edge = {"default": "INK-4", "hover": "CANDLE", "pressed": "CANDLE", "focus": "CANDLE", "disabled": "INK-3"}[state]
+    c.rect(0, 0, 12, 12, "CANDLE" if state == "pressed" else "INK-1")
+    c.frame(0, 0, 12, 12, 2 if state == "focus" else 1, edge)
+    return c
+
+
+def dim_mask() -> Cv:
+    """One-step dim for the pause overlay (art bible 2.3.1): a 1 px checker of INK-0, so no pixel leaves the palette."""
+    c = Cv(4, 4)
+    for y in range(4):
+        for x in range(4):
+            if (x + y) % 2 == 0:
+                c.px(x, y, "INK-0")
+    return c
+
+
+def ghost_cells() -> dict[str, Cv]:
+    """Ghost footprint cells for dragging an item (art bible 7.11): a solid 1 px outline, Fog-hi when the target is valid and
+    Fog when it is not, plus a 5 x 5 cross on each blocking cell. Never red."""
+    valid = Cv(20, 20); valid.frame(0, 0, 20, 20, 1, "FOG-HI")
+    invalid = Cv(20, 20); invalid.frame(0, 0, 20, 20, 1, "FOG")
+    cross = Cv(20, 20)
+    for i in range(5):
+        cross.px(8 + i, 8 + i, "FOG"); cross.px(12 - i, 8 + i, "FOG")
+    return {"ui_ghost_valid_20x20": valid, "ui_ghost_invalid_20x20": invalid, "ui_ghost_cross_20x20": cross}
+
+
+# ------------------------------------------------------------------ sell zone (user request 2026-11-16)
+def sell_scale(state: str) -> Cv:
+    """Balance scale above the sell zone, 48 x 28. Default is quiet chrome; active (an item is held) lifts it to Fog."""
+    c = Cv(48, 28)
+    hi, lo = ("FOG-HI", "FOG") if state == "active" else ("INK-4", "INK-3")
+    c.rect(22, 0, 4, 2, hi)                      # knob
+    c.rect(23, 2, 2, 22, lo); c.rect(23, 2, 1, 22, hi)   # pillar, lit on the left
+    c.rect(4, 4, 40, 2, lo); c.rect(4, 4, 40, 1, hi)     # beam
+    c.rect(16, 24, 16, 2, lo); c.rect(14, 26, 20, 2, lo); c.rect(16, 24, 16, 1, hi)  # base
+    for cx in (7, 40):
+        c.rect(cx - 1, 6, 2, 2, hi)              # hook
+        for k in range(9):                       # two strings to the pan rim
+            c.px(cx - 1 - k // 2 - (k % 2), 8 + k, lo)
+            c.px(cx + k // 2 + (k % 2), 8 + k, lo)
+        c.rect(cx - 7, 17, 15, 1, hi)            # pan rim
+        c.rect(cx - 6, 18, 13, 1, lo); c.rect(cx - 4, 19, 9, 1, lo)
+    return c
+
+
+def sell_frame(state: str) -> Cv:
+    """Sell zone 9-slice, 24 x 24, border 8: a thin frame with bracket corners. Default Blood-d corners; active (an item is
+    held) Blood corners and an Ink-4 frame; hover (the held item is over it) a Blood frame and Wine fill."""
+    c = Cv(24, 24)
+    fill = {"default": "INK-1", "active": "INK-1", "hover": "WINE-1"}[state]
+    edge = {"default": "INK-3", "active": "INK-4", "hover": "BLOOD"}[state]
+    corner = {"default": "BLOOD-D", "active": "BLOOD", "hover": "RED-GLOW"}[state]
+    c.rect(2, 2, 20, 20, fill)
+    c.frame(2, 2, 20, 20, 1, edge)
+    for x0, y0, sx, sy in ((0, 0, 1, 1), (23, 0, -1, 1), (0, 23, 1, -1), (23, 23, -1, -1)):
+        for i in range(6):
+            c.px(x0 + sx * i, y0, corner); c.px(x0, y0 + sy * i, corner)
+            c.px(x0 + sx * i, y0 + sy, corner); c.px(x0 + sx, y0 + sy * i, corner)
+        c.px(x0 + sx * 3, y0 + sy * 3, corner)
+    return c
+
+
+def sell_tile() -> Cv:
+    """Floor of the sell zone, tiled at the cell pitch: a small ring at the cell centre and a plus at the corners, Ink-2."""
+    c = Cv(20, 20)
+    for dx, dy in ((0, -1), (1, 0), (0, 1), (-1, 0)):
+        c.px(10 + dx, 10 + dy, "INK-3")
+    for x, y in ((0, 0),):
+        for k in range(-2, 3):
+            c.px((x + k) % 20, y, "INK-2"); c.px(x, (y + k) % 20, "INK-2")
+    return c
+
+
+def start_button(state: str) -> Cv:
+    """Start, the one filled button (art bible 7.3, review 2026-11-16): a Candle plate with a Candle-d lip so it reads as
+    pressable, dark text on it. 24 x 24, body at 4..19, border 8. Hover adds a 1 px Candle ring with a 1 px gap; focus a
+    2 px Bone ring, so focus never looks like the resting plate; pressed sinks 1 px and loses the lip; disabled is Ink."""
+    c = Cv(24, 24)
+    if state == "disabled":
+        c.rect(4, 4, 16, 16, "INK-3"); c.frame(4, 4, 16, 16, 1, "INK-4")
+        return c
+    if state == "hover":
+        c.frame(2, 2, 20, 20, 1, "CANDLE")
+    if state == "focus":
+        c.frame(0, 0, 24, 24, 2, "BONE")
+    if state == "pressed":
+        c.rect(4, 5, 16, 15, "CANDLE-D"); c.rect(5, 6, 14, 13, "CANDLE")
+        return c
+    c.rect(4, 4, 16, 16, "CANDLE-D")              # outline and lip
+    c.rect(5, 5, 14, 12, "CANDLE")                # face
+    c.rect(5, 5, 14, 1, "BONE")                   # top light
+    return c
+
+
+# ------------------------------------------------------------------ mouse cursors (user request 2026-11-16)
+CURSOR_ARROW = [
+    "O..........",
+    "OO.........",
+    "OCO........",
+    "OBBO.......",
+    "OBBBO......",
+    "OBBBBO.....",
+    "OBBBBFO....",
+    "OBBBBBFO...",
+    "OBBBBBBFO..",
+    "OBBBBBBBFO.",
+    "OBBBBFOOOOO",
+    "OBBOBFO....",
+    "OBO.OBFO...",
+    "OO..OBFO...",
+    "O....OBFO..",
+    ".....OOO...",
+]
+CURSOR_GRAB = [
+    "..OOOOOOOO....",
+    ".OBBOBBOBBOO..",
+    ".OBBOBBOBBOBO.",
+    "OOBBBBBBBBBBO.",
+    "OBOBBBBBBBBBO.",
+    "OBBBBBBBBBBFO.",
+    "OBBBBBBBBBBFO.",
+    ".OBBBBBBBBFO..",
+    "..OBBBBBBFO...",
+    "...OBBBBBFO...",
+    "...OOOOOOO....",
+]
+CURSOR_INK = {"O": "INK-0", "B": "BONE", "F": "FOG", "C": "CANDLE"}
+
+
+def cursor(rows: list[str]) -> Cv:
+    """A cursor drawn from a character map: Ink-0 outline, Bone body, Fog shade, a Candle tip on the arrow."""
+    c = Cv(len(rows[0]), len(rows))
+    for y, row in enumerate(rows):
+        for x, ch in enumerate(row):
+            if ch in CURSOR_INK:
+                c.px(x, y, CURSOR_INK[ch])
+    return c
+
+
+def save_cursor(c: Cv, name: str) -> None:
+    """Hardware cursors are not scaled by the canvas, so each one is saved pre-scaled for zoom 1 to 4."""
+    folder = ROOT / "Assets/_Project/Art/UI/Cursors"
+    folder.mkdir(parents=True, exist_ok=True)
+    img = Image.fromarray(c.a, "RGBA")
+    for z in range(1, 5):
+        big = img.resize((c.w * z, c.h * z), Image.NEAREST)
+        big.save(folder / f"ui_cursor-{name}_x{z}_{c.w * z}x{c.h * z}.png")
+
+
 def main() -> int:
     UI.mkdir(parents=True, exist_ok=True)
+    for name, c in ghost_cells().items():
+        c.save(UI / f"{name}.png")
+    for st in ("default", "hover", "pressed", "focus", "disabled"):
+        primary(st).save(UI / f"ui_primary_{st}_9s.png")
+        chipbtn(st).save(UI / f"ui_chipbtn_{st}_9s.png")
+        start_button(st).save(UI / f"ui_start_{st}_9s.png")
+    dim_mask().save(UI / "ui_dim-mask_default_4x4.png")
+    save_cursor(cursor(CURSOR_ARROW), "arrow")
+    save_cursor(cursor(CURSOR_GRAB), "grab")
+    for st in ("default", "active"):
+        sell_scale(st).save(UI / f"ui_sell-scale_{st}_48x28.png")
+    for st in ("default", "active", "hover"):
+        sell_frame(st).save(UI / f"ui_sell-frame_{st}_9s.png")
+    sell_tile().save(UI / "ui_sell-tile_default_20x20.png")
     panel_void().save(UI / "ui_panel_void_9s.png")
     for name, colour in FILLS.items():  # solid fills as sprites: UI vertex colour is not exact in a linear-colour project
         f = Cv(4, 4); f.rect(0, 0, 4, 4, colour); f.save(UI / f"ui_fill_{name}_4x4.png")

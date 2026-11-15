@@ -16,7 +16,7 @@ their curses. The target names `FirstEnemy` and `AllEnemies` are a **proposal**:
 | 4 | Mực Ấn / Seal Ink (`item_seal_ink`) | White | 1x1 (1 cells) | Cooldown 2 | Apply 2 Ấn → FirstEnemy | - | - | seal |
 | 5 | Đá Mài / Whetstone (`item_whetstone`) | White | 1x1 (1 cells) | Passive | - | - | blade: +3 damage | tool |
 | 6 | Áo Da / Leather Vest (`item_leather_vest`) | White | 2x2 (4 cells) | Passive | - | +12 max HP | - | armour |
-| 7 | Giày Gió / Swift Boots (`item_swift_boots`) | White | l (3 cells) | Passive | - | +3 speed | - | boots |
+| 7 | Giày Gió / Swift Boots (`item_swift_boots`) | White | l3 (3 cells) | Passive | - | +3 speed | - | boots |
 | 8 | Mũ Sắt / Iron Helm (`item_iron_helm`) | White | 1x1 (1 cells) | Passive | - | +6 max HP | - | armour |
 | 9 | Nỏ Gỗ / Crossbow (`item_crossbow`) | Green | 2x1 (2 cells) | Cooldown 3 | Damage 15 → FirstEnemy | - | - | weapon, ranged |
 | 10 | Ấn Triện / Seal Stamp (`item_seal_stamp`) | Green | 1x2 (2 cells) | Cooldown 2 | Apply 3 Ấn → FirstEnemy | - | - | seal |
@@ -34,7 +34,7 @@ their curses. The target names `FirstEnemy` and `AllEnemies` are a **proposal**:
 | 22 | Kính Học Giả / Scholar Lens (`item_scholar_lens`) | Purple | 1x1 (1 cells) | Passive | - | - | seal: +2 an applied; detonator: +50% damage | relic |
 | 23 | Khiên Tháp / Tower Shield (`item_tower_shield`) | Purple | 2x3 (6 cells) | Passive | - | +30 max HP, -2 speed | - | armour |
 
-23 items. Per tier: {'White': 8, 'Green': 7, 'Blue': 5, 'Purple': 3}. Footprints used: 1x1, 1x2, 1x3, 2x1, 2x2, 2x3, l, s, t.
+23 items. Per tier: {'White': 8, 'Green': 7, 'Blue': 5, 'Purple': 3}. Footprints used: 1x1, 1x2, 1x3, 2x1, 2x2, 2x3, l, l3, s, t.
 
 ## Design intent
 

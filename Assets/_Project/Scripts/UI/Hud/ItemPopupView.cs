@@ -8,8 +8,8 @@ namespace Project05.UI.Hud
 {
     /// <summary>
     /// Draws the item popup (art bible 7.9, 8.8): the panel frame, 152 px wide and 9-sliced to any height up to 232 px,
-    /// then a title, the tier and shape in words, and one row per fact with its keyword glyph. Rows are rebuilt on
-    /// every <see cref="Build"/>; they are not saved with the scene.
+    /// then a title, the tier and shape in words, and one row per fact with its keyword glyph. Rows are pooled and reused
+    /// on every <see cref="Build"/>, so swapping between items creates no objects; they are not saved with the scene.
     /// </summary>
     public sealed class ItemPopupView : MonoBehaviour
     {
@@ -30,6 +30,12 @@ namespace Project05.UI.Hud
         private static readonly Color Bone = new Color32(0xE4, 0xDA, 0xC0, 0xFF);
         private static readonly Color Fog = new Color32(0x87, 0x95, 0xB3, 0xFF);
 
+        private readonly List<TextMeshProUGUI> _texts = new List<TextMeshProUGUI>();
+        private readonly List<Image> _glyphs = new List<Image>();
+        private Image _separator;
+        private int _textUsed;
+        private int _glyphUsed;
+
         /// <summary>Current popup size in native px.</summary>
         public Vector2 Size { get; private set; }
 
@@ -37,11 +43,9 @@ namespace Project05.UI.Hud
         public Vector2 Build(PopupContent content)
         {
             panel.gameObject.SetActive(true);   // text on an inactive object is not measured
-            for (int i = panel.childCount - 1; i >= 0; i--)
-            {
-                GameObject child = panel.GetChild(i).gameObject;
-                if (Application.isPlaying) Destroy(child); else DestroyImmediate(child);
-            }
+            if (_texts.Count == 0 && _glyphs.Count == 0 && _separator == null) ClearStrayChildren();
+            _textUsed = 0;
+            _glyphUsed = 0;
 
             int inner = Width - 2 * Pad;
             float y = Pad;
@@ -57,6 +61,9 @@ namespace Project05.UI.Hud
                 if (glyph) AddGlyph(line.Glyph.Value, Pad, y + 2);
                 y += AddText(line.Text, x, y, inner - (glyph ? GlyphIndent : 0), line.Dim ? Fog : Bone) + 3;
             }
+
+            for (int i = _textUsed; i < _texts.Count; i++) _texts[i].gameObject.SetActive(false);
+            for (int i = _glyphUsed; i < _glyphs.Count; i++) _glyphs[i].gameObject.SetActive(false);
 
             float height = Mathf.Min(MaxHeight, Mathf.Ceil(y + Pad - 3));
             panel.sizeDelta = new Vector2(Width, height);
@@ -76,16 +83,24 @@ namespace Project05.UI.Hud
 
         private float AddText(string text, float x, float y, float width, Color colour)
         {
-            RectTransform rt = NewRect("Text", x, y, width, 14);
-            var tmp = rt.gameObject.AddComponent<TextMeshProUGUI>();
-            tmp.font = font;
-            tmp.fontSize = 12;
+            if (_textUsed == _texts.Count)
+            {
+                var created = NewRect("Text", 0, 0, width, 14).gameObject.AddComponent<TextMeshProUGUI>();
+                created.font = font;
+                created.fontSize = 12;
+                created.alignment = TextAlignmentOptions.TopLeft;
+                created.textWrappingMode = TextWrappingModes.Normal;
+                created.overflowMode = TextOverflowModes.Overflow;
+                created.margin = Vector4.zero;
+                created.raycastTarget = false;
+                _texts.Add(created);
+            }
+
+            TextMeshProUGUI tmp = _texts[_textUsed++];
+            RectTransform rt = tmp.rectTransform;
+            tmp.gameObject.SetActive(true);
+            rt.anchoredPosition = new Vector2(x, -y);
             tmp.color = colour;
-            tmp.alignment = TextAlignmentOptions.TopLeft;
-            tmp.textWrappingMode = TextWrappingModes.Normal;
-            tmp.overflowMode = TextOverflowModes.Overflow;
-            tmp.margin = Vector4.zero;
-            tmp.raycastTarget = false;
             tmp.text = text;
             rt.sizeDelta = new Vector2(width, 14f);
             tmp.ForceMeshUpdate();
@@ -97,18 +112,40 @@ namespace Project05.UI.Hud
 
         private void AddGlyph(GlyphKind kind, float x, float y)
         {
-            RectTransform rt = NewRect("Glyph", x - 1, y - 1, 10, 10);
-            var image = rt.gameObject.AddComponent<Image>();
+            if (_glyphUsed == _glyphs.Count)
+            {
+                Image created = NewRect("Glyph", 0, 0, 10, 10).gameObject.AddComponent<Image>();
+                created.raycastTarget = false;
+                _glyphs.Add(created);
+            }
+
+            Image image = _glyphs[_glyphUsed++];
+            image.gameObject.SetActive(true);
+            image.rectTransform.anchoredPosition = new Vector2(x - 1, -(y - 1));
             image.sprite = sprites.Glyph8(kind);
-            image.raycastTarget = false;
         }
 
         private void AddSeparator(float x, float y, float width)
         {
-            RectTransform rt = NewRect("Separator", x, y, width, 1);
-            var image = rt.gameObject.AddComponent<Image>();
-            image.sprite = separator;
-            image.raycastTarget = false;
+            if (_separator == null)
+            {
+                _separator = NewRect("Separator", x, y, width, 1).gameObject.AddComponent<Image>();
+                _separator.sprite = separator;
+                _separator.raycastTarget = false;
+            }
+
+            _separator.rectTransform.anchoredPosition = new Vector2(x, -y);
+            _separator.rectTransform.sizeDelta = new Vector2(width, 1);
+        }
+
+        // Rows left in the panel by an earlier build (edit-mode captures) are not in the pools: remove them once.
+        private void ClearStrayChildren()
+        {
+            for (int i = panel.childCount - 1; i >= 0; i--)
+            {
+                GameObject child = panel.GetChild(i).gameObject;
+                if (Application.isPlaying) Destroy(child); else DestroyImmediate(child);
+            }
         }
 
         private RectTransform NewRect(string name, float x, float y, float w, float h)

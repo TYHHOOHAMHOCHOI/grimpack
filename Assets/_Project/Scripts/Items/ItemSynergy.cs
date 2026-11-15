@@ -2,18 +2,20 @@ using System.Collections.Generic;
 
 namespace Project05.Items
 {
-    /// <summary>An item placed in one hero grid: its record and the grid cell of its origin.</summary>
+    /// <summary>An item placed in one hero grid: its record, the grid cell of its origin and its rotation in quarter turns.</summary>
     public readonly struct PlacedItem
     {
         public readonly ItemRecord Item;
         public readonly int X;
         public readonly int Y;
+        public readonly CellRecord[] Cells;
 
-        public PlacedItem(ItemRecord item, int x, int y)
+        public PlacedItem(ItemRecord item, int x, int y, int rotation = 0)
         {
             Item = item;
             X = x;
             Y = y;
+            Cells = ItemShapes.Rotate(item.cells, rotation);
         }
     }
 
@@ -73,9 +75,9 @@ namespace Project05.Items
         /// <summary>True when the two placed items share at least one cell edge.</summary>
         public static bool Adjacent(PlacedItem a, PlacedItem b)
         {
-            foreach (CellRecord ca in a.Item.cells)
+            foreach (CellRecord ca in a.Cells)
             {
-                foreach (CellRecord cb in b.Item.cells)
+                foreach (CellRecord cb in b.Cells)
                 {
                     int dx = System.Math.Abs(a.X + ca.x - (b.X + cb.x));
                     int dy = System.Math.Abs(a.Y + ca.y - (b.Y + cb.y));

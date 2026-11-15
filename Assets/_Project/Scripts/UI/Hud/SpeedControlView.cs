@@ -1,5 +1,7 @@
 using System;
+using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace Project05.UI.Hud
@@ -13,6 +15,9 @@ namespace Project05.UI.Hud
     {
         [SerializeField] private Button[] buttons = Array.Empty<Button>();
         [SerializeField] private Image[] segments = Array.Empty<Image>();
+        [SerializeField] private TMP_Text skipLabel;
+        [SerializeField] private string skipIdleText = string.Empty;
+        [SerializeField] private string skipArmedText = string.Empty;
 
         /// <summary>Raised with the segment index when the player activates a segment.</summary>
         public event Action<int> SpeedRequested;
@@ -32,6 +37,18 @@ namespace Project05.UI.Hud
         private void OnDisable()
         {
             foreach (Button b in buttons) b.onClick.RemoveAllListeners();
+        }
+
+        /// <summary>Shows whether Skip is armed. The label changes, so it is never mistaken for a selected speed.</summary>
+        public void SetSkipArmed(bool armed)
+        {
+            if (skipLabel != null) skipLabel.text = armed ? skipArmedText : skipIdleText;
+        }
+
+        /// <summary>Gives keyboard focus to a segment (the current speed has focus on entering playback).</summary>
+        public void Focus(int index)
+        {
+            if (EventSystem.current != null && index >= 0 && index < buttons.Length) EventSystem.current.SetSelectedGameObject(buttons[index].gameObject);
         }
 
         /// <summary>Marks one segment selected.</summary>

@@ -30,7 +30,8 @@ FP = {
     "1x3": [(0, 0), (0, 1), (0, 2)],
     "2x2": [(0, 0), (1, 0), (0, 1), (1, 1)],
     "2x3": [(0, 0), (1, 0), (0, 1), (1, 1), (0, 2), (1, 2)],
-    "l": [(0, 0), (1, 0), (0, 1)],                  # axe, boots: handle plus head
+    "l": [(0, 0), (1, 0), (0, 1)],                  # axe: haft down the left, head across the top
+    "l3": [(0, 0), (0, 1), (1, 1)],                 # boots: shaft down the left, foot along the bottom
     "t": [(0, 0), (1, 0), (2, 0), (1, 1), (1, 2)],  # hammer: head across the top, handle down
     "s": [(0, 0), (1, 0), (1, 1), (2, 1)],          # chain links
 }
@@ -84,7 +85,7 @@ ITEMS = [
          ["tool"], PASSIVE, rules=[rule("DamageFlat", 3, ["blade"])]),
     item("leather-vest", "White", "2x2", "Áo Da", "Leather Vest", "Đã sờn, vẫn ấm.", "Worn, still warm.",
          ["armour"], PASSIVE, hp=12),
-    item("swift-boots", "White", "l", "Giày Gió", "Swift Boots", "Đế mỏng, bước nhẹ.", "Thin soles, light steps.",
+    item("swift-boots", "White", "l3", "Giày Gió", "Swift Boots", "Đế mỏng, bước nhẹ.", "Thin soles, light steps.",
          ["boots"], PASSIVE, speed=3),
     item("iron-helm", "White", "1x1", "Mũ Sắt", "Iron Helm", "Móp ở một bên.", "Dented on one side.",
          ["armour"], PASSIVE, hp=6),

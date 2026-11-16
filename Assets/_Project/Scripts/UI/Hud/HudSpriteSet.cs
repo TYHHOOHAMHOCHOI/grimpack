@@ -27,6 +27,8 @@ namespace Project05.UI.Hud
         [Tooltip("Idle1, Idle2, Hurt1, Hurt2, Down1, Down2.")]
         public Sprite[] heroPoses = new Sprite[6];
         public Sprite heroNarrow;
+        [Tooltip("Attack wind-up and strike, shown by combat playback during the lunge.")]
+        public Sprite[] heroAttack = Array.Empty<Sprite>();
         public Sprite pedestalDefault;
         public Sprite pedestalDim;
 
@@ -47,6 +49,23 @@ namespace Project05.UI.Hud
         [Header("Plates, indexed by Tier")]
         public Sprite[] plateLift = new Sprite[6];
         public Sprite[] plateLiftHi = new Sprite[6];
+
+        [Header("Combat effects (art bible 5.10), plain = hero side, foe = enemy side")]
+        public Sprite[] vfxSmear = Array.Empty<Sprite>();
+        public Sprite[] vfxSmearFoe = Array.Empty<Sprite>();
+        public Sprite[] vfxSpark = Array.Empty<Sprite>();
+        public Sprite[] vfxSparkFoe = Array.Empty<Sprite>();
+        public Sprite[] vfxBurst = Array.Empty<Sprite>();
+        public Sprite[] vfxBurstFoe = Array.Empty<Sprite>();
+        public Sprite vfxBurstCalm;
+        public Sprite vfxBurstFoeCalm;
+        public Sprite[] vfxTrail = Array.Empty<Sprite>();
+        public Sprite[] vfxTrailFoe = Array.Empty<Sprite>();
+        public Sprite[] vfxMote = Array.Empty<Sprite>();
+        public Sprite[] vfxMoteFoe = Array.Empty<Sprite>();
+
+        [Tooltip("1 px INK-0 checker: dims a charging item plate without alpha.")]
+        public Sprite dimMask;
 
         [Header("Markers")]
         public Sprite chevronTurnHero;

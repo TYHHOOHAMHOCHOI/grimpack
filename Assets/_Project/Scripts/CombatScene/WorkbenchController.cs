@@ -116,6 +116,10 @@ namespace Project05.CombatScene
 
         public event Action ArrangementChanged;
 
+        /// <summary>The plate of a placed item instance, or null.</summary>
+        public RectTransform PlateOf(long instanceId) =>
+            _plateImagesById.TryGetValue(instanceId, out Image plate) && plate != null ? plate.rectTransform : null;
+
         public void Initialize(
             RectTransform safeFrame,
             RectTransform workbenchRoot,

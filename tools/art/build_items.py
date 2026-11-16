@@ -99,6 +99,8 @@ def make_art(raw: Path, w: int, h: int) -> np.ndarray:
     body = erode4(solid)                       # the generator's own outline is replaced below
     if not body.any():
         body = solid
+    # A 1-2 px thin part (a handle or a chain after the 2x reduction) would vanish entirely under the erosion; keep it.
+    body = body | (solid & ~dilate4(body))
     rgb = quantise(a[..., :3], body)
     sil = body
     outline = dilate4(sil) & ~sil

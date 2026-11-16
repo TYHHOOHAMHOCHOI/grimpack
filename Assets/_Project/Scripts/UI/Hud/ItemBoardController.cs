@@ -49,6 +49,8 @@ namespace Project05.UI.Hud
         [Tooltip("Top layer a held plate moves to, so it draws above the stage and the drawer.")]
         [SerializeField] private RectTransform dragLayer;
         [SerializeField] private WorkbenchView workbench;
+        [Tooltip("Fill used for the 2 px gap drawn between two items that touch (user request 2026-11-16).")]
+        [SerializeField] private Sprite separatorSprite;
         [Tooltip("Provisional sell price per tier (White, Green, Blue, Purple, Gold, Red) until Currency and Shop (System 20) exists.")]
         [SerializeField] private int[] sellPriceByTier = { 1, 2, 3, 5, 8, 12 };
 
@@ -71,6 +73,9 @@ namespace Project05.UI.Hud
         private PlaceResult _targetResult = PlaceResult.OutOfBounds;
         private readonly List<(int x, int y)> _bad = new List<(int x, int y)>();
         private bool _overSell;
+        private bool _separatorsDirty = true;
+        private RectTransform _separatorLayer;
+        private readonly List<Image> _separators = new List<Image>();
         private Transform _heldParent;
         private bool _sellEnabled = true;
 
@@ -326,6 +331,7 @@ namespace Project05.UI.Hud
             popup.Suppressed = true;
             popup.Close();
             _heldParent = target.transform.parent;
+            _separatorsDirty = true;
             if (dragLayer != null) target.transform.SetParent(dragLayer, false);   // same top-left origin, so positions hold
             target.transform.SetAsLastSibling();
             Refresh();
@@ -390,6 +396,7 @@ namespace Project05.UI.Hud
             ItemRecord record = _heldItem.Record;
             _gesture.Dropped(Time.frameCount);
             _board.Remove(_heldItem);
+            _separatorsDirty = true;
             _map.Remove(_held);
             RestoreParent();
             _held.gameObject.SetActive(false);
@@ -579,7 +586,108 @@ namespace Project05.UI.Hud
             return view.origin + new Vector2(item.X * Cell + w * Cell / 2f, item.Y * Cell + h * Cell / 2f);
         }
 
-        private void Place(ItemHoverTarget target, BoardItem item) => SetRect(target, Center(item, item.Rotation), item.Rotation);
+        private void Place(ItemHoverTarget target, BoardItem item)
+        {
+            SetRect(target, Center(item, item.Rotation), item.Rotation);
+            _separatorsDirty = true;
+        }
+
+        /// <summary>The plate of a board item, or null.</summary>
+        public RectTransform PlateOf(BoardItem item)
+        {
+            foreach (KeyValuePair<ItemHoverTarget, BoardItem> pair in _map)
+            {
+                if (pair.Value == item) return pair.Key != null ? pair.Key.Rect : null;
+            }
+
+            return null;
+        }
+
+        // ------------------------------------------------------------------ gaps between touching items
+        private void LateUpdate()
+        {
+            if (!_separatorsDirty || _board == null) return;
+            _separatorsDirty = false;
+            RebuildSeparators();
+        }
+
+        /// <summary>
+        /// Two items that touch would read as one block: a 2 px INK-1 line is drawn over their shared edge, which covers the
+        /// dark outer ring of both plates and leaves each lit tier frame standing on its own. A held item has no lines.
+        /// </summary>
+        private void RebuildSeparators()
+        {
+            if (separatorSprite == null || ghostLayer == null) return;
+            if (_separatorLayer == null)
+            {
+                var go = new GameObject("ItemGaps", typeof(RectTransform));
+                go.hideFlags = HideFlags.DontSave;
+                go.transform.SetParent(ghostLayer.parent, false);
+                _separatorLayer = (RectTransform)go.transform;
+                _separatorLayer.anchorMin = _separatorLayer.anchorMax = _separatorLayer.pivot = new Vector2(0f, 1f);
+                _separatorLayer.anchoredPosition = ghostLayer.anchoredPosition;
+            }
+
+            int used = 0;
+            foreach (ContainerView c in containers)
+            {
+                var owner = new BoardItem[c.cols, c.rows];
+                foreach (BoardItem item in _board.Items)
+                {
+                    if (item.Container != c.id || item == _heldItem) continue;
+                    foreach (CellRecord cell in item.Cells)
+                    {
+                        int x = item.X + cell.x, y = item.Y + cell.y;
+                        if (x >= 0 && y >= 0 && x < c.cols && y < c.rows) owner[x, y] = item;
+                    }
+                }
+
+                for (int x = 0; x < c.cols; x++)
+                {
+                    for (int y = 0; y < c.rows; y++)
+                    {
+                        BoardItem here = owner[x, y];
+                        if (here == null) continue;
+                        if (x + 1 < c.cols && owner[x + 1, y] != null && owner[x + 1, y] != here)
+                        {
+                            Line(ref used, c.origin + new Vector2((x + 1) * Cell - 1, y * Cell), new Vector2(2f, Cell));
+                        }
+
+                        if (y + 1 < c.rows && owner[x, y + 1] != null && owner[x, y + 1] != here)
+                        {
+                            Line(ref used, c.origin + new Vector2(x * Cell, (y + 1) * Cell - 1), new Vector2(Cell, 2f));
+                        }
+                    }
+                }
+            }
+
+            for (int i = used; i < _separators.Count; i++) _separators[i].gameObject.SetActive(false);
+            _separatorLayer.SetAsLastSibling();
+            ghostLayer.SetAsLastSibling();
+        }
+
+        private void Line(ref int used, Vector2 topLeft, Vector2 size)
+        {
+            Image line;
+            if (used < _separators.Count) line = _separators[used];
+            else
+            {
+                var go = new GameObject("Gap", typeof(RectTransform), typeof(Image));
+                go.hideFlags = HideFlags.DontSave;
+                go.transform.SetParent(_separatorLayer, false);
+                line = go.GetComponent<Image>();
+                line.raycastTarget = false;
+                line.sprite = separatorSprite;
+                var rt = line.rectTransform;
+                rt.anchorMin = rt.anchorMax = rt.pivot = new Vector2(0f, 1f);
+                _separators.Add(line);
+            }
+
+            used++;
+            line.gameObject.SetActive(true);
+            line.rectTransform.anchoredPosition = new Vector2(topLeft.x, -topLeft.y);
+            line.rectTransform.sizeDelta = size;
+        }
 
         /// <summary>Puts a plate with its box centre at a point in the safe frame, turned by quarter turns clockwise.</summary>
         private static void SetRect(ItemHoverTarget target, Vector2 centre, int rotation)

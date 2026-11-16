@@ -49,6 +49,33 @@ namespace Project05.UI.Hud
         /// <summary>The sprite set the HUD draws with.</summary>
         public HudSpriteSet Sprites => sprites;
 
+        /// <summary>When false, <see cref="Apply"/> leaves the readout layer alone (combat playback draws its own numbers).</summary>
+        public bool DrawReadouts { get; set; } = true;
+
+        /// <summary>The slot view of a unit, or null when there is none.</summary>
+        public MonoBehaviour Slot(bool hero, int slot)
+        {
+            if (hero) return slot >= 0 && slot < heroes.Length ? heroes[slot] : null;
+            return slot >= 0 && slot < enemies.Length ? enemies[slot] : null;
+        }
+
+        /// <summary>The body image of a unit, or null.</summary>
+        public UnityEngine.UI.Image Body(bool hero, int slot)
+        {
+            MonoBehaviour view = Slot(hero, slot);
+            return view is HeroSlotView h ? h.Body : view is EnemySlotView e ? e.Body : null;
+        }
+
+        /// <summary>A numeral cut of the readout fonts: Bone and Blood atlases with their metrics. False when not set up.</summary>
+        public bool TryGetReadoutFont(int cut, out Sprite bone, out Sprite blood, out TextAsset metrics)
+        {
+            ReadoutFont font = Array.Find(readoutFonts, f => f.cut == cut);
+            bone = font?.boneAtlas;
+            blood = font?.bloodAtlas;
+            metrics = font?.boneMetrics;
+            return font != null;
+        }
+
         /// <summary>Redraws only the currency readout.</summary>
         public void SetCurrency(int value) => currency.Text = value.ToString();
 
@@ -71,7 +98,7 @@ namespace Project05.UI.Hud
             speed.Apply(data.SpeedIndex, sprites);
             currency.Text = data.Currency.ToString();
             room.Text = data.Room + "/" + data.RoomCount;
-            ApplyReadouts(data);
+            if (DrawReadouts) ApplyReadouts(data);
         }
 
         /// <summary>

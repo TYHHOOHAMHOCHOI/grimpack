@@ -20,6 +20,15 @@ namespace Project05.UI.Hud
         [SerializeField] private Image chevron;
         [SerializeField] private RectTransform rowsRect;
 
+        /// <summary>The body image, for hit effects.</summary>
+        public Image Body => body;
+
+        /// <summary>The intent glyph shown on the tab, which flies to the target when the enemy acts (art bible 5.10.8).</summary>
+        public Sprite IntentSprite => tabGlyph != null ? tabGlyph.sprite : null;
+
+        /// <summary>The lit eyes, hidden with the body while it blinks.</summary>
+        public Image Eyes => eyes;
+
         /// <summary>Slot pitch for a body height: intent tab zone 26, body and headroom, shadow row 4, HP row 10, stat row 12.</summary>
         public static int Pitch(int bodyHeight) => bodyHeight + 56;
 

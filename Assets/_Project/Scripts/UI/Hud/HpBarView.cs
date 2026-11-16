@@ -22,6 +22,17 @@ namespace Project05.UI.Hud
         [Tooltip("Share of max HP at or below which the low-HP frame is used.")]
         [SerializeField, Range(0f, 1f)] private float lowThreshold = 0.3f;
 
+        [Tooltip("Seconds the lost-HP trail holds before it drains, so the size of a hit can be read.")]
+        [SerializeField] private float trailHold = 0.28f;
+
+        [Tooltip("Native px per second the lost-HP trail drains at.")]
+        [SerializeField] private float trailDrain = 70f;
+
+        private int _lastHp = -1;
+        private int _lastMax = -1;
+        private float _trailWidth;
+        private float _drainFrom;
+
         /// <summary>Whole-pixel width of the fill for a given HP. Pure, so it can be tested without a scene.</summary>
         /// <param name="current">Current HP, zero or more.</param>
         /// <param name="max">Max HP, at least 1.</param>
@@ -41,8 +52,30 @@ namespace Project05.UI.Hud
         {
             if (max < 1) max = 1;
             current = Mathf.Clamp(current, 0, max);
-            SetWidth(fill, FillWidth(current, max));
-            SetWidth(trail, previous > current ? FillWidth(previous, max) : 0);
+            int fillWidth = FillWidth(current, max);
+            SetWidth(fill, fillWidth);
+
+            // In play, a drop leaves a Blood-D trail at the old width that holds, then drains down to the new fill, so
+            // a hit reads as a chunk taken out of the bar rather than a jump.
+            if (Application.isPlaying)
+            {
+                if (previous < 0 && _lastHp >= 0 && max == _lastMax && current < _lastHp) previous = _lastHp;
+                if (previous > current)
+                {
+                    _trailWidth = Mathf.Max(_trailWidth, FillWidth(previous, max));
+                    _drainFrom = Time.unscaledTime + trailHold;
+                }
+
+                if (_trailWidth < fillWidth) _trailWidth = 0f;
+                SetWidth(trail, Mathf.RoundToInt(_trailWidth));
+            }
+            else
+            {
+                SetWidth(trail, previous > current ? FillWidth(previous, max) : 0);
+            }
+
+            _lastHp = current;
+            _lastMax = max;
             if (frame != null)
             {
                 bool low = current > 0 && (float)current / max <= lowThreshold;
@@ -50,6 +83,15 @@ namespace Project05.UI.Hud
             }
 
             if (value != null) value.Text = current + "/" + max;
+        }
+
+        private void Update()
+        {
+            if (_trailWidth <= 0f || Time.unscaledTime < _drainFrom) return;
+            float target = fill != null && fill.enabled ? fill.rectTransform.sizeDelta.x : 0f;
+            _trailWidth = Mathf.MoveTowards(_trailWidth, target, trailDrain * Time.unscaledDeltaTime);
+            if (_trailWidth <= target + 0.01f) _trailWidth = 0f;
+            SetWidth(trail, Mathf.RoundToInt(_trailWidth));
         }
 
         private static void SetWidth(Image image, int width)

@@ -135,3 +135,28 @@ Spec: `design/ux/combat-screen-buttons.md`. Presentation only; playback is a fix
 | Sell moved into a drawer on the right edge of the stage: a tab with an arrow at the top opens it with a spring (about 20 px overshoot, then settles), the tab again tucks it away without a bounce; reduced motion moves it at once | Done, driven in Play Mode (path 460, 365, 304, 279, 272, 277 ... 292) | `SellDrawerView`, `DrawerSpring`, `ui_drawer-tab_*` |
 | Carrying an item over the closed tab opens the drawer; Tab from the keyboard reaches it too; a carried plate draws above the drawer | Done, driven in Play Mode | `ItemBoardController` (drag layer) |
 | The open drawer covers part of the enemy column | Open: acceptable while it is closed by default; revisit with the art director | |
+
+## Combat playback motion, new item art, smoother playback (added 2026-11-16, user request)
+
+| Requirement | Status | Where |
+|---|---|---|
+| The 11 items added with CombatCore (spiked buckler, oak buckler, field bandage, sweeping halberd, runed mace, crimson vial, guard sigil, whirlwind axe, oath blade, sanctuary relic, resonant bell) redrawn with Pixellab (pixen, 2x the plate bed, transparent), plus a compact glyph for each multi-cell one; the code-drawn placeholders are replaced | Done, through `build_items.py` (palette, outline); thin handles are now kept by the outline step | `art-source/ai-raw/item_*_raw.png`, `items_sheet_2026-11-15.png` |
+| Hero attack key frames: wind-up (sword raised) and strike (sword swung forward), edited from the idle with Pixellab, processed by the hero rule | Done | `char_tank_attack_01/02` |
+| Attack animation: 2 px pull-back, 12 px lunge (enemies 10 px) with the attack frames, contact hold, return | Done, traced in Play Mode (hero x 247, 244, 259, back to 247) | `CombatFx.Lunge` |
+| Hit reactions: swing smear on the first hit, impact spark, 3 px knock-back with a damped wobble, two quick blinks (once per burst), floating numbers that fan out, HP trail that holds then drains, detonation burst and a 1-2 px shake | Done, captured | `CombatFx.Hit`, `HpBarView`, `combat_playback_*_z3_2026-11-16.png` |
+| Less turn-based: beats come from `PlaybackTimeline` (next actor starts 0.2 s after the last beat, hits 0.11 s apart, detonations get 0.14 s more), 45 ms hit-stop at 1x/2x, speed changes keep progress | Done, 6 timeline tests | `PlaybackTimeline`, `CombatPlaybackController` |
+| Smoother frames: numeral digits are pooled and share parsed metrics and glyph sprites (before, every HP change destroyed and created objects and re-parsed JSON); playback numbers are pooled instead of rebuilt on every HUD apply | Done | `SpriteNumeralText`, `CombatHudView.DrawReadouts` |
+| Reduced motion removes lunge, knock-back, shake and number drift; reduced flashes removes the blink and uses the calm burst | Done in code, not captured | `CombatFx` |
+| Open: at the start of a fight many reactions land together and numbers still stack; the whirlwind axe art is dark after quantising; enemy attacks have no wind-up frame of their own (they use the Act pose) | Open | |
+
+## Item avatars, weapon archetypes, backpack pulse and cooldown (added 2026-11-16, user request)
+
+| Requirement | Ref | Status | Where |
+|---|---|---|---|
+| Slower pacing with time to read each item: hero ready 200 ms, avatar pop-in 100 ms, read hold 180 ms, then the archetype; next avatar after 60% of the previous travel; 400 ms hand-off between actions; 130 ms between hits of one source | 5.10.6, user | Done, 7 timeline tests | `PlaybackPacing`, `PlaybackTimeline` |
+| Each weapon type has its own motion (archetype from the item's effects and tags): Swing (melee: stepped arc, smear, hero attack frames), Throw (crossbow, charms: hops with trail), Status (seal items: mote hops), Ring (shield, heal: code-drawn ring grows in the tier colour), Detonate (bells, censer: pulse and burst), Pulse | 5.11, 5.12 | Done, captured | `ItemAvatarFx`, `CombatPlaybackController.ArchetypeOf` |
+| Avatar: the item's 1x1 tier plate with its compact glyph, over the hero's head; enemy intent glyph flies from its tab to the hero | 5.10.2, 5.10.8 | Done, captured | `combat_playback_avatar_z3`, `combat_playback_enemy-glyph_z3` |
+| Backpack: a 2 px gap is drawn wherever two items touch | user | Done | `ItemBoardController.RebuildSeparators` |
+| Backpack: a firing item swells to 115% and shakes 1 px, then a checker dim covers the share of its cooldown still to go and drains as actions pass; ready items show normally | user, 5.10.9 | Done, captured. The swell is a non-integer scale (user request, deviates from 8.1) | `BackpackFx`, `combat_playback_cooldown_z3` |
+| Hero damage numbers moved into the body band; the zone over the head is the avatar's | 5.10.3 | Done | `CombatFx.ShowNumber` |
+| Not built: avatar lean by row shear, Chain/Surge ladder, 4x avatar groups, Skip stopping at each Detonation, chip aggregation within 300 ms | 5.10.7, 5.10.9, 5.12 | Open | |

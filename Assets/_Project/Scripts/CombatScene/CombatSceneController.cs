@@ -237,8 +237,33 @@ namespace Project05.CombatScene
             return true;
         }
 
+        // Simulated item instance -> the board item it was made from (integrated mode), for backpack effects.
+        private readonly Dictionary<long, Project05.Items.BoardItem> _simToBoard = new Dictionary<long, Project05.Items.BoardItem>();
+
+        /// <summary>The backpack plate showing a simulated item instance, or null.</summary>
+        private RectTransform PlateOfSimItem(long instanceId)
+        {
+            if (_integratedMode)
+            {
+                return _externalBoard != null && _simToBoard.TryGetValue(instanceId, out Project05.Items.BoardItem bi) ? _externalBoard.PlateOf(bi) : null;
+            }
+
+            return Workbench != null ? Workbench.PlateOf(instanceId) : null;
+        }
+
+        /// <summary>The 1x1 tier plate and the glyph an item's avatar is drawn with (art bible 5.10.2).</summary>
+        private (Sprite plate, Sprite glyph) AvatarSprites(string itemDefId)
+        {
+            ItemDef def = Catalog?.FindItem(itemDefId);
+            if (def == null || spriteCatalog == null) return (null, null);
+            Sprite plate = spriteCatalog.GetAuthoredPlate(def.Tier.ToString().ToLowerInvariant(), false, "1x1");
+            Sprite glyph = spriteCatalog.GetItemIcon(def.Art, def.Footprint, compact: true);
+            return (plate, glyph);
+        }
+
         private void SyncArrangementFromExternalBoard()
         {
+            _simToBoard.Clear();
             if (Catalog == null || HeroDef == null) return;
 
             _idSource = new SequentialItemIdSource(1);
@@ -262,7 +287,10 @@ namespace Project05.CombatScene
                 if (!Arrangement.Place(itemId, ContainerKind.Hero0, bi.X, bi.Y, bi.Rotation).IsOk)
                 {
                     Arrangement.DestroyTrayItem(itemId);
+                    continue;
                 }
+
+                _simToBoard[itemId] = bi;
             }
         }
 
@@ -312,6 +340,7 @@ namespace Project05.CombatScene
             // Playback & Post-Combat panels
             Playback = gameObject.AddComponent<CombatPlaybackController>();
             Playback.Initialize(hudView);
+            Playback.SetPresentation(PlateOfSimItem, AvatarSprites);
             Playback.PlaybackCompleted += HandlePlaybackCompleted;
 
             PostCombatPanel = gameObject.AddComponent<PostCombatPanelView>();
@@ -674,6 +703,7 @@ namespace Project05.CombatScene
             // Playback
             Playback = gameObject.AddComponent<CombatPlaybackController>();
             Playback.Initialize(hudView);
+            Playback.SetPresentation(PlateOfSimItem, AvatarSprites);
             Playback.PlaybackCompleted += HandlePlaybackCompleted;
 
             // Post-combat breakdown panel

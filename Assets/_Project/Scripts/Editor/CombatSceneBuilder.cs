@@ -169,6 +169,7 @@ namespace Project05.Editor
                 S("Characters/char_tank_hurt_02.png"), S("Characters/char_tank_down_01.png"), S("Characters/char_tank_down_02.png"),
             };
             set.heroNarrow = S("Characters/char_tank_narrow_01.png");
+            set.heroAttack = new[] { S("Characters/char_tank_attack_01.png"), S("Characters/char_tank_attack_02.png") };
             set.pedestalDefault = S("Props/prop_pedestal_default_52x12.png");
             set.pedestalDim = S("Props/prop_pedestal_dim_52x12.png");
             set.shadowContact = S("Props/prop_shadow-contact_default_30x4.png");
@@ -187,6 +188,19 @@ namespace Project05.Editor
             set.chevronTurnFoe = S("UI/ui_chevron-turn_foe_7x4.png");
             set.segmentDefault = S("UI/ui_segment_default_9s.png");
             set.segmentSelected = S("UI/ui_segment_selected_9s.png");
+            set.vfxSmear = Many("VFX/vfx_swing_smear_{0}.png", "01", "02", "03");
+            set.vfxSmearFoe = Many("VFX/vfx_swing_smear-foe_{0}.png", "01", "02", "03");
+            set.vfxSpark = Many("VFX/vfx_impact_spark_{0}.png", "01", "02");
+            set.vfxSparkFoe = Many("VFX/vfx_impact_spark-foe_{0}.png", "01", "02");
+            set.vfxBurst = Many("VFX/vfx_detonate_burst_{0}.png", "01", "02", "03", "04");
+            set.vfxBurstFoe = Many("VFX/vfx_detonate_burst-foe_{0}.png", "01", "02", "03", "04");
+            set.vfxBurstCalm = S("VFX/vfx_detonate_burst-calm_01.png");
+            set.vfxBurstFoeCalm = S("VFX/vfx_detonate_burst-foe-calm_01.png");
+            set.vfxTrail = Many("VFX/vfx_throw_trail_{0}.png", "01", "02");
+            set.vfxTrailFoe = Many("VFX/vfx_throw_trail-foe_{0}.png", "01", "02");
+            set.vfxMote = Many("VFX/vfx_status_mote_{0}.png", "01", "02");
+            set.vfxMoteFoe = Many("VFX/vfx_status_mote-foe_{0}.png", "01", "02");
+            set.dimMask = S("UI/ui_dim-mask_default_4x4.png");
             EditorUtility.SetDirty(set);
             return set;
         }
@@ -483,6 +497,7 @@ namespace Project05.Editor
             so.FindProperty("ghostValid").objectReferenceValue = S("UI/ui_ghost_valid_20x20.png");
             so.FindProperty("ghostInvalid").objectReferenceValue = S("UI/ui_ghost_invalid_20x20.png");
             so.FindProperty("ghostCross").objectReferenceValue = S("UI/ui_ghost_cross_20x20.png");
+            so.FindProperty("separatorSprite").objectReferenceValue = S("UI/ui_fill_ink-1_4x4.png");
             SerializedProperty views = so.FindProperty("containers");
             views.arraySize = 2;
             SetContainer(views.GetArrayElementAtIndex(0), "grid", Start.GridOrigin.x, Start.GridOrigin.y, WorkbenchLayout.StartGrid, WorkbenchLayout.StartGrid, true);

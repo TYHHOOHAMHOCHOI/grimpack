@@ -20,6 +20,9 @@ MonoBehaviour:
   - {fileID: 21300000, guid: d75e801c02466984283c62c190c637a1, type: 3}
   - {fileID: 21300000, guid: 0d5e39aea1451b2459d4ecb1723bd71c, type: 3}
   heroNarrow: {fileID: 21300000, guid: ee777eea57247ff4e821547d9d8e01a7, type: 3}
+  heroAttack:
+  - {fileID: 21300000, guid: e84042d84d8b8214c80d00bac6aaf6f4, type: 3}
+  - {fileID: 21300000, guid: 64ea64228bdceaf4ea03ad0042b36dbf, type: 3}
   pedestalDefault: {fileID: 21300000, guid: 07160788f4ddd684eb37322829f40513, type: 3}
   pedestalDim: {fileID: 21300000, guid: 3b42c168f6e5af04f9fdf8c187a60125, type: 3}
   monsters:
@@ -124,6 +127,45 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 2dec72913f73c4640abf2c023ef1ba21, type: 3}
   - {fileID: 21300000, guid: d6f5558f2d43f5f48b55f25dc20b558e, type: 3}
   - {fileID: 21300000, guid: 2b0a51ebd12d05a4b90da388c911d122, type: 3}
+  vfxSmear:
+  - {fileID: 21300000, guid: 96e7dd5b0b38a8b4491968f3f6fbfaff, type: 3}
+  - {fileID: 21300000, guid: ece070104f64679459d76287dd7db3cc, type: 3}
+  - {fileID: 21300000, guid: 3b6ae3dd35c4d324f9bc8cd652cd0060, type: 3}
+  vfxSmearFoe:
+  - {fileID: 21300000, guid: 05c9e7ebedb545e41a117379f28b35ab, type: 3}
+  - {fileID: 21300000, guid: 3cfe9068dc95ece41bf476aeaee350a0, type: 3}
+  - {fileID: 21300000, guid: d7b49beec2c82fa43875d488219530cc, type: 3}
+  vfxSpark:
+  - {fileID: 21300000, guid: 8fedef0b27a24a2498ad27ba70b78c45, type: 3}
+  - {fileID: 21300000, guid: 7221951fd3a91e74b97cdd99f0feb8f0, type: 3}
+  vfxSparkFoe:
+  - {fileID: 21300000, guid: 5ef4e8da1f7f9e9438c6f6bfafc6213e, type: 3}
+  - {fileID: 21300000, guid: b5c4b3d296b132f45ab35f12d8620b04, type: 3}
+  vfxBurst:
+  - {fileID: 21300000, guid: b4bffba502800314e9c20ac26396d8be, type: 3}
+  - {fileID: 21300000, guid: 04b9269235efff54fae35417eb0a9337, type: 3}
+  - {fileID: 21300000, guid: e1d93a7600021c34ba985fe5f4f5c386, type: 3}
+  - {fileID: 21300000, guid: e881be9550f98f44fa494ca6da1d138e, type: 3}
+  vfxBurstFoe:
+  - {fileID: 21300000, guid: 0fd63d214a1981f4dbd94eb09438fd17, type: 3}
+  - {fileID: 21300000, guid: 4dc9682fc40d7564abafe9c9fd528382, type: 3}
+  - {fileID: 21300000, guid: d1ebadb293ddf0d4987ba5587d406fd9, type: 3}
+  - {fileID: 21300000, guid: 33e048f719dcbf34e8d52456dcd11092, type: 3}
+  vfxBurstCalm: {fileID: 21300000, guid: ab58d35ce1c52ba439ab297a39c452b8, type: 3}
+  vfxBurstFoeCalm: {fileID: 21300000, guid: 2a8c0c814410d434a80b156b6c039fce, type: 3}
+  vfxTrail:
+  - {fileID: 21300000, guid: 9e75ddbb654f8d84ead4460eec823520, type: 3}
+  - {fileID: 21300000, guid: fab17a81c44110648a6901ec99455c54, type: 3}
+  vfxTrailFoe:
+  - {fileID: 21300000, guid: abc552fd0c07ba54e90a4df5f4abbd51, type: 3}
+  - {fileID: 21300000, guid: 5f0021e1c2e617c4fae37d38b5b7a627, type: 3}
+  vfxMote:
+  - {fileID: 21300000, guid: a7aca8ae4e2463c4082e0d36814260cf, type: 3}
+  - {fileID: 21300000, guid: fa09dd792b0ad6e48ba0caebbd9f069f, type: 3}
+  vfxMoteFoe:
+  - {fileID: 21300000, guid: 79b87527b291ab94d8b4c7d802993ca6, type: 3}
+  - {fileID: 21300000, guid: 7753462aa482e4349811e6c2f5379a12, type: 3}
+  dimMask: {fileID: 21300000, guid: a4ab116d8b656b74898a750e738b9544, type: 3}
   chevronTurnHero: {fileID: 21300000, guid: 89215b919932afc40be8cf3ad0b225ab, type: 3}
   chevronTurnFoe: {fileID: 21300000, guid: 67cc2de1f032a4b4eaa4303bf7f72725, type: 3}
   segmentDefault: {fileID: 21300000, guid: 9a4da908b6aebe84e983cd46f51801d0, type: 3}

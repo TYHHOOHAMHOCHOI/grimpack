@@ -188,6 +188,10 @@ def build_hero(frames: dict[str, np.ndarray]) -> None:
         for y, x in comp:
             ov[y, x] = (*P.rgb("CANDLE-D" if y == top else "INK-0"), 255)
     frames["char_tank_narrow_01"] = ov
+    # attack key frames (user request 2026-11-16): wind-up and strike, generated from the idle with an edit, then
+    # processed by the same rule as the idle so palette, outline and rim match
+    frames["char_tank_attack_01"] = PC.process(RAW / "char_tank_attack_01_raw.png", "hero", 48)
+    frames["char_tank_attack_02"] = PC.process(RAW / "char_tank_attack_02_raw.png", "hero", 48)
 
 
 def build_monster(name: str, raw: str, canvas: int, arm_lift: bool, min_eye: int, left_frac: float, frames: dict[str, np.ndarray]) -> None:

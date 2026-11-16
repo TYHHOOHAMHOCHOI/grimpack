@@ -20,6 +20,9 @@ namespace Project05.UI.Hud
         /// <summary>Body Y position inside the slot when standing, in native px (the ready state lifts it by 1).</summary>
         [SerializeField] private float bodyRestY = -20f;
 
+        /// <summary>The body image, for hit effects.</summary>
+        public Image Body => body;
+
         /// <summary>Shows one hero. A fallen hero holds the last down frame on a dim pedestal with its pool out.</summary>
         public void Apply(HeroSlotData data, HudSpriteSet sprites)
         {

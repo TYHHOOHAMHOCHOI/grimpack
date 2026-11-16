@@ -337,6 +337,145 @@
    "flavorEn": "Dented on one side."
   },
   {
+   "id": "item_spiked_buckler",
+   "art": "spiked-buckler",
+   "tier": "White",
+   "footprint": "1x2",
+   "cells": [
+    {
+     "x": 0,
+     "y": 0
+    },
+    {
+     "x": 0,
+     "y": 1
+    }
+   ],
+   "tags": [
+    "armour",
+    "shield"
+   ],
+   "trigger": {
+    "kind": "Cooldown",
+    "n": 2,
+    "s": 0,
+    "eventKind": "",
+    "eventStatus": "",
+    "eventSide": ""
+   },
+   "effects": [
+    {
+     "kind": "ShieldGain",
+     "target": "Self",
+     "base": 0,
+     "status": "",
+     "amount": 6,
+     "units": 0,
+     "perUnit": 0
+    },
+    {
+     "kind": "Damage",
+     "target": "FirstEnemy",
+     "base": 3,
+     "status": "",
+     "amount": 0,
+     "units": 0,
+     "perUnit": 0
+    }
+   ],
+   "hpBonus": 0,
+   "speedBonus": 0,
+   "synergy": [],
+   "nameVi": "Khiên Gai",
+   "nameEn": "Spiked Buckler",
+   "flavorVi": "Vừa đỡ đòn vừa húc trả.",
+   "flavorEn": "Blocks the blow and strikes back."
+  },
+  {
+   "id": "item_oak_buckler",
+   "art": "oak-buckler",
+   "tier": "White",
+   "footprint": "1x1",
+   "cells": [
+    {
+     "x": 0,
+     "y": 0
+    }
+   ],
+   "tags": [
+    "armour",
+    "shield"
+   ],
+   "trigger": {
+    "kind": "Cooldown",
+    "n": 2,
+    "s": 0,
+    "eventKind": "",
+    "eventStatus": "",
+    "eventSide": ""
+   },
+   "effects": [
+    {
+     "kind": "ShieldGain",
+     "target": "Self",
+     "base": 0,
+     "status": "",
+     "amount": 5,
+     "units": 0,
+     "perUnit": 0
+    }
+   ],
+   "hpBonus": 0,
+   "speedBonus": 0,
+   "synergy": [],
+   "nameVi": "Khiên Gỗ Sồi",
+   "nameEn": "Oak Buckler",
+   "flavorVi": "Gỗ sồi nẹp sắt, nhẹ tay mà chắc.",
+   "flavorEn": "Iron-banded oak, light and steady."
+  },
+  {
+   "id": "item_field_bandage",
+   "art": "field-bandage",
+   "tier": "White",
+   "footprint": "1x1",
+   "cells": [
+    {
+     "x": 0,
+     "y": 0
+    }
+   ],
+   "tags": [
+    "tool",
+    "heal"
+   ],
+   "trigger": {
+    "kind": "Cooldown",
+    "n": 3,
+    "s": 0,
+    "eventKind": "",
+    "eventStatus": "",
+    "eventSide": ""
+   },
+   "effects": [
+    {
+     "kind": "Heal",
+     "target": "Self",
+     "base": 0,
+     "status": "",
+     "amount": 6,
+     "units": 0,
+     "perUnit": 0
+    }
+   ],
+   "hpBonus": 0,
+   "speedBonus": 0,
+   "synergy": [],
+   "nameVi": "Băng Cứu Thương",
+   "nameEn": "Field Bandage",
+   "flavorVi": "Vải thô thấm thảo dược, buộc vội vẫn cầm máu.",
+   "flavorEn": "Coarse herb-soaked cloth; bound in haste, still stops the bleed."
+  },
+  {
    "id": "item_crossbow",
    "art": "crossbow",
    "tier": "Green",
@@ -638,6 +777,196 @@
    "flavorEn": "Raised before the first step in."
   },
   {
+   "id": "item_cleaver_halberd",
+   "art": "cleaver-halberd",
+   "tier": "Green",
+   "footprint": "1x3",
+   "cells": [
+    {
+     "x": 0,
+     "y": 0
+    },
+    {
+     "x": 0,
+     "y": 1
+    },
+    {
+     "x": 0,
+     "y": 2
+    }
+   ],
+   "tags": [
+    "weapon",
+    "blade"
+   ],
+   "trigger": {
+    "kind": "Cooldown",
+    "n": 3,
+    "s": 0,
+    "eventKind": "",
+    "eventStatus": "",
+    "eventSide": ""
+   },
+   "effects": [
+    {
+     "kind": "Damage",
+     "target": "AllEnemies",
+     "base": 8,
+     "status": "",
+     "amount": 0,
+     "units": 0,
+     "perUnit": 0
+    }
+   ],
+   "hpBonus": 0,
+   "speedBonus": 0,
+   "synergy": [],
+   "nameVi": "Kích Phá Trận",
+   "nameEn": "Sweeping Halberd",
+   "flavorVi": "Quét ngang một vòng, không chừa kẻ nào.",
+   "flavorEn": "Sweeps across the front line, sparing none."
+  },
+  {
+   "id": "item_runed_mace",
+   "art": "runed-mace",
+   "tier": "Green",
+   "footprint": "1x2",
+   "cells": [
+    {
+     "x": 0,
+     "y": 0
+    },
+    {
+     "x": 0,
+     "y": 1
+    }
+   ],
+   "tags": [
+    "weapon",
+    "blunt",
+    "seal"
+   ],
+   "trigger": {
+    "kind": "Cooldown",
+    "n": 2,
+    "s": 0,
+    "eventKind": "",
+    "eventStatus": "",
+    "eventSide": ""
+   },
+   "effects": [
+    {
+     "kind": "Damage",
+     "target": "FirstEnemy",
+     "base": 6,
+     "status": "",
+     "amount": 0,
+     "units": 0,
+     "perUnit": 0
+    },
+    {
+     "kind": "ApplyStatus",
+     "target": "FirstEnemy",
+     "base": 0,
+     "status": "an",
+     "amount": 2,
+     "units": 0,
+     "perUnit": 0
+    }
+   ],
+   "hpBonus": 0,
+   "speedBonus": 0,
+   "synergy": [],
+   "nameVi": "Chùy Khắc Ấn",
+   "nameEn": "Runed Mace",
+   "flavorVi": "Mỗi cú nện để lại một vết ấn.",
+   "flavorEn": "Every blow leaves a burning mark."
+  },
+  {
+   "id": "item_crimson_vial",
+   "art": "crimson-vial",
+   "tier": "Green",
+   "footprint": "1x1",
+   "cells": [
+    {
+     "x": 0,
+     "y": 0
+    }
+   ],
+   "tags": [
+    "potion",
+    "heal"
+   ],
+   "trigger": {
+    "kind": "Cooldown",
+    "n": 3,
+    "s": 0,
+    "eventKind": "",
+    "eventStatus": "",
+    "eventSide": ""
+   },
+   "effects": [
+    {
+     "kind": "Heal",
+     "target": "Self",
+     "base": 0,
+     "status": "",
+     "amount": 10,
+     "units": 0,
+     "perUnit": 0
+    }
+   ],
+   "hpBonus": 0,
+   "speedBonus": 0,
+   "synergy": [],
+   "nameVi": "Huyết Dược",
+   "nameEn": "Crimson Vial",
+   "flavorVi": "Một ngụm đỏ thẫm, xương thịt liền lại.",
+   "flavorEn": "One crimson sip, and flesh knits anew."
+  },
+  {
+   "id": "item_guard_sigil",
+   "art": "guard-sigil",
+   "tier": "Green",
+   "footprint": "1x1",
+   "cells": [
+    {
+     "x": 0,
+     "y": 0
+    }
+   ],
+   "tags": [
+    "charm",
+    "shield"
+   ],
+   "trigger": {
+    "kind": "Reaction",
+    "n": 2,
+    "s": 0,
+    "eventKind": "Damage",
+    "eventStatus": "",
+    "eventSide": "self"
+   },
+   "effects": [
+    {
+     "kind": "ShieldGain",
+     "target": "Self",
+     "base": 0,
+     "status": "",
+     "amount": 5,
+     "units": 0,
+     "perUnit": 0
+    }
+   ],
+   "hpBonus": 0,
+   "speedBonus": 0,
+   "synergy": [],
+   "nameVi": "Ấn Hộ Vệ",
+   "nameEn": "Guard Sigil",
+   "flavorVi": "Chạm đòn là bừng sáng lớp chắn.",
+   "flavorEn": "Struck once, the ward flares to meet the next."
+  },
+  {
    "id": "item_war_hammer",
    "art": "war-hammer",
    "tier": "Blue",
@@ -887,6 +1216,180 @@
    "flavorEn": "It answers when a seal is set."
   },
   {
+   "id": "item_whirlwind_axe",
+   "art": "whirlwind-axe",
+   "tier": "Blue",
+   "footprint": "t",
+   "cells": [
+    {
+     "x": 0,
+     "y": 0
+    },
+    {
+     "x": 1,
+     "y": 0
+    },
+    {
+     "x": 2,
+     "y": 0
+    },
+    {
+     "x": 1,
+     "y": 1
+    },
+    {
+     "x": 1,
+     "y": 2
+    }
+   ],
+   "tags": [
+    "weapon",
+    "axe"
+   ],
+   "trigger": {
+    "kind": "Cooldown",
+    "n": 4,
+    "s": 0,
+    "eventKind": "",
+    "eventStatus": "",
+    "eventSide": ""
+   },
+   "effects": [
+    {
+     "kind": "Damage",
+     "target": "AllEnemies",
+     "base": 14,
+     "status": "",
+     "amount": 0,
+     "units": 0,
+     "perUnit": 0
+    }
+   ],
+   "hpBonus": 0,
+   "speedBonus": 0,
+   "synergy": [],
+   "nameVi": "Đại Phủ Cuồng Phong",
+   "nameEn": "Whirlwind Axe",
+   "flavorVi": "Lưỡi rìu hai đầu xoay tròn qua cả hàng quái.",
+   "flavorEn": "A twin-bit arc that carves through every foe."
+  },
+  {
+   "id": "item_oath_blade",
+   "art": "oath-blade",
+   "tier": "Blue",
+   "footprint": "1x3",
+   "cells": [
+    {
+     "x": 0,
+     "y": 0
+    },
+    {
+     "x": 0,
+     "y": 1
+    },
+    {
+     "x": 0,
+     "y": 2
+    }
+   ],
+   "tags": [
+    "weapon",
+    "blade",
+    "shield"
+   ],
+   "trigger": {
+    "kind": "Cooldown",
+    "n": 3,
+    "s": 0,
+    "eventKind": "",
+    "eventStatus": "",
+    "eventSide": ""
+   },
+   "effects": [
+    {
+     "kind": "Damage",
+     "target": "FirstEnemy",
+     "base": 14,
+     "status": "",
+     "amount": 0,
+     "units": 0,
+     "perUnit": 0
+    },
+    {
+     "kind": "ShieldGain",
+     "target": "Self",
+     "base": 0,
+     "status": "",
+     "amount": 7,
+     "units": 0,
+     "perUnit": 0
+    }
+   ],
+   "hpBonus": 0,
+   "speedBonus": 0,
+   "synergy": [],
+   "nameVi": "Thánh Kiếm Lời Thề",
+   "nameEn": "Oath Blade",
+   "flavorVi": "Lời thề giữ thành không đổi qua trăm trận.",
+   "flavorEn": "An oath that holds the line through a hundred fights."
+  },
+  {
+   "id": "item_sanctuary_relic",
+   "art": "sanctuary-relic",
+   "tier": "Blue",
+   "footprint": "1x2",
+   "cells": [
+    {
+     "x": 0,
+     "y": 0
+    },
+    {
+     "x": 0,
+     "y": 1
+    }
+   ],
+   "tags": [
+    "relic",
+    "heal",
+    "shield"
+   ],
+   "trigger": {
+    "kind": "Cooldown",
+    "n": 4,
+    "s": 0,
+    "eventKind": "",
+    "eventStatus": "",
+    "eventSide": ""
+   },
+   "effects": [
+    {
+     "kind": "Heal",
+     "target": "Self",
+     "base": 0,
+     "status": "",
+     "amount": 9,
+     "units": 0,
+     "perUnit": 0
+    },
+    {
+     "kind": "ShieldGain",
+     "target": "Self",
+     "base": 0,
+     "status": "",
+     "amount": 9,
+     "units": 0,
+     "perUnit": 0
+    }
+   ],
+   "hpBonus": 0,
+   "speedBonus": 0,
+   "synergy": [],
+   "nameVi": "Thánh Tích Hồi Sinh",
+   "nameEn": "Sanctuary Relic",
+   "flavorVi": "Ánh nến trong lồng kính giữ hơi thở không tắt.",
+   "flavorEn": "A caged ember that keeps breath and ward alike."
+  },
+  {
    "id": "item_void_censer",
    "art": "void-censer",
    "tier": "Purple",
@@ -1046,6 +1549,60 @@
    "nameEn": "Tower Shield",
    "flavorVi": "Đứng sau nó, bạn chậm hơn và sống lâu hơn.",
    "flavorEn": "Behind it you are slower, and last longer."
+  },
+  {
+   "id": "item_resonant_bell",
+   "art": "resonant-bell",
+   "tier": "Purple",
+   "footprint": "2x2",
+   "cells": [
+    {
+     "x": 0,
+     "y": 0
+    },
+    {
+     "x": 1,
+     "y": 0
+    },
+    {
+     "x": 0,
+     "y": 1
+    },
+    {
+     "x": 1,
+     "y": 1
+    }
+   ],
+   "tags": [
+    "detonator",
+    "bell"
+   ],
+   "trigger": {
+    "kind": "Cooldown",
+    "n": 4,
+    "s": 0,
+    "eventKind": "",
+    "eventStatus": "",
+    "eventSide": ""
+   },
+   "effects": [
+    {
+     "kind": "ConsumeDetonate",
+     "target": "AllEnemies",
+     "base": 0,
+     "status": "an",
+     "amount": 0,
+     "units": 8,
+     "perUnit": 3
+    }
+   ],
+   "hpBonus": 0,
+   "speedBonus": 0,
+   "synergy": [],
+   "nameVi": "Chuông Cộng Hưởng",
+   "nameEn": "Resonant Bell",
+   "flavorVi": "Một hồi chuông vang, mọi dấu ấn đều nứt vỡ cùng lúc.",
+   "flavorEn": "One toll, and every mark across the room shatters at once."
   }
  ]
 }

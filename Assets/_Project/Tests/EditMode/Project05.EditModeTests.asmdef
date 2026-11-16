@@ -2,6 +2,7 @@
     "name": "Project05.EditModeTests",
     "rootNamespace": "Project05.Tests.EditMode",
     "references": [
+        "Project05.CombatCore",
         "Project05.Runtime",
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner"

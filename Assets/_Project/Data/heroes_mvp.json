@@ -1,0 +1,240 @@
+{
+ "heroes": [
+  {
+   "id": "hero_crusader",
+   "art": "tank",
+   "nameVi": "Kỵ Sĩ Hắc Quang",
+   "nameEn": "Duskblade Crusader",
+   "roleVi": "Đỡ Đòn / Khắc Ấn",
+   "roleEn": "Tank / Seal Bruiser",
+   "baseMaxHp": 110,
+   "baseSpeed": 22,
+   "initialShield": 8,
+   "backpackProfile": {
+    "width": 4,
+    "height": 4,
+    "startWidth": 4,
+    "startHeight": 4,
+    "unlockSequence": []
+   },
+   "startingItems": [
+    "item_iron_sword",
+    "item_spiked_buckler",
+    "item_seal_ink",
+    "item_whetstone"
+   ],
+   "signatureItemId": "item_spiked_buckler",
+   "innateItem": {
+    "id": "innate_crusader_vow",
+    "nameVi": "Lời Thề Thiết Giáp",
+    "nameEn": "Ironclad Vow",
+    "descVi": "Đầu trận: +6 Giáp, áp 1 Ấn lên mọi kẻ địch.",
+    "descEn": "Combat start: +6 Shield, apply 1 Seal to all enemies.",
+    "tags": [
+     "relic",
+     "shield"
+    ],
+    "trigger": {
+     "kind": "CombatStart",
+     "n": 0,
+     "s": 0,
+     "eventKind": "",
+     "eventStatus": "",
+     "eventSide": ""
+    },
+    "effects": [
+     {
+      "kind": "ShieldGain",
+      "target": "Self",
+      "base": 0,
+      "status": "",
+      "amount": 6,
+      "units": 0,
+      "perUnit": 0
+     },
+     {
+      "kind": "ApplyStatus",
+      "target": "AllEnemies",
+      "base": 0,
+      "status": "an",
+      "amount": 1,
+      "units": 0,
+      "perUnit": 0
+     }
+    ]
+   }
+  },
+  {
+   "id": "hero_alchemist",
+   "art": "tank",
+   "nameVi": "Dược Sư Dịch Hạch",
+   "nameEn": "Plague Alchemist",
+   "roleVi": "Khắc Ấn / Phản Ứng",
+   "roleEn": "Seal Setup / Catalyst",
+   "baseMaxHp": 86,
+   "baseSpeed": 26,
+   "initialShield": 0,
+   "backpackProfile": {
+    "width": 4,
+    "height": 4,
+    "startWidth": 4,
+    "startHeight": 4,
+    "unlockSequence": []
+   },
+   "startingItems": [
+    "item_dagger",
+    "item_seal_stamp",
+    "item_ink_pot",
+    "item_crimson_vial"
+   ],
+   "signatureItemId": "item_seal_stamp",
+   "innateItem": {
+    "id": "innate_alchemist_catalyst",
+    "nameVi": "Xúc Tác Cổ Ngữ",
+    "nameEn": "Rune Catalyst",
+    "descVi": "Phản ứng khi áp Ấn lên kẻ địch (hồi 2): gây 3 sát thương lên kẻ địch đầu tiên.",
+    "descEn": "Reaction when Seal applied to enemy (CD 2): deal 3 damage to first enemy.",
+    "tags": [
+     "relic"
+    ],
+    "trigger": {
+     "kind": "Reaction",
+     "n": 2,
+     "s": 0,
+     "eventKind": "StatusApplied",
+     "eventStatus": "an",
+     "eventSide": "enemy"
+    },
+    "effects": [
+     {
+      "kind": "Damage",
+      "target": "FirstEnemy",
+      "base": 3,
+      "status": "",
+      "amount": 0,
+      "units": 0,
+      "perUnit": 0
+     }
+    ]
+   }
+  },
+  {
+   "id": "hero_ranger",
+   "art": "tank",
+   "nameVi": "Thợ Săn Huyết Nguyệt",
+   "nameEn": "Bloodmoon Ranger",
+   "roleVi": "Tốc Độ / Sát Thương",
+   "roleEn": "Striker / Tempo",
+   "baseMaxHp": 82,
+   "baseSpeed": 29,
+   "initialShield": 0,
+   "backpackProfile": {
+    "width": 4,
+    "height": 4,
+    "startWidth": 4,
+    "startHeight": 4,
+    "unlockSequence": []
+   },
+   "startingItems": [
+    "item_crossbow",
+    "item_swift_boots",
+    "item_whetstone"
+   ],
+   "signatureItemId": "item_crossbow",
+   "innateItem": {
+    "id": "innate_ranger_opening",
+    "nameVi": "Mũi Tên Khai Màn",
+    "nameEn": "Opening Shot",
+    "descVi": "Đầu trận: gây 5 sát thương lên kẻ địch đầu tiên.",
+    "descEn": "Combat start: deal 5 damage to first enemy.",
+    "tags": [
+     "weapon",
+     "ranged"
+    ],
+    "trigger": {
+     "kind": "CombatStart",
+     "n": 0,
+     "s": 0,
+     "eventKind": "",
+     "eventStatus": "",
+     "eventSide": ""
+    },
+    "effects": [
+     {
+      "kind": "Damage",
+      "target": "FirstEnemy",
+      "base": 5,
+      "status": "",
+      "amount": 0,
+      "units": 0,
+      "perUnit": 0
+     }
+    ]
+   }
+  },
+  {
+   "id": "hero_cleric",
+   "art": "tank",
+   "nameVi": "Thánh Nữ Tro Tàn",
+   "nameEn": "Ashen Cleric",
+   "roleVi": "Hộ Vệ / Phá Ấn",
+   "roleEn": "Support / Detonator",
+   "baseMaxHp": 92,
+   "baseSpeed": 24,
+   "initialShield": 4,
+   "backpackProfile": {
+    "width": 4,
+    "height": 4,
+    "startWidth": 4,
+    "startHeight": 4,
+    "unlockSequence": []
+   },
+   "startingItems": [
+    "item_breaking_bell",
+    "item_field_bandage",
+    "item_oak_buckler"
+   ],
+   "signatureItemId": "item_breaking_bell",
+   "innateItem": {
+    "id": "innate_cleric_ward",
+    "nameVi": "Tro Tàn Hộ Thân",
+    "nameEn": "Ashen Ward",
+    "descVi": "Mỗi 2 hành động: hồi 4 HP và +4 Giáp cho đồng đội ít HP nhất.",
+    "descEn": "Cooldown 2: heal 4 HP and grant 4 Shield to lowest-HP hero.",
+    "tags": [
+     "relic",
+     "heal",
+     "shield"
+    ],
+    "trigger": {
+     "kind": "Cooldown",
+     "n": 2,
+     "s": 0,
+     "eventKind": "",
+     "eventStatus": "",
+     "eventSide": ""
+    },
+    "effects": [
+     {
+      "kind": "Heal",
+      "target": "LowestHpHero",
+      "base": 0,
+      "status": "",
+      "amount": 4,
+      "units": 0,
+      "perUnit": 0
+     },
+     {
+      "kind": "ShieldGain",
+      "target": "LowestHpHero",
+      "base": 0,
+      "status": "",
+      "amount": 4,
+      "units": 0,
+      "perUnit": 0
+     }
+    ]
+   }
+  }
+ ]
+}

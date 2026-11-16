@@ -2,6 +2,7 @@
     "name": "Project05.Runtime",
     "rootNamespace": "Project05",
     "references": [
+        "Project05.CombatCore",
         "Unity.TextMeshPro",
         "UnityEngine.UI",
         "Unity.InputSystem",

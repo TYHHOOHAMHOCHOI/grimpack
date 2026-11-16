@@ -49,6 +49,14 @@ def blast(units, per_unit, target="FirstEnemy"):
     return {"kind": "ConsumeDetonate", "target": target, "base": 0, "status": "an", "amount": 0, "units": units, "perUnit": per_unit}
 
 
+def shield(amount, target="Self"):
+    return {"kind": "ShieldGain", "target": target, "base": 0, "status": "", "amount": amount, "units": 0, "perUnit": 0}
+
+
+def heal(amount, target="Self"):
+    return {"kind": "Heal", "target": target, "base": 0, "status": "", "amount": amount, "units": 0, "perUnit": 0}
+
+
 def rule(kind, amount, tags=(), status=""):
     return {"targetTags": list(tags), "kind": kind, "amount": amount, "statusId": status}
 
@@ -69,6 +77,7 @@ def cd(n, s=0):
 PASSIVE = {"kind": "Passive", "n": 0, "s": 0, "eventKind": "", "eventStatus": "", "eventSide": ""}
 START = {"kind": "CombatStart", "n": 0, "s": 0, "eventKind": "", "eventStatus": "", "eventSide": ""}
 ON_SEAL = {"kind": "Reaction", "n": 2, "s": 0, "eventKind": "StatusApplied", "eventStatus": "an", "eventSide": "enemy"}
+ON_HIT_SELF = {"kind": "Reaction", "n": 2, "s": 0, "eventKind": "Damage", "eventStatus": "", "eventSide": "self"}
 
 ITEMS = [
     # ---- White
@@ -88,6 +97,12 @@ ITEMS = [
          ["boots"], PASSIVE, speed=3),
     item("iron-helm", "White", "1x1", "Mũ Sắt", "Iron Helm", "Móp ở một bên.", "Dented on one side.",
          ["armour"], PASSIVE, hp=6),
+    item("spiked-buckler", "White", "1x2", "Khiên Gai", "Spiked Buckler", "Vừa đỡ đòn vừa húc trả.", "Blocks the blow and strikes back.",
+         ["armour", "shield"], cd(2), [shield(6), dmg(3)]),
+    item("oak-buckler", "White", "1x1", "Khiên Gỗ Sồi", "Oak Buckler", "Gỗ sồi nẹp sắt, nhẹ tay mà chắc.", "Iron-banded oak, light and steady.",
+         ["armour", "shield"], cd(2), [shield(5)]),
+    item("field-bandage", "White", "1x1", "Băng Cứu Thương", "Field Bandage", "Vải thô thấm thảo dược, buộc vội vẫn cầm máu.", "Coarse herb-soaked cloth; bound in haste, still stops the bleed.",
+         ["tool", "heal"], cd(3), [heal(6)]),
     # ---- Green
     item("crossbow", "Green", "2x1", "Nỏ Gỗ", "Crossbow", "Một phát, một tiếng cạch.", "One shot, one click.",
          ["weapon", "ranged"], cd(3), [dmg(15)]),
@@ -103,6 +118,14 @@ ITEMS = [
          ["charm"], PASSIVE, hp=10),
     item("war-banner", "Green", "1x3", "Cờ Chiến", "War Banner", "Kéo lên trước khi bước vào.", "Raised before the first step in.",
          ["banner"], START, [seal(2, "AllEnemies")]),
+    item("cleaver-halberd", "Green", "1x3", "Kích Phá Trận", "Sweeping Halberd", "Quét ngang một vòng, không chừa kẻ nào.", "Sweeps across the front line, sparing none.",
+         ["weapon", "blade"], cd(3), [dmg(8, "AllEnemies")]),
+    item("runed-mace", "Green", "1x2", "Chùy Khắc Ấn", "Runed Mace", "Mỗi cú nện để lại một vết ấn.", "Every blow leaves a burning mark.",
+         ["weapon", "blunt", "seal"], cd(2), [dmg(6), seal(2)]),
+    item("crimson-vial", "Green", "1x1", "Huyết Dược", "Crimson Vial", "Một ngụm đỏ thẫm, xương thịt liền lại.", "One crimson sip, and flesh knits anew.",
+         ["potion", "heal"], cd(3), [heal(10)]),
+    item("guard-sigil", "Green", "1x1", "Ấn Hộ Vệ", "Guard Sigil", "Chạm đòn là bừng sáng lớp chắn.", "Struck once, the ward flares to meet the next.",
+         ["charm", "shield"], ON_HIT_SELF, [shield(5)]),
     # ---- Blue
     item("war-hammer", "Blue", "t", "Búa Chiến", "War Hammer", "Một nhát, cả hang rung.", "One blow, and the cave shakes.",
          ["weapon", "blunt"], cd(4), [dmg(28)]),
@@ -114,6 +137,12 @@ ITEMS = [
          ["relic"], PASSIVE, rules=[rule("CooldownReduction", 1)]),
     item("echo-charm", "Blue", "1x1", "Bùa Vang", "Echo Charm", "Nghe thấy dấu ấn, nó đáp lại.", "It answers when a seal is set.",
          ["charm"], ON_SEAL, [dmg(4)]),
+    item("whirlwind-axe", "Blue", "t", "Đại Phủ Cuồng Phong", "Whirlwind Axe", "Lưỡi rìu hai đầu xoay tròn qua cả hàng quái.", "A twin-bit arc that carves through every foe.",
+         ["weapon", "axe"], cd(4), [dmg(14, "AllEnemies")]),
+    item("oath-blade", "Blue", "1x3", "Thánh Kiếm Lời Thề", "Oath Blade", "Lời thề giữ thành không đổi qua trăm trận.", "An oath that holds the line through a hundred fights.",
+         ["weapon", "blade", "shield"], cd(3), [dmg(14), shield(7)]),
+    item("sanctuary-relic", "Blue", "1x2", "Thánh Tích Hồi Sinh", "Sanctuary Relic", "Ánh nến trong lồng kính giữ hơi thở không tắt.", "A caged ember that keeps breath and ward alike.",
+         ["relic", "heal", "shield"], cd(4), [heal(9), shield(9)]),
     # ---- Purple
     item("void-censer", "Purple", "2x3", "Lư Hương Hư Vô", "Void Censer", "Khói của nó nuốt mọi dấu ấn.", "Its smoke swallows every seal.",
          ["detonator", "incense"], cd(5), [blast(99, 4)]),
@@ -121,6 +150,8 @@ ITEMS = [
          ["relic"], PASSIVE, rules=[rule("StatusAmount", 2, ["seal"], "an"), rule("DamagePercent", 500, ["detonator"])]),
     item("tower-shield", "Purple", "2x3", "Khiên Tháp", "Tower Shield", "Đứng sau nó, bạn chậm hơn và sống lâu hơn.",
          "Behind it you are slower, and last longer.", ["armour"], PASSIVE, hp=30, speed=-2),
+    item("resonant-bell", "Purple", "2x2", "Chuông Cộng Hưởng", "Resonant Bell", "Một hồi chuông vang, mọi dấu ấn đều nứt vỡ cùng lúc.", "One toll, and every mark across the room shatters at once.",
+         ["detonator", "bell"], cd(4), [blast(8, 3, "AllEnemies")]),
 ]
 
 
@@ -145,10 +176,12 @@ def validate() -> list[str]:
         if not -20 <= it["hpBonus"] <= 40:
             errors.append(f"{it['id']}: hpBonus out of -20..40 (party-and-heroes)")
         for e in it["effects"]:
-            if e["kind"] not in ("Damage", "ApplyStatus", "ConsumeDetonate"):
-                errors.append(f"{it['id']}: effect kind {e['kind']} is deferred")
+            if e["kind"] not in ("Damage", "ApplyStatus", "ConsumeDetonate", "ShieldGain", "Heal"):
+                errors.append(f"{it['id']}: effect kind {e['kind']} is unsupported")
             if e["kind"] == "Damage" and not 1 <= e["base"] <= 100000:
                 errors.append(f"{it['id']}: damage base out of range")
+            if e["kind"] in ("ApplyStatus", "ShieldGain", "Heal") and not 1 <= e["amount"] <= 100000:
+                errors.append(f"{it['id']}: amount out of range")
         cells = FP[it["footprint"]]
         w, h = SIZE[it["footprint"]]
         if w > 3 or h > 3 or not 1 <= len(cells) <= 9:
@@ -169,27 +202,34 @@ def md() -> str:
     lines = [
         "# MVP item catalog",
         "",
-        "> **Status**: Draft, 2026-11-15. Generated from `tools/art/item_catalog.py`; edit the script, not this file.",
+        "> **Status**: Updated for 1-Hero Crusader Combat, 2026-11-16. Generated from `tools/art/item_catalog.py`; edit the script, not this file.",
         "> **Every number is provisional.** Balance belongs to the balance harness (System 35).",
         "",
-        "Follows `item-trigger-and-cooldown.md`, `effect-resolution-model.md` (MVP effect kinds), `adjacency-and-synergy.md`,",
-        "`party-and-heroes.md` (passive `hpBonus` and `speedBonus`) and `grid-backpack.md` (footprints). Gold and Red wait for",
-        "their curses. The target names `FirstEnemy` and `AllEnemies` are a **proposal**: the owners of target selection",
-        "(Systems 3 and 9) have not defined a vocabulary yet.",
+        "Follows `item-trigger-and-cooldown.md`, `effect-resolution-model.md` (extended with `ShieldGain`, `Heal`, and `Self` for solo Crusader survival),",
+        "`adjacency-and-synergy.md`, `party-and-heroes.md` (passive `hpBonus` and `speedBonus`), and `grid-backpack.md` (footprints).",
         "",
         "| # | Item | Tier | Shape | Trigger | Skill (effects) | Stats | Synergy (adjacent items) | Tags |",
         "|---|------|------|-------|---------|-----------------|-------|--------------------------|------|",
     ]
     for i, it in enumerate(ITEMS, 1):
         t = it["trigger"]
-        trig = {"Passive": "Passive", "CombatStart": "Combat start", "Cooldown": f"Cooldown {t['n']}",
-                "Reaction": f"Reaction (Ấn applied on an enemy), cooldown {t['n']}"}[t["kind"]]
+        if t["kind"] == "Reaction":
+            if t["eventKind"] == "Damage":
+                trig = f"Reaction (Owner takes damage), cooldown {t['n']}"
+            else:
+                trig = f"Reaction (Ấn applied on an enemy), cooldown {t['n']}"
+        else:
+            trig = {"Passive": "Passive", "CombatStart": "Combat start", "Cooldown": f"Cooldown {t['n']}"}[t["kind"]]
         fx = []
         for e in it["effects"]:
             if e["kind"] == "Damage":
                 fx.append(f"Damage {e['base']} → {e['target']}")
             elif e["kind"] == "ApplyStatus":
                 fx.append(f"Apply {e['amount']} Ấn → {e['target']}")
+            elif e["kind"] == "ShieldGain":
+                fx.append(f"Shield +{e['amount']} → {e['target']}")
+            elif e["kind"] == "Heal":
+                fx.append(f"Heal +{e['amount']} → {e['target']}")
             else:
                 fx.append(f"Detonate up to {e['units']} Ấn × {e['perUnit']} → {e['target']}")
         stats = []
@@ -210,13 +250,13 @@ def md() -> str:
     lines += [
         "", f"{len(ITEMS)} items. Per tier: {counts}. Footprints used: {', '.join(shapes)}.",
         "", "## Design intent", "",
-        "- **Three jobs, one chain.** Seals (ApplyStatus Ấn) set up, detonators (ConsumeDetonate) cash in, and passive relics",
-        "  tune either end. The same loop the Ấn spike proves, spread over enough pieces that arrangement is a decision.",
+        "- **Three jobs, one chain + solo Crusader sustain.** Seals (ApplyStatus Ấn) set up, detonators (ConsumeDetonate) cash in, passive relics",
+        "  tune either end, and active Shield/Heal/Cleave gear lets a solo Tank survive and clear 1..6 monsters.",
         "- **Rhythm is the cost.** Strong pieces wait longer (cooldown 4 to 5) and take more cells (T, S, 2×3), so",
         "  the grid pays for power in space and in time.",
         "- **Passive stats are small and honest.** `hpBonus` stays inside the `-20..40` range, and the Tower Shield trades 2 speed for 30 HP.",
         "- **Synergy is local.** Every rule sits on a neighbour link (System 10); none crosses hero grids.",
-        "- **Shapes match the object.** A sword is 1×3, a hammer a T, a chain an S, a bell 1×2, a gong 2×2. Art fills the footprint.",
+        "- **Shapes match the object.** A sword/halberd is 1×3, a hammer/whirlwind axe a T, a chain an S, a bell 1×2, a gong/resonant bell 2×2. Art fills the footprint.",
         "",
     ]
     return "\n".join(lines)

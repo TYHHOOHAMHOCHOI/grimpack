@@ -9,6 +9,7 @@ using UnityEngine.InputSystem.UI;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using Project05.CombatScene;
 using Project05.Items;
 using Project05.UI;
 using Project05.UI.Hud;
@@ -16,14 +17,15 @@ using Project05.UI.Hud;
 namespace Project05.Editor
 {
     /// <summary>
-    /// Builds the Combat scene from the combat art set (art bible 7.3 to 7.5, 8.1) and the HUD views. The scene is
-    /// a generated output, rebuilt on every run. It shows fixture states, not live combat: the combat presentation
-    /// (Systems 27 and 29) does not exist yet.
+    /// Builds the Combat scene from the combat art set (art bible 7.3 to 7.5, 8.1), the HUD views,
+    /// and the runtime <see cref="CombatSceneController"/>. Rebuilt on every run; preserves EditMode
+    /// fixture capture via <see cref="CombatHudDemo"/>.
     /// </summary>
     public static class CombatSceneBuilder
     {
         private const string ScenePath = "Assets/_Project/Scenes/Combat.unity";
         private const string SetPath = "Assets/_Project/ScriptableObjects/HudSpriteSet.asset";
+        private const string SpriteCatalogPath = "Assets/_Project/ScriptableObjects/CombatSceneSpriteCatalog.asset";
         private const string Art = "Assets/_Project/Art/";
         private const string FontAssetPath = Art + "Fonts/grimpack-pixel/font_grimpack-pixel_regular_12_tmp.asset";
         private const string NumeralFolder = Art + "Fonts/grimpack-numeral/font_grimpack-numeral_";
@@ -35,7 +37,7 @@ namespace Project05.Editor
 
         // TEMPORARY: user-facing strings must come from the localization system (System 7), which does not exist
         // in code yet. Replace these with keyed lookups when it does.
-        private const string LabelHero = "Alchemist";
+        private const string LabelHero = "Kỵ Sĩ Hắc Quang";
         private const string LabelStash = "Kho đồ";
         private const string LabelForecast = "nếu không có gì đổi";
         private const string LabelSkip = "Bỏ qua";
@@ -85,9 +87,12 @@ namespace Project05.Editor
 
             BuildFrame(safe);
             ItemPopupController popup = BuildPopupController(safe);
-            BuildWorkbench(safe, popup);
-            BuildHud(safe);
+            RectTransform workbenchRoot = BuildWorkbench(safe, popup);
+            CombatHudView hudView = BuildHud(safe);
             BuildPopupView(safe, popup);
+
+            CombatSceneSpriteCatalog spriteCatalog = BuildCombatSceneSpriteCatalog();
+            WireSceneController(canvasGo, cam, safe, workbenchRoot, hudView, popup, spriteCatalog);
 
             EditorSceneManager.SaveScene(scene, ScenePath);
             EnsureBuildSettings();
@@ -164,6 +169,125 @@ namespace Project05.Editor
             set.segmentSelected = S("UI/ui_segment_selected_9s.png");
             EditorUtility.SetDirty(set);
             return set;
+        }
+
+        private static CombatSceneSpriteCatalog BuildCombatSceneSpriteCatalog()
+        {
+            Directory.CreateDirectory("Assets/_Project/ScriptableObjects");
+            var catalog = AssetDatabase.LoadAssetAtPath<CombatSceneSpriteCatalog>(SpriteCatalogPath);
+            if (catalog == null)
+            {
+                catalog = ScriptableObject.CreateInstance<CombatSceneSpriteCatalog>();
+                AssetDatabase.CreateAsset(catalog, SpriteCatalogPath);
+            }
+
+            catalog.font = _font;
+            catalog.num8BoneAtlas = AtlasSprite(8, "num");
+            catalog.num8FogHiAtlas = AtlasSprite(8, "num-fog-hi");
+            catalog.num8Metrics = Metrics(8);
+
+            catalog.panelDefault = S("UI/ui_panel_default_9s.png");
+            catalog.panelVoid = S("UI/ui_panel_void_9s.png");
+            catalog.chipBase = S("UI/ui_chip_base_9s.png");
+            catalog.segmentDefault = S("UI/ui_segment_default_9s.png");
+            catalog.segmentSelected = S("UI/ui_segment_selected_9s.png");
+            catalog.btnDefault = S("UI/ui_btn_default_120x28.png");
+            catalog.btnHover = S("UI/ui_btn_hover_120x28.png");
+            catalog.btnPressed = S("UI/ui_btn_pressed_120x28.png");
+            catalog.btnFocus = S("UI/ui_btn_focus_120x28.png");
+            catalog.btnDisabled = S("UI/ui_btn_disabled_120x28.png");
+
+            catalog.fillInk0 = S("UI/ui_fill_ink-0_4x4.png");
+            catalog.fillInk1 = S("UI/ui_fill_ink-1_4x4.png");
+            catalog.fillInk2 = S("UI/ui_fill_ink-2_4x4.png");
+            catalog.fillInk3 = S("UI/ui_fill_ink-3_4x4.png");
+            catalog.fillInk4 = S("UI/ui_fill_ink-4_4x4.png");
+            catalog.fillCandle = S("UI/ui_fill_candle_4x4.png");
+            catalog.fillCandleD = S("UI/ui_fill_candle-d_4x4.png");
+            catalog.fillFog = S("UI/ui_fill_fog_4x4.png");
+            catalog.fillBone = S("UI/ui_fill_bone_4x4.png");
+            catalog.fillBlood = S("UI/ui_fill_blood_4x4.png");
+
+            catalog.glyphHeartBlood8 = S("UI/ui_glyph-heart_blood_8x8.png");
+            catalog.glyphHeartBone8 = S("UI/ui_glyph-heart_bone_8x8.png");
+            catalog.glyphShieldFog8 = S("UI/ui_glyph-shield_fog_8x8.png");
+            catalog.glyphSpeedBone8 = S("UI/ui_glyph-speed_bone_8x8.png");
+            catalog.glyphAttackBone8 = S("UI/ui_glyph-attack_bone_8x8.png");
+            catalog.glyphSealBone8 = S("UI/ui_glyph-seal_bone_8x8.png");
+            catalog.glyphDamageBone8 = S("UI/ui_glyph-damage_bone_8x8.png");
+            catalog.glyphDropletBone8 = S("UI/ui_glyph-droplet_bone_8x8.png");
+
+            catalog.itemIcons.Clear();
+            string iconsDir = Art + "Items/Icons";
+            if (Directory.Exists(iconsDir))
+            {
+                string[] files = Directory.GetFiles(iconsDir, "item_*.png");
+                System.Array.Sort(files, System.StringComparer.OrdinalIgnoreCase);
+                foreach (string file in files)
+                {
+                    string assetPath = file.Replace('\\', '/');
+                    string fileName = Path.GetFileNameWithoutExtension(assetPath);
+                    if (!fileName.StartsWith("item_", System.StringComparison.Ordinal)) continue;
+                    Sprite sprite = AssetDatabase.LoadAssetAtPath<Sprite>(assetPath);
+                    if (sprite == null) continue;
+                    catalog.itemIcons.Add(new CombatSceneSpriteCatalog.SpriteEntry
+                    {
+                        key = fileName.Substring("item_".Length),
+                        sprite = sprite
+                    });
+                }
+            }
+
+            catalog.itemPlates.Clear();
+            string platesDir = Art + "Items/Plates";
+            if (Directory.Exists(platesDir))
+            {
+                string[] files = Directory.GetFiles(platesDir, "plate_*.png");
+                System.Array.Sort(files, System.StringComparer.OrdinalIgnoreCase);
+                foreach (string file in files)
+                {
+                    string assetPath = file.Replace('\\', '/');
+                    string fileName = Path.GetFileNameWithoutExtension(assetPath);
+                    if (!fileName.StartsWith("plate_", System.StringComparison.Ordinal)) continue;
+                    if (!fileName.Contains("_rest_") && !fileName.Contains("_hi_")) continue;
+
+                    MakeReadable(assetPath);
+                    Sprite sprite = AssetDatabase.LoadAssetAtPath<Sprite>(assetPath);
+                    if (sprite == null) continue;
+                    catalog.itemPlates.Add(new CombatSceneSpriteCatalog.SpriteEntry
+                    {
+                        key = fileName.Substring("plate_".Length),
+                        sprite = sprite
+                    });
+                }
+            }
+
+            catalog.InvalidateCache();
+            EditorUtility.SetDirty(catalog);
+            return catalog;
+        }
+
+        private static void WireSceneController(
+            GameObject canvasGo,
+            Camera cam,
+            RectTransform safe,
+            RectTransform workbenchRoot,
+            CombatHudView hudView,
+            ItemPopupController popup,
+            CombatSceneSpriteCatalog spriteCatalog)
+        {
+            var controller = canvasGo.AddComponent<CombatSceneController>();
+            var so = new SerializedObject(controller);
+            so.FindProperty("itemsJson").objectReferenceValue = AssetDatabase.LoadAssetAtPath<TextAsset>("Assets/_Project/Data/items_mvp.json");
+            so.FindProperty("heroesJson").objectReferenceValue = AssetDatabase.LoadAssetAtPath<TextAsset>("Assets/_Project/Data/heroes_mvp.json");
+            so.FindProperty("monstersJson").objectReferenceValue = AssetDatabase.LoadAssetAtPath<TextAsset>("Assets/_Project/Data/monsters_mvp.json");
+            so.FindProperty("spriteCatalog").objectReferenceValue = spriteCatalog;
+            so.FindProperty("hudView").objectReferenceValue = hudView;
+            so.FindProperty("popupController").objectReferenceValue = popup;
+            so.FindProperty("safeFrame").objectReferenceValue = safe;
+            so.FindProperty("workbenchRoot").objectReferenceValue = workbenchRoot;
+            so.FindProperty("uiCamera").objectReferenceValue = cam;
+            so.ApplyModifiedPropertiesWithoutUndo();
         }
 
         private static HudSpriteSet.MonsterVisual Monster(string id, int body)
@@ -261,12 +385,12 @@ namespace Project05.Editor
             Fill("ActionStripEdge", safe, "ink-3", 177, 333, 460, 1, TopLeft);
         }
 
-        private static void BuildWorkbench(RectTransform safe, ItemPopupController popup)
+        private static RectTransform BuildWorkbench(RectTransform safe, ItemPopupController popup)
         {
             RectTransform wb = Rect("Workbench", safe, TopLeft, TopLeft);
             wb.anchoredPosition = Vector2.zero;
             Img("NameChip", wb, S("UI/ui_chip_base_9s.png"), 7, 22, TopLeft, 14, 12, true);
-            Num("NameJoin", wb, 8, "num", 12, 24, "2", TopLeft);
+            Num("NameJoin", wb, 8, "num", 12, 24, "1", TopLeft);
             Img("NameChevron", wb, S("UI/ui_chevron-turn_hero_7x4.png"), 24, 26, TopLeft);
             Label("NameLabel", wb, LabelHero, 34, 22, 120, Bone);
             Fill("GridBed", wb, "ink-2", 7, 40, 80, 80, TopLeft);
@@ -283,6 +407,7 @@ namespace Project05.Editor
             for (int i = 1; i < 8; i++) Fill("StashV", wb, "ink-1", 7 + 20 * i, 152, 1, 40, TopLeft);
             Fill("StashH", wb, "ink-1", 7, 172, 160, 1, TopLeft);
             PlaceItems(wb, popup, false);
+            return wb;
         }
 
         // The arrangement shown in the workbench: the items of hero 2 grid (4 x 4, origin at 7, 40) and the stash
@@ -385,7 +510,7 @@ namespace Project05.Editor
         }
 
         // ------------------------------------------------------------------ HUD
-        private static void BuildHud(RectTransform safe)
+        private static CombatHudView BuildHud(RectTransform safe)
         {
             var hudGo = new GameObject("CombatHud", typeof(RectTransform));
             hudGo.transform.SetParent(safe, false);
@@ -397,7 +522,7 @@ namespace Project05.Editor
             // top strip: coin, currency, room counter, menu glyph, order strip and its forecast label
             Img("Coin", hudRt, S("UI/ui_glyph-coin_default_12x12.png"), 3, 2, TopLeft);
             SpriteNumeralText currency = Num("Currency", hudRt, 8, "num", 18, 4, "120", TopLeft);
-            SpriteNumeralText room = Num("Room", hudRt, 8, "num-fog", 52, 4, "3/8", TopLeft);
+            SpriteNumeralText room = Num("Room", hudRt, 8, "num-fog", 52, 4, "1/8", TopLeft);
             Img("Menu", hudRt, S("UI/ui_glyph-menu_bone_8x8.png"), 624, 4, TopLeft);
             Label("ForecastLabel", hudRt, LabelForecast, 276, 2, 150, Fog);
             OrderStripView orderView = BuildOrderStrip(hudRt);
@@ -439,6 +564,7 @@ namespace Project05.Editor
             var demoSo = new SerializedObject(demo);
             demoSo.FindProperty("hud").objectReferenceValue = view;
             demoSo.ApplyModifiedPropertiesWithoutUndo();
+            return view;
         }
 
         private static void Assign<T>(SerializedProperty array, T[] items) where T : Object

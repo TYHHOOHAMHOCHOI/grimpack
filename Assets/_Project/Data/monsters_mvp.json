@@ -1,0 +1,343 @@
+{
+ "monsters": [
+  {
+   "id": "mon_hunter",
+   "visual": "swarmer",
+   "bodyHeight": 26,
+   "nameVi": "Thợ Săn Hang Tối",
+   "nameEn": "Cave Hunter",
+   "classification": "regular",
+   "sizeClass": "small",
+   "baseMaxHp": 52,
+   "baseSpeed": 20,
+   "openerMoveId": "strike",
+   "moves": [
+    {
+     "id": "strike",
+     "nameVi": "Bắn Nỏ Đêm",
+     "nameEn": "Night Bolt",
+     "glyph": "attack",
+     "delivery": "throw",
+     "hitCount": 1,
+     "baseDamage": 7,
+     "targetMode": "RandomHero",
+     "sameAsMoveId": "",
+     "weight": 100,
+     "heavy": false,
+     "linkedNextMoveId": ""
+    }
+   ],
+   "bossPhases": []
+  },
+  {
+   "id": "mon_striker",
+   "visual": "swarmer",
+   "bodyHeight": 26,
+   "nameVi": "Kẻ Đột Kích",
+   "nameEn": "Cavern Striker",
+   "classification": "regular",
+   "sizeClass": "medium",
+   "baseMaxHp": 64,
+   "baseSpeed": 21,
+   "openerMoveId": "jab",
+   "moves": [
+    {
+     "id": "jab",
+     "nameVi": "Đâm Nhanh",
+     "nameEn": "Quick Jab",
+     "glyph": "attack",
+     "delivery": "swing",
+     "hitCount": 1,
+     "baseDamage": 6,
+     "targetMode": "RandomHero",
+     "sameAsMoveId": "",
+     "weight": 60,
+     "heavy": false,
+     "linkedNextMoveId": ""
+    },
+    {
+     "id": "bash",
+     "nameVi": "Đánh Mạnh",
+     "nameEn": "Bone Bash",
+     "glyph": "attack",
+     "delivery": "swing",
+     "hitCount": 1,
+     "baseDamage": 9,
+     "targetMode": "RandomHero",
+     "sameAsMoveId": "",
+     "weight": 40,
+     "heavy": false,
+     "linkedNextMoveId": ""
+    }
+   ],
+   "bossPhases": []
+  },
+  {
+   "id": "mon_swarmer",
+   "visual": "swarmer",
+   "bodyHeight": 26,
+   "nameVi": "Bầy Bọ Đêm",
+   "nameEn": "Swarmer",
+   "classification": "regular",
+   "sizeClass": "small",
+   "baseMaxHp": 38,
+   "baseSpeed": 26,
+   "openerMoveId": "flurry",
+   "moves": [
+    {
+     "id": "flurry",
+     "nameVi": "Cào Liên Hoàn",
+     "nameEn": "Claw Flurry",
+     "glyph": "attack",
+     "delivery": "swing",
+     "hitCount": 3,
+     "baseDamage": 4,
+     "targetMode": "RandomHero",
+     "sameAsMoveId": "",
+     "weight": 100,
+     "heavy": false,
+     "linkedNextMoveId": ""
+    }
+   ],
+   "bossPhases": []
+  },
+  {
+   "id": "mon_sweeper",
+   "visual": "brute",
+   "bodyHeight": 44,
+   "nameVi": "Quái Quét Hàng",
+   "nameEn": "Ash Sweeper",
+   "classification": "regular",
+   "sizeClass": "medium",
+   "baseMaxHp": 56,
+   "baseSpeed": 18,
+   "openerMoveId": "sweep",
+   "moves": [
+    {
+     "id": "sweep",
+     "nameVi": "Quét Ngang",
+     "nameEn": "Wide Sweep",
+     "glyph": "attack",
+     "delivery": "swing",
+     "hitCount": 1,
+     "baseDamage": 5,
+     "targetMode": "AllHeroes",
+     "sameAsMoveId": "",
+     "weight": 100,
+     "heavy": false,
+     "linkedNextMoveId": ""
+    }
+   ],
+   "bossPhases": []
+  },
+  {
+   "id": "mon_brute",
+   "visual": "brute",
+   "bodyHeight": 44,
+   "nameVi": "Quái Khổng Lồ",
+   "nameEn": "Cave Brute",
+   "classification": "regular",
+   "sizeClass": "large",
+   "baseMaxHp": 88,
+   "baseSpeed": 19,
+   "openerMoveId": "strike",
+   "moves": [
+    {
+     "id": "strike",
+     "nameVi": "Vung Chùy",
+     "nameEn": "Club Strike",
+     "glyph": "attack",
+     "delivery": "swing",
+     "hitCount": 1,
+     "baseDamage": 7,
+     "targetMode": "RandomHero",
+     "sameAsMoveId": "",
+     "weight": 60,
+     "heavy": false,
+     "linkedNextMoveId": ""
+    },
+    {
+     "id": "windup",
+     "nameVi": "Gồng Sức",
+     "nameEn": "Windup",
+     "glyph": "windup",
+     "delivery": "swing",
+     "hitCount": 0,
+     "baseDamage": 0,
+     "targetMode": "RandomHero",
+     "sameAsMoveId": "",
+     "weight": 25,
+     "heavy": false,
+     "linkedNextMoveId": "heavy"
+    },
+    {
+     "id": "heavy",
+     "nameVi": "Đập Nghiền Nát",
+     "nameEn": "Crushing Blow",
+     "glyph": "attack",
+     "delivery": "swing",
+     "hitCount": 1,
+     "baseDamage": 14,
+     "targetMode": "SameAsMove",
+     "sameAsMoveId": "windup",
+     "weight": 0,
+     "heavy": true,
+     "linkedNextMoveId": ""
+    }
+   ],
+   "bossPhases": []
+  },
+  {
+   "id": "mon_elite_bruiser",
+   "visual": "brute",
+   "bodyHeight": 44,
+   "nameVi": "Hung Thần Tinh Anh",
+   "nameEn": "Elite Bruiser",
+   "classification": "elite",
+   "sizeClass": "large",
+   "baseMaxHp": 140,
+   "baseSpeed": 21,
+   "openerMoveId": "strike",
+   "moves": [
+    {
+     "id": "strike",
+     "nameVi": "Chém Nặng",
+     "nameEn": "Heavy Slash",
+     "glyph": "attack",
+     "delivery": "swing",
+     "hitCount": 1,
+     "baseDamage": 10,
+     "targetMode": "RandomHero",
+     "sameAsMoveId": "",
+     "weight": 70,
+     "heavy": false,
+     "linkedNextMoveId": ""
+    },
+    {
+     "id": "heavy",
+     "nameVi": "Giáng Búa Sấm",
+     "nameEn": "Thunder Slam",
+     "glyph": "attack",
+     "delivery": "swing",
+     "hitCount": 1,
+     "baseDamage": 17,
+     "targetMode": "RandomHero",
+     "sameAsMoveId": "",
+     "weight": 30,
+     "heavy": true,
+     "linkedNextMoveId": ""
+    }
+   ],
+   "bossPhases": []
+  },
+  {
+   "id": "mon_boss",
+   "visual": "brute",
+   "bodyHeight": 44,
+   "nameVi": "Chúa Tể Hầm Ngục",
+   "nameEn": "Crypt Warden",
+   "classification": "boss",
+   "sizeClass": "boss",
+   "baseMaxHp": 320,
+   "baseSpeed": 22,
+   "openerMoveId": "strike",
+   "moves": [
+    {
+     "id": "strike",
+     "nameVi": "Trảm Kích",
+     "nameEn": "Warden Strike",
+     "glyph": "attack",
+     "delivery": "swing",
+     "hitCount": 1,
+     "baseDamage": 10,
+     "targetMode": "RandomHero",
+     "sameAsMoveId": "",
+     "weight": 60,
+     "heavy": false,
+     "linkedNextMoveId": ""
+    },
+    {
+     "id": "sweep",
+     "nameVi": "Sóng Hắc Ám",
+     "nameEn": "Shadow Sweep",
+     "glyph": "attack",
+     "delivery": "swing",
+     "hitCount": 1,
+     "baseDamage": 6,
+     "targetMode": "AllHeroes",
+     "sameAsMoveId": "",
+     "weight": 40,
+     "heavy": false,
+     "linkedNextMoveId": ""
+    },
+    {
+     "id": "windup",
+     "nameVi": "Tụ Lực Hủy Diệt",
+     "nameEn": "Dark Charge",
+     "glyph": "windup",
+     "delivery": "swing",
+     "hitCount": 0,
+     "baseDamage": 0,
+     "targetMode": "RandomHero",
+     "sameAsMoveId": "",
+     "weight": 20,
+     "heavy": false,
+     "linkedNextMoveId": "crush"
+    },
+    {
+     "id": "crush",
+     "nameVi": "Nghiền Xương",
+     "nameEn": "Bone Shatter",
+     "glyph": "attack",
+     "delivery": "swing",
+     "hitCount": 1,
+     "baseDamage": 18,
+     "targetMode": "SameAsMove",
+     "sameAsMoveId": "windup",
+     "weight": 0,
+     "heavy": true,
+     "linkedNextMoveId": ""
+    }
+   ],
+   "bossPhases": [
+    {
+     "startIndex": 0,
+     "endIndexInclusive": 3,
+     "allowedMoveIds": [
+      "strike",
+      "sweep"
+     ]
+    },
+    {
+     "startIndex": 4,
+     "endIndexInclusive": -1,
+     "allowedMoveIds": [
+      "strike",
+      "sweep",
+      "windup",
+      "crush"
+     ]
+    }
+   ]
+  }
+ ],
+ "tierTable": {
+  "hpRampPerRoom": 60,
+  "damageRampPerRoom": 40,
+  "dangerThresholds": [20, 40, 70, 110],
+  "tiers": [
+   { "tier": "White", "minRoom": 1, "hpKick": 0, "damageKick": 0 },
+   { "tier": "Green", "minRoom": 2, "hpKick": 0, "damageKick": 0 },
+   { "tier": "Blue", "minRoom": 3, "hpKick": 100, "damageKick": 50 },
+   { "tier": "Purple", "minRoom": 5, "hpKick": 200, "damageKick": 100 }
+  ]
+ },
+ "encounterPresets": [
+  { "monsterCount": 1, "roster": ["mon_hunter"] },
+  { "monsterCount": 2, "roster": ["mon_swarmer", "mon_brute"] },
+  { "monsterCount": 3, "roster": ["mon_swarmer", "mon_hunter", "mon_brute"] },
+  { "monsterCount": 4, "roster": ["mon_swarmer", "mon_striker", "mon_sweeper", "mon_brute"] },
+  { "monsterCount": 5, "roster": ["mon_swarmer", "mon_hunter", "mon_striker", "mon_sweeper", "mon_brute"] },
+  { "monsterCount": 6, "roster": ["mon_swarmer", "mon_swarmer", "mon_hunter", "mon_striker", "mon_sweeper", "mon_brute"] }
+ ]
+}

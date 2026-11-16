@@ -1,0 +1,445 @@
+using System;
+using System.Collections.Generic;
+using Project05.CombatCore;
+using Project05.UI.Hud;
+using TMPro;
+using UnityEngine;
+using UnityEngine.UI;
+
+namespace Project05.CombatScene
+{
+    public enum CombatScenePhase
+    {
+        Planning = 0,
+        Playing = 1,
+        PostCombat = 2
+    }
+
+    /// <summary>
+    /// Top-level runtime orchestrator for <c>Combat.unity</c> in temporary 1-hero mode (Hero0 active).
+    /// Connects the interactive Workbench + Equipment Picker, live Turn Order Forecast,
+    /// deterministic <see cref="CombatCore"/> simulation, HUD playback, Post-Combat breakdown,
+    /// and the Next-Stage Monster Count Test System (1..6).
+    /// </summary>
+    public sealed class CombatSceneController : MonoBehaviour
+    {
+        [Header("Data Catalogs")]
+        [SerializeField] private TextAsset itemsJson;
+        [SerializeField] private TextAsset heroesJson;
+        [SerializeField] private TextAsset monstersJson;
+        [SerializeField] private CombatSceneSpriteCatalog spriteCatalog;
+
+        [Header("Scene References")]
+        [SerializeField] private CombatHudView hudView;
+        [SerializeField] private ItemPopupController popupController;
+        [SerializeField] private RectTransform safeFrame;
+        [SerializeField] private RectTransform workbenchRoot;
+        [SerializeField] private Camera uiCamera;
+
+        [Header("Run & Test Defaults")]
+        [SerializeField] private ulong stageSeed = 12345UL;
+        [SerializeField] [Range(1, 6)] private int defaultMonsterCount = 2;
+        [SerializeField] private int roomCount = 8;
+        [SerializeField] private int startingCurrency = 120;
+
+        private EncounterPresetCatalog _presetCatalog;
+        private SequentialItemIdSource _idSource;
+        private List<EnemySpawnInput> _currentSpawns = new List<EnemySpawnInput>();
+        private RectTransform _planningActionStripRoot;
+        private Button _fightButton;
+
+        public GameCatalog Catalog { get; private set; }
+        public HeroDef HeroDef { get; private set; }
+        public BackpackArrangement Arrangement { get; private set; }
+        public PreparedEncounter Prepared { get; private set; }
+        public CombatResult LastResult { get; private set; }
+
+        public WorkbenchController Workbench { get; private set; }
+        public NextStageTestPanel NextStagePanel { get; private set; }
+        public CombatPlaybackController Playback { get; private set; }
+        public PostCombatPanelView PostCombatPanel { get; private set; }
+
+        public CombatScenePhase Phase { get; private set; } = CombatScenePhase.Planning;
+        public int CurrentStage { get; private set; } = 1;
+        public int NextMonsterCount { get; private set; } = 2;
+        public int Currency { get; private set; }
+        public bool IsFighting => Phase == CombatScenePhase.Playing;
+        public string LastPrepareError { get; private set; }
+
+        private void Start()
+        {
+            InitializeRuntime();
+        }
+
+        private void OnDestroy()
+        {
+            if (Workbench != null) Workbench.ArrangementChanged -= HandleArrangementChanged;
+            if (Playback != null) Playback.PlaybackCompleted -= HandlePlaybackCompleted;
+            if (NextStagePanel != null)
+            {
+                NextStagePanel.MonsterCountChanged -= SetNextStageMonsterCount;
+                NextStagePanel.ApplyNowRequested -= ApplyMonsterCountImmediately;
+            }
+            if (PostCombatPanel != null)
+            {
+                PostCombatPanel.NextMonsterCountSelected -= SetNextStageMonsterCount;
+                PostCombatPanel.NextStageClicked -= ProceedToNextStage;
+                PostCombatPanel.RetryClicked -= RetryStage;
+            }
+        }
+
+        /// <summary>
+        /// Initializes catalogs, 1-hero arrangement, starter items, and runtime UI modules.
+        /// Safe to call explicitly from integration tests immediately after scene load.
+        /// </summary>
+        public void InitializeRuntime()
+        {
+            if (Catalog != null) return;
+
+            if (itemsJson == null || heroesJson == null || monstersJson == null || spriteCatalog == null || hudView == null)
+            {
+                Debug.LogError("[CombatSceneController] Missing serialized catalog or scene references.");
+                return;
+            }
+
+            Catalog = GameCatalog.LoadFromJson(
+                itemsJson.text,
+                heroesJson.text,
+                monstersJson.text,
+                out IReadOnlyList<string> validationErrors);
+
+            if (validationErrors != null && validationErrors.Count > 0)
+            {
+                for (int i = 0; i < validationErrors.Count; i++)
+                {
+                    Debug.LogWarning("[CombatSceneController] Catalog validation: " + validationErrors[i]);
+                }
+            }
+
+            _presetCatalog = new EncounterPresetCatalog(monstersJson.text);
+            HeroDef = Catalog.FindHero("hero_crusader") ?? (Catalog.Heroes.Count > 0 ? Catalog.Heroes[0] : null);
+            if (HeroDef == null)
+            {
+                Debug.LogError("[CombatSceneController] No hero definition available.");
+                return;
+            }
+
+            CurrentStage = 1;
+            NextMonsterCount = Mathf.Clamp(defaultMonsterCount, 1, 6);
+            Currency = startingCurrency;
+            _idSource = new SequentialItemIdSource(1);
+
+            Arrangement = new BackpackArrangement(
+                Catalog,
+                heroCount: 1,
+                heroProfiles: new[] { HeroDef.BackpackProfile },
+                idSource: _idSource,
+                stashWidth: 8,
+                stashHeight: 2,
+                rotationEnabled: true);
+
+            PopulateInitialLoadout();
+            CenterSingleHeroSlot();
+            BuildRuntimePanels();
+
+            PrepareStage(CurrentStage, NextMonsterCount);
+        }
+
+        public void SetNextStageMonsterCount(int count)
+        {
+            NextMonsterCount = Mathf.Clamp(count, 1, 6);
+            NextStagePanel?.SetCountSilently(NextMonsterCount);
+            PostCombatPanel?.SetNextMonsterCount(NextMonsterCount);
+        }
+
+        public void ApplyMonsterCountImmediately(int count)
+        {
+            SetNextStageMonsterCount(count);
+            if (Phase != CombatScenePhase.Planning) return;
+
+            PrepareStage(CurrentStage, NextMonsterCount);
+        }
+
+        public void StartFight()
+        {
+            if (Phase != CombatScenePhase.Planning || Catalog == null || Arrangement == null) return;
+
+            Workbench?.ForceClearDragAndTray();
+            ClearLooseTrayItems();
+
+            Arrangement.Freeze();
+            if (!TryPrepareCurrentArrangement(out PreparedEncounter prepared, out string error))
+            {
+                LastPrepareError = error;
+                Debug.LogWarning("[CombatSceneController] Cannot start fight: " + error);
+                Arrangement.Thaw();
+                Workbench?.ShowFeedback(string.IsNullOrEmpty(error) ? "Không thể bắt đầu!" : error, isError: true);
+                return;
+            }
+
+            Prepared = prepared;
+            LastPrepareError = null;
+            LastResult = CombatRunner.RunEncounter(Catalog, Prepared);
+
+            SetPhase(CombatScenePhase.Playing);
+            Workbench?.SetInteractive(false);
+            PostCombatPanel?.Hide();
+
+            int speedIndex = Playback != null ? Playback.SpeedIndex : 0;
+            CombatHudData startData = CombatHudMapper.MapPlanning(
+                Catalog,
+                HeroDef,
+                Arrangement.CaptureView().HeroGrids[0],
+                Workbench != null ? Workbench.CurrentSynergy : null,
+                Prepared,
+                CurrentStage,
+                roomCount,
+                Currency,
+                speedIndex);
+            hudView.Apply(startData);
+
+            Playback.Play(Catalog, Prepared, LastResult, CurrentStage, roomCount, Currency);
+        }
+
+        public void ProceedToNextStage()
+        {
+            if (Phase != CombatScenePhase.PostCombat) return;
+
+            Playback?.StopPlayback();
+            PostCombatPanel?.Hide();
+            Arrangement.Thaw();
+
+            CurrentStage += 1;
+            Currency += 25 * (_currentSpawns != null ? _currentSpawns.Count : 1);
+
+            PrepareStage(CurrentStage, NextMonsterCount);
+        }
+
+        public void RetryStage()
+        {
+            if (Phase != CombatScenePhase.PostCombat) return;
+
+            Playback?.StopPlayback();
+            PostCombatPanel?.Hide();
+            Arrangement.Thaw();
+
+            int count = _currentSpawns != null && _currentSpawns.Count > 0 ? _currentSpawns.Count : NextMonsterCount;
+            PrepareStage(CurrentStage, count);
+        }
+
+        public void RefreshPlanningHud()
+        {
+            if (Phase != CombatScenePhase.Planning || Catalog == null || Arrangement == null) return;
+
+            ArrangementView view = Arrangement.CaptureView();
+            ArrangementGridView heroGrid = view.HeroGrids != null && view.HeroGrids.Count > 0 ? view.HeroGrids[0] : null;
+            GridSynergyView synergy = Workbench != null
+                ? Workbench.CurrentSynergy
+                : AdjacencySynergyEvaluator.Evaluate(heroGrid, Catalog);
+
+            if (TryPrepareCurrentArrangement(out PreparedEncounter prepared, out string error))
+            {
+                Prepared = prepared;
+                LastPrepareError = null;
+            }
+            else
+            {
+                LastPrepareError = error;
+            }
+
+            int speedIndex = Playback != null ? Playback.SpeedIndex : 0;
+            CombatHudData data = CombatHudMapper.MapPlanning(
+                Catalog,
+                HeroDef,
+                heroGrid,
+                synergy,
+                Prepared,
+                CurrentStage,
+                roomCount,
+                Currency,
+                speedIndex);
+            hudView.Apply(data);
+        }
+
+        private void PrepareStage(int stage, int monsterCount)
+        {
+            int count = Mathf.Clamp(monsterCount, 1, 6);
+            _currentSpawns = _presetCatalog.BuildSpawns(Catalog, count, stage);
+            SetPhase(CombatScenePhase.Planning);
+
+            Workbench?.SetInteractive(true);
+            Workbench?.RefreshAll();
+            NextStagePanel?.SetCountSilently(NextMonsterCount);
+            NextStagePanel?.UpdateSummary(stage, _currentSpawns.Count);
+
+            RefreshPlanningHud();
+        }
+
+        private bool TryPrepareCurrentArrangement(out PreparedEncounter prepared, out string error)
+        {
+            ArrangementView view = Arrangement.CaptureView();
+            ArrangementGridView heroGrid = view.HeroGrids[0];
+            GridSynergyView synergy = AdjacencySynergyEvaluator.Evaluate(heroGrid, Catalog);
+
+            var heroBaseline = new HeroBaselineInput(
+                slot: 0,
+                definition: HeroDef,
+                permanentHpBonus: 0,
+                frozenGrid: heroGrid,
+                frozenSynergy: synergy);
+
+            var setup = new EncounterSetup(
+                encounterId: CurrentStage,
+                stageNumber: CurrentStage,
+                heroes: new[] { heroBaseline },
+                enemies: _currentSpawns);
+
+            ulong encounterSeed = DeriveStageSeed(stageSeed, CurrentStage, _currentSpawns.Count);
+            var rng = new SeededRng(encounterSeed);
+            return CombatRunner.TryPrepare(Catalog, setup, rng, out prepared, out error);
+        }
+
+        private void PopulateInitialLoadout()
+        {
+            if (HeroDef.StartingItems != null)
+            {
+                for (int i = 0; i < HeroDef.StartingItems.Count; i++)
+                {
+                    PlaceNewItem(HeroDef.StartingItems[i], ContainerKind.Hero0);
+                }
+            }
+
+            // Seed a few starter options into Stash so players can swap immediately without opening Chọn đồ.
+            string[] starterSpares = { "item_dagger", "item_oak_buckler", "item_breaking_bell" };
+            for (int i = 0; i < starterSpares.Length; i++)
+            {
+                if (Catalog.FindItem(starterSpares[i]) != null)
+                {
+                    PlaceNewItem(starterSpares[i], ContainerKind.Stash);
+                }
+            }
+        }
+
+        private void PlaceNewItem(string defId, ContainerKind container)
+        {
+            if (string.IsNullOrEmpty(defId) || Catalog.FindItem(defId) == null) return;
+            if (!Arrangement.CreateInTray(defId, out long itemId).IsOk) return;
+            if (!Arrangement.AutoPlace(itemId, container).IsOk)
+            {
+                Arrangement.DestroyTrayItem(itemId);
+            }
+        }
+
+        private void ClearLooseTrayItems()
+        {
+            ArrangementView view = Arrangement.CaptureView();
+            if (view.Tray == null || view.Tray.Count == 0) return;
+
+            var ids = new List<long>(view.Tray.Count);
+            for (int i = 0; i < view.Tray.Count; i++) ids.Add(view.Tray[i].InstanceId);
+            for (int i = 0; i < ids.Count; i++) Arrangement.DestroyTrayItem(ids[i]);
+        }
+
+        private void CenterSingleHeroSlot()
+        {
+            Transform hero1 = hudView.transform.Find("HeroSlot1");
+            if (hero1 is RectTransform rt)
+            {
+                // Center single active hero vertically inside the 137x314 WallPlane (y = 19..333)
+                rt.anchoredPosition = new Vector2(247f, -129f);
+            }
+        }
+
+        private void BuildRuntimePanels()
+        {
+            // Planning action strip (overlay sharing the ActionStrip band y=333..357)
+            _planningActionStripRoot = CombatUiFactory.CreateRect("PlanningActionStrip", safeFrame, 0f, 0f, 640f, 360f);
+
+            NextStagePanel = gameObject.AddComponent<NextStageTestPanel>();
+            NextStagePanel.Initialize(_planningActionStripRoot, spriteCatalog, NextMonsterCount);
+            NextStagePanel.MonsterCountChanged += SetNextStageMonsterCount;
+            NextStagePanel.ApplyNowRequested += ApplyMonsterCountImmediately;
+
+            _fightButton = CombatUiFactory.CreateSegmentButton(
+                "FightButton",
+                _planningActionStripRoot,
+                spriteCatalog,
+                "Chiến đấu",
+                550f,
+                335f,
+                82f,
+                20f,
+                selected: true);
+            TextMeshProUGUI fightLabel = _fightButton.GetComponentInChildren<TextMeshProUGUI>(true);
+            if (fightLabel != null) fightLabel.color = CombatUiFactory.Candle;
+            _fightButton.onClick.AddListener(StartFight);
+
+            // Workbench
+            Workbench = gameObject.AddComponent<WorkbenchController>();
+            Workbench.Initialize(safeFrame, workbenchRoot, uiCamera, spriteCatalog, popupController, Catalog, HeroDef, Arrangement);
+            Workbench.ArrangementChanged += HandleArrangementChanged;
+
+            // Playback
+            Playback = gameObject.AddComponent<CombatPlaybackController>();
+            Playback.Initialize(hudView);
+            Playback.PlaybackCompleted += HandlePlaybackCompleted;
+
+            // Post-combat breakdown panel
+            PostCombatPanel = gameObject.AddComponent<PostCombatPanelView>();
+            PostCombatPanel.Initialize(safeFrame, spriteCatalog);
+            PostCombatPanel.NextMonsterCountSelected += SetNextStageMonsterCount;
+            PostCombatPanel.NextStageClicked += ProceedToNextStage;
+            PostCombatPanel.RetryClicked += RetryStage;
+
+            // Keep ItemPopup topmost so hover tooltips stay above PostCombatPanel and Workbench.
+            Transform popupViewTf = safeFrame.Find("ItemPopup");
+            if (popupViewTf != null) popupViewTf.SetAsLastSibling();
+        }
+
+        private void HandleArrangementChanged()
+        {
+            if (Phase == CombatScenePhase.Planning)
+            {
+                RefreshPlanningHud();
+            }
+        }
+
+        private void HandlePlaybackCompleted(CombatResult result)
+        {
+            LastResult = result;
+            SetPhase(CombatScenePhase.PostCombat);
+            PostCombatPanel?.Show(result, Catalog, CurrentStage, NextMonsterCount);
+        }
+
+        private void SetPhase(CombatScenePhase nextPhase)
+        {
+            Phase = nextPhase;
+            bool inPlanning = nextPhase == CombatScenePhase.Planning;
+            bool inCombat = nextPhase == CombatScenePhase.Playing;
+
+            if (_planningActionStripRoot != null)
+            {
+                _planningActionStripRoot.gameObject.SetActive(inPlanning);
+            }
+
+            if (hudView != null && hudView.Speed != null)
+            {
+                hudView.Speed.gameObject.SetActive(inCombat);
+            }
+        }
+
+        private static ulong DeriveStageSeed(ulong baseSeed, int stage, int monsterCount)
+        {
+            unchecked
+            {
+                ulong x = baseSeed ^ ((ulong)(uint)stage * 0x9E3779B97F4A7C15UL) ^ ((ulong)(uint)monsterCount * 0xBF58476D1CE4E5B9UL);
+                x ^= x >> 30;
+                x *= 0xBF58476D1CE4E5B9UL;
+                x ^= x >> 27;
+                x *= 0x94D049BB133111EBUL;
+                x ^= x >> 31;
+                return x == 0 ? 1UL : x;
+            }
+        }
+    }
+}

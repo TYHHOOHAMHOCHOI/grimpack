@@ -18,11 +18,11 @@ namespace Project05.Tests.EditMode
         private static PlacedItem At(ItemCatalog c, string id, int x, int y) => new PlacedItem(c.Find(id), x, y);
 
         [Test]
-        public void Catalog_Loads23ItemsWithUniqueIds()
+        public void Catalog_Loads34ItemsWithUniqueIds()
         {
             ItemCatalog c = LoadCatalog();
 
-            Assert.AreEqual(23, c.All.Count);
+            Assert.AreEqual(34, c.All.Count);
             var seen = new HashSet<string>();
             foreach (ItemRecord i in c.All) Assert.IsTrue(seen.Add(i.id), i.id);
         }
@@ -37,7 +37,7 @@ namespace Project05.Tests.EditMode
                 Assert.IsTrue(i.cells.Length >= 1 && i.cells.Length <= 9, i.id);
                 Assert.IsTrue(i.hpBonus >= -20 && i.hpBonus <= 40, i.id);
                 Assert.AreEqual(i.trigger.kind == "Passive", i.effects.Length == 0, i.id);
-                foreach (EffectRecord e in i.effects) CollectionAssert.Contains(new[] { "Damage", "ApplyStatus", "ConsumeDetonate" }, e.kind, i.id);
+                foreach (EffectRecord e in i.effects) CollectionAssert.Contains(new[] { "Damage", "ApplyStatus", "ConsumeDetonate", "ShieldGain", "Heal" }, e.kind, i.id);
             }
         }
 

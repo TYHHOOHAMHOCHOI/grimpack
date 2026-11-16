@@ -86,11 +86,24 @@ namespace Project05.Items
                 case "chain": return "xích";
                 case "relic": return "di vật";
                 case "incense": return "hương";
+                case "shield": return "khiên";
+                case "heal": return "hồi máu";
+                case "potion": return "dược phẩm";
                 default: return tag;
             }
         }
 
-        private static string Target(string target) => target == "AllEnemies" ? "mọi kẻ địch" : "kẻ địch đầu tiên";
+        private static string Target(string target)
+        {
+            switch (target)
+            {
+                case "AllEnemies": return "mọi kẻ địch";
+                case "Self": return "bản thân";
+                case "AllHeroes": return "cả đội";
+                case "LowestHpHero": return "đồng đội ít HP nhất";
+                default: return "kẻ địch đầu tiên";
+            }
+        }
 
         private static string Signed(int v) => v > 0 ? "+" + v : v.ToString();
 
@@ -119,7 +132,11 @@ namespace Project05.Items
                     break;
                 case "Reaction":
                     int nr = ItemSynergy.EffectiveCooldown(item.trigger.n, cooldownCut);
-                    c.Lines.Add(new PopupLine(GlyphKind.Speed, "Phản ứng khi Ấn được áp lên kẻ địch, hồi " + nr + (cooldownCut != 0 ? " (gốc " + item.trigger.n + ")" : string.Empty)));
+                    string reactDesc = item.trigger.eventKind == "Damage" &&
+                                       (item.trigger.eventSide == "self" || item.trigger.eventSide == "own_hero")
+                        ? "Phản ứng khi chủ nhận sát thương, hồi "
+                        : "Phản ứng khi Ấn được áp lên kẻ địch, hồi ";
+                    c.Lines.Add(new PopupLine(GlyphKind.Speed, reactDesc + nr + (cooldownCut != 0 ? " (gốc " + item.trigger.n + ")" : string.Empty)));
                     break;
                 case "CombatStart":
                     c.Lines.Add(new PopupLine(GlyphKind.Speed, "Đầu trận, một lần"));
@@ -146,6 +163,12 @@ namespace Project05.Items
                         string units = e.units >= 99 ? "mọi" : "tối đa " + e.units;
                         string pct = percent != 0 ? ", " + Signed(percent / 10) + "% sát thương" : string.Empty;
                         c.Lines.Add(new PopupLine(GlyphKind.Damage, "Nổ " + units + " Ấn, " + e.perUnit + " sát thương mỗi Ấn, lên " + Target(e.target) + pct));
+                        break;
+                    case "ShieldGain":
+                        c.Lines.Add(new PopupLine(GlyphKind.Shield, "Tạo " + e.amount + " Giáp cho " + Target(e.target)));
+                        break;
+                    case "Heal":
+                        c.Lines.Add(new PopupLine(GlyphKind.Heart, "Hồi " + e.amount + " HP cho " + Target(e.target)));
                         break;
                 }
             }

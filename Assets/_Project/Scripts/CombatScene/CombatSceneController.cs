@@ -48,6 +48,18 @@ namespace Project05.CombatScene
         private RectTransform _planningActionStripRoot;
         private Button _fightButton;
 
+        // Integrated mode fields (when wired with CombatScreenController + ItemBoardController)
+        private ItemBoardController _externalBoard;
+        private ActionStripView _externalStrip;
+        private bool _integratedMode;
+        private RectTransform _pickerOverlay;
+        private EquipmentPickerView _integratedPicker;
+        private Button _pickerToggleBtn;
+        private TextMeshProUGUI _pickerToggleLabel;
+        private int _playbackSpeedIndex;
+
+        public event Action StageReturnedToPlanning;
+
         public GameCatalog Catalog { get; private set; }
         public HeroDef HeroDef { get; private set; }
         public BackpackArrangement Arrangement { get; private set; }
@@ -68,7 +80,277 @@ namespace Project05.CombatScene
 
         private void Start()
         {
-            InitializeRuntime();
+            if (!_integratedMode && FindAnyObjectByType<CombatScreenController>() == null)
+            {
+                InitializeRuntime();
+            }
+        }
+
+        /// <summary>
+        /// Integrated initialization driven by <see cref="CombatScreenController"/>: keeps <c>main</c>'s
+        /// <see cref="ItemBoardController"/>, <see cref="SellDrawerView"/>, pause/settings modals, and pixel cursor,
+        /// while replacing fixture playback with real <see cref="CombatCore"/> simulation, 1-hero centering,
+        /// an equipment picker ("Chọn đồ"), and the 1..6 monster count test selector.
+        /// </summary>
+        public void InitializeIntegrated(
+            ItemBoardController externalBoard,
+            CombatHudView externalHud,
+            ActionStripView externalStrip,
+            ItemPopupController externalPopup,
+            Transform externalSafeFrame,
+            int initialSpeedIndex)
+        {
+            if (Catalog != null) return;
+
+            _integratedMode = true;
+            _externalBoard = externalBoard;
+            hudView = externalHud;
+            _externalStrip = externalStrip;
+            popupController = externalPopup;
+            if (externalSafeFrame is RectTransform rt) safeFrame = rt;
+            _playbackSpeedIndex = Mathf.Clamp(initialSpeedIndex, 0, 2);
+
+            if (!LoadCatalogs()) return;
+
+            CurrentStage = 1;
+            NextMonsterCount = Mathf.Clamp(defaultMonsterCount, 1, 6);
+            Currency = startingCurrency;
+            _idSource = new SequentialItemIdSource(1);
+
+            CenterSingleHeroSlot();
+            BuildIntegratedPanels();
+            SyncArrangementFromExternalBoard();
+            PrepareStage(CurrentStage, NextMonsterCount);
+        }
+
+        private bool LoadCatalogs()
+        {
+            if (itemsJson == null || heroesJson == null || monstersJson == null || spriteCatalog == null || hudView == null)
+            {
+                Debug.LogError("[CombatSceneController] Missing serialized catalog or scene references.");
+                return false;
+            }
+
+            Catalog = GameCatalog.LoadFromJson(
+                itemsJson.text,
+                heroesJson.text,
+                monstersJson.text,
+                out IReadOnlyList<string> validationErrors);
+
+            if (validationErrors != null && validationErrors.Count > 0)
+            {
+                for (int i = 0; i < validationErrors.Count; i++)
+                {
+                    Debug.LogWarning("[CombatSceneController] Catalog validation: " + validationErrors[i]);
+                }
+            }
+
+            _presetCatalog = new EncounterPresetCatalog(monstersJson.text);
+            HeroDef = Catalog.FindHero("hero_crusader") ?? (Catalog.Heroes.Count > 0 ? Catalog.Heroes[0] : null);
+            if (HeroDef == null)
+            {
+                Debug.LogError("[CombatSceneController] No hero definition available.");
+                return false;
+            }
+
+            return true;
+        }
+
+        public void AddCurrency(int delta)
+        {
+            Currency = Mathf.Max(0, Currency + delta);
+            if (hudView != null) hudView.SetCurrency(Currency);
+        }
+
+        public void SetMonsterSelectorVisible(bool visible)
+        {
+            if (_integratedMode && NextStagePanel != null)
+            {
+                NextStagePanel.SetVisible(visible);
+            }
+        }
+
+        public void SetPlaybackSpeed(int index)
+        {
+            _playbackSpeedIndex = Mathf.Clamp(index, 0, 2);
+            Playback?.SetSpeedIndex(_playbackSpeedIndex);
+        }
+
+        public void ArmSkip()
+        {
+            Playback?.SetSpeedIndex(3);
+        }
+
+        public void SetPlaybackPaused(bool paused)
+        {
+            Playback?.SetPaused(paused);
+        }
+
+        public void RefreshFromExternalBoard()
+        {
+            if (!_integratedMode || Phase != CombatScenePhase.Planning) return;
+            SyncArrangementFromExternalBoard();
+            RefreshPlanningHud();
+        }
+
+        public bool StartIntegratedFight(int speedIndex)
+        {
+            if (!_integratedMode || Phase != CombatScenePhase.Planning || Catalog == null) return false;
+
+            SetPickerOpen(false);
+            SyncArrangementFromExternalBoard();
+            Arrangement.Freeze();
+            if (!TryPrepareCurrentArrangement(out PreparedEncounter prepared, out string error))
+            {
+                LastPrepareError = error;
+                Debug.LogWarning("[CombatSceneController] Cannot start fight: " + error);
+                Arrangement.Thaw();
+                return false;
+            }
+
+            Prepared = prepared;
+            LastPrepareError = null;
+            LastResult = CombatRunner.RunEncounter(Catalog, Prepared);
+
+            SetPhase(CombatScenePhase.Playing);
+            PostCombatPanel?.Hide();
+
+            _playbackSpeedIndex = Mathf.Clamp(speedIndex, 0, 2);
+            if (Playback != null && Playback.SpeedIndex != 3)
+            {
+                Playback.SetSpeedIndex(_playbackSpeedIndex);
+            }
+
+            CombatHudData startData = CombatHudMapper.MapPlanning(
+                Catalog,
+                HeroDef,
+                Arrangement.CaptureView().HeroGrids[0],
+                null,
+                Prepared,
+                CurrentStage,
+                roomCount,
+                Currency,
+                _playbackSpeedIndex);
+            hudView.Apply(startData);
+
+            Playback.Play(Catalog, Prepared, LastResult, CurrentStage, roomCount, Currency);
+            return true;
+        }
+
+        private void SyncArrangementFromExternalBoard()
+        {
+            if (Catalog == null || HeroDef == null) return;
+
+            _idSource = new SequentialItemIdSource(1);
+            Arrangement = new BackpackArrangement(
+                Catalog,
+                heroCount: 1,
+                heroProfiles: new[] { HeroDef.BackpackProfile },
+                idSource: _idSource,
+                stashWidth: 8,
+                stashHeight: 8,
+                rotationEnabled: true);
+
+            if (_externalBoard == null) return;
+
+            List<Project05.Items.BoardItem> gridItems = _externalBoard.ExportContainerItems("grid");
+            for (int i = 0; i < gridItems.Count; i++)
+            {
+                Project05.Items.BoardItem bi = gridItems[i];
+                if (bi == null || bi.Record == null) continue;
+                if (!Arrangement.CreateInTray(bi.Record.id, out long itemId).IsOk) continue;
+                if (!Arrangement.Place(itemId, ContainerKind.Hero0, bi.X, bi.Y, bi.Rotation).IsOk)
+                {
+                    Arrangement.DestroyTrayItem(itemId);
+                }
+            }
+        }
+
+        private void BuildIntegratedPanels()
+        {
+            // Next-stage 1..6 monster test selector inside ActionStrip's StartGroup
+            Transform startGroupTf = _externalStrip != null ? _externalStrip.transform.parent.Find("StartGroup") : null;
+            if (startGroupTf is RectTransform startGroupRt)
+            {
+                NextStagePanel = gameObject.AddComponent<NextStageTestPanel>();
+                NextStagePanel.Initialize(startGroupRt, spriteCatalog, NextMonsterCount);
+                NextStagePanel.MonsterCountChanged += SetNextStageMonsterCount;
+                NextStagePanel.ApplyNowRequested += ApplyMonsterCountImmediately;
+            }
+
+            // "Chọn đồ" button in Workbench header (right of hero name) + picker overlay
+            Transform wbTf = safeFrame != null ? safeFrame.Find("Workbench") : null;
+            if (wbTf is RectTransform wbRt)
+            {
+                _pickerToggleBtn = CombatUiFactory.CreateSegmentButton(
+                    "PickerToggleButton",
+                    wbRt,
+                    spriteCatalog,
+                    "Chọn đồ",
+                    116f,
+                    20f,
+                    52f,
+                    16f,
+                    selected: false);
+                _pickerToggleLabel = _pickerToggleBtn.GetComponentInChildren<TextMeshProUGUI>(true);
+                _pickerToggleBtn.onClick.AddListener(TogglePickerOverlay);
+
+                _pickerOverlay = CombatUiFactory.CreateRect("EquipmentPickerOverlay", wbRt, 4f, 38f, 166f, 174f);
+                CombatUiFactory.CreateImage("PickerBg", _pickerOverlay, spriteCatalog.panelDefault, 0f, 0f, 166f, 174f, sliced: true, raycastTarget: true);
+                CombatUiFactory.CreateLabel("PickerTitle", _pickerOverlay, spriteCatalog.font, "Chọn trang bị (34):", 6f, 5f, 120f, 12f, CombatUiFactory.Bone);
+                Button closePickerBtn = CombatUiFactory.CreateSegmentButton("ClosePickerBtn", _pickerOverlay, spriteCatalog, "X", 142f, 4f, 18f, 14f);
+                closePickerBtn.onClick.AddListener(() => SetPickerOpen(false));
+
+                RectTransform pickerBody = CombatUiFactory.CreateRect("PickerBody", _pickerOverlay, 4f, 20f, 158f, 150f);
+                _integratedPicker = pickerBody.gameObject.AddComponent<EquipmentPickerView>();
+                _integratedPicker.Initialize(pickerBody, spriteCatalog, popupController);
+                _integratedPicker.Populate(Catalog);
+                _integratedPicker.ItemClicked += HandleIntegratedPickerClicked;
+                _pickerOverlay.gameObject.SetActive(false);
+            }
+
+            // Playback & Post-Combat panels
+            Playback = gameObject.AddComponent<CombatPlaybackController>();
+            Playback.Initialize(hudView);
+            Playback.PlaybackCompleted += HandlePlaybackCompleted;
+
+            PostCombatPanel = gameObject.AddComponent<PostCombatPanelView>();
+            PostCombatPanel.Initialize(safeFrame, spriteCatalog);
+            PostCombatPanel.NextMonsterCountSelected += SetNextStageMonsterCount;
+            PostCombatPanel.NextStageClicked += ProceedToNextStage;
+            PostCombatPanel.RetryClicked += RetryStage;
+
+            // Keep ItemPopup topmost so hover tooltips stay above PostCombatPanel and PickerOverlay.
+            Transform popupViewTf = safeFrame != null ? safeFrame.Find("ItemPopup") : null;
+            if (popupViewTf != null) popupViewTf.SetAsLastSibling();
+        }
+
+        private void TogglePickerOverlay()
+        {
+            if (_pickerOverlay == null) return;
+            SetPickerOpen(!_pickerOverlay.gameObject.activeSelf);
+        }
+
+        private void SetPickerOpen(bool open)
+        {
+            if (_pickerOverlay != null) _pickerOverlay.gameObject.SetActive(open);
+            if (_pickerToggleBtn != null) CombatUiFactory.SetSegmentVisual(_pickerToggleBtn, spriteCatalog, open);
+            if (!open && popupController != null) popupController.Close();
+        }
+
+        private void HandleIntegratedPickerClicked(string itemId)
+        {
+            if (_externalBoard == null || popupController == null || spriteCatalog == null) return;
+            Project05.Items.ItemRecord record = popupController.Catalog.Find(itemId);
+            if (record == null) return;
+
+            string tierLower = string.IsNullOrEmpty(record.tier) ? "white" : record.tier.ToLowerInvariant();
+            Sprite plateSprite = spriteCatalog.GetAuthoredPlate(tierLower, false, record.footprint);
+            Sprite iconSprite = spriteCatalog.GetItemIcon(record.art, record.footprint, compact: false);
+            if (!_externalBoard.TrySpawnItem(record, plateSprite, iconSprite, "stash", out _))
+            {
+                Debug.LogWarning("[CombatSceneController] Stash and Grid are full; sell or remove an item first.");
+            }
         }
 
         private void OnDestroy()
@@ -185,7 +467,7 @@ namespace Project05.CombatScene
             Workbench?.SetInteractive(false);
             PostCombatPanel?.Hide();
 
-            int speedIndex = Playback != null ? Playback.SpeedIndex : 0;
+            int speedIndex = _integratedMode ? _playbackSpeedIndex : (Playback != null ? Playback.SpeedIndex : 0);
             CombatHudData startData = CombatHudMapper.MapPlanning(
                 Catalog,
                 HeroDef,
@@ -213,6 +495,11 @@ namespace Project05.CombatScene
             Currency += 25 * (_currentSpawns != null ? _currentSpawns.Count : 1);
 
             PrepareStage(CurrentStage, NextMonsterCount);
+            if (_integratedMode)
+            {
+                Playback?.SetSpeedIndex(_playbackSpeedIndex);
+                StageReturnedToPlanning?.Invoke();
+            }
         }
 
         public void RetryStage()
@@ -225,6 +512,11 @@ namespace Project05.CombatScene
 
             int count = _currentSpawns != null && _currentSpawns.Count > 0 ? _currentSpawns.Count : NextMonsterCount;
             PrepareStage(CurrentStage, count);
+            if (_integratedMode)
+            {
+                Playback?.SetSpeedIndex(_playbackSpeedIndex);
+                StageReturnedToPlanning?.Invoke();
+            }
         }
 
         public void RefreshPlanningHud()
@@ -247,7 +539,7 @@ namespace Project05.CombatScene
                 LastPrepareError = error;
             }
 
-            int speedIndex = Playback != null ? Playback.SpeedIndex : 0;
+            int speedIndex = _integratedMode ? _playbackSpeedIndex : (Playback != null ? Playback.SpeedIndex : 0);
             CombatHudData data = CombatHudMapper.MapPlanning(
                 Catalog,
                 HeroDef,
@@ -422,7 +714,7 @@ namespace Project05.CombatScene
                 _planningActionStripRoot.gameObject.SetActive(inPlanning);
             }
 
-            if (hudView != null && hudView.Speed != null)
+            if (!_integratedMode && hudView != null && hudView.Speed != null)
             {
                 hudView.Speed.gameObject.SetActive(inCombat);
             }

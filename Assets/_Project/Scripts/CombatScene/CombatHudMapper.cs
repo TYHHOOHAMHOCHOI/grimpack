@@ -287,7 +287,8 @@ namespace Project05.CombatScene
                     data.Order.Add(new OrderEntryData
                     {
                         IsHero = false,
-                        Intent = intent
+                        Intent = intent,
+                        EnemySlot = entry.Unit.Slot
                     });
                 }
             }

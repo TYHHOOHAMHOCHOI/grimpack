@@ -11,6 +11,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.TextCore.LowLevel;
 using UnityEngine.UI;
 using Project05.UI;
+using Project05.UI.Hud;
 
 namespace Project05.Editor
 {
@@ -242,12 +243,25 @@ namespace Project05.Editor
             Button quit = NewButton("QuitButton", safe, normal, spriteState, font, LabelQuit, 52, 214);
             LinkVertical(play, settings, quit);
 
+            // Buttons share a group so the settings panel can take the input; the panel sits above them.
+            var buttonGroup = NewRect("MenuButtons", safe);
+            foreach (Button b in new[] { play, settings, quit }) b.transform.SetParent(buttonGroup, false);
+            buttonGroup.anchorMin = buttonGroup.anchorMax = buttonGroup.pivot = new Vector2(0f, 1f);
+            buttonGroup.anchoredPosition = Vector2.zero;
+            CanvasGroup menuGroup = buttonGroup.gameObject.AddComponent<CanvasGroup>();
+            ModalKit.ConfigureBorders();
+            SettingsPanelView settingsPanel = ModalKit.Settings(safe, font, 320, 180);
+
             var menuGo = new GameObject("TitleMenu");
+            ModalKit.AddCursor(menuGo);
             var controller = menuGo.AddComponent<TitleMenuController>();
             var so = new SerializedObject(controller);
             so.FindProperty("playButton").objectReferenceValue = play;
             so.FindProperty("settingsButton").objectReferenceValue = settings;
             so.FindProperty("quitButton").objectReferenceValue = quit;
+            so.FindProperty("settingsPanel").objectReferenceValue = settingsPanel;
+            so.FindProperty("menuGroup").objectReferenceValue = menuGroup;
+            so.FindProperty("playSceneName").stringValue = "Combat";
             so.ApplyModifiedPropertiesWithoutUndo();
 
             EditorSceneManager.SaveScene(scene, ScenePath);

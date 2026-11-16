@@ -164,7 +164,7 @@ The order is Goblin, Warrior, Support, Tanker, Goblin. After 134 time steps the 
 | 12 Combat Resolution | Downstream (caller) | Hard | Calls `Next`, commits the result, owns the 200-action limit and the outcome checks. | Updated. |
 | 9 Item Trigger and Cooldown | Downstream | Hard | `GlobalIndex` and `Schedule` for the party-wide firing rank. | Present (System 9, Dependencies). |
 | 25 Backpack UI | Downstream | Soft | Forecast, schedule and global index for the arrangement screen. | Not designed. |
-| 27 Combat HUD | Downstream | Hard | Forecast for the order strip, real gauges for the speed gauge. | Not designed. |
+| 27 Combat HUD | Downstream | Hard | Forecast for the order strip and cursor-aligned speed/gauge state. The meaning of the visual 'speed gauge' and the repeated-enemy intent-glyph adapter remain open. | Designed, pending review. |
 | 35 Balance Simulation Harness | Downstream | Soft | Calls `Next` and `Schedule`. | Not designed. |
 | 1 Seeded RNG | None | n/a | System 11 draws no RNG. | No change. |
 | 3 Effect Resolution | None | n/a | `GaugeChange` stays deferred; no effect in the MVP changes a gauge. | No change. |

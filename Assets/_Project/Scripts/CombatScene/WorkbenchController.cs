@@ -64,7 +64,6 @@ namespace Project05.CombatScene
         private Camera _uiCamera;
         private CombatSceneSpriteCatalog _sprites;
         private ItemPopupController _popup;
-        private ItemGridContext _heroGridContext;
         private GameCatalog _catalog;
         private HeroDef _heroDef;
         private BackpackArrangement _arrangement;
@@ -300,10 +299,6 @@ namespace Project05.CombatScene
                 {
                     CombatUiFactory.DestroySafe(child.gameObject);
                 }
-                else if (child.name == "HeroGrid")
-                {
-                    _heroGridContext = child.GetComponent<ItemGridContext>();
-                }
                 else if (child.name == "StashLabel")
                 {
                     CombatUiFactory.DestroySafe(child.gameObject);
@@ -312,13 +307,6 @@ namespace Project05.CombatScene
                 {
                     // Move stash bed lines into our toggleable StashSectionRoot below.
                 }
-            }
-
-            if (_heroGridContext == null)
-            {
-                var ctxGo = new GameObject("HeroGrid", typeof(RectTransform));
-                ctxGo.transform.SetParent(_workbenchRoot, false);
-                _heroGridContext = ctxGo.AddComponent<ItemGridContext>();
             }
 
             _nameLabel = _workbenchRoot.Find("NameLabel")?.GetComponent<TextMeshProUGUI>();
@@ -501,10 +489,8 @@ namespace Project05.CombatScene
             }
             spawnedList.Clear();
 
-            var hoverTargets = isHeroGrid ? new List<ItemHoverTarget>() : null;
             if (gridView == null || gridView.Items == null)
             {
-                if (isHeroGrid && _heroGridContext != null) _heroGridContext.SetItems(Array.Empty<ItemHoverTarget>());
                 return;
             }
 
@@ -554,16 +540,10 @@ namespace Project05.CombatScene
                 if (_popup != null)
                 {
                     var hover = plateImg.gameObject.AddComponent<ItemHoverTarget>();
-                    hover.Configure(def.Id, placed.OriginX, placed.OriginY, isHeroGrid ? _heroGridContext : null, _popup);
-                    hoverTargets?.Add(hover);
+                    hover.Configure(def.Id, isHeroGrid ? "grid" : "stash", placed.OriginX, placed.OriginY, placed.Orientation, null, _popup);
                 }
 
                 spawnedList.Add(plateImg.gameObject);
-            }
-
-            if (isHeroGrid && _heroGridContext != null)
-            {
-                _heroGridContext.SetItems(hoverTargets.ToArray());
             }
         }
 

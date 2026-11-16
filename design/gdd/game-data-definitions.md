@@ -28,7 +28,7 @@ The player is the architect of a machine. Before a fight they can read what an i
 ### Core Rules
 
 1. **Stable identity.** Each definition has an explicit ID and a kind. References carry an expected kind. The draft convention uses lowercase ASCII tokens starting with a letter and allowing digits, underscores and hyphens, compared ordinally. This accommodates existing IDs such as `item_iron_sword`. Moving or renaming an asset, changing a translated label or reordering a list preserves its ID. Retired IDs are reserved against reuse. An explicit mapping is needed to migrate a legacy ID whose spelling changes.
-2. **Authored records.** Each record has an ID and may expose localization keys and authored parameters. Where text is required, validation rejects a blank key. Labels and visual assets are resolved by the presentation boundary. Downstream GDDs specify the allowed tags, effect kinds, targeting, ordering, units and tuning for their own payloads.
+2. **Authored records.** Each record has an ID and may carry authored parameters; its text keys are not stored but derived by System 7 from the ID and a fixed slot list per record kind (`<ns>.<id>.<slot>`). Where text is required, validation rejects a record whose required slot has no row in the string tables (the check runs in System 7's lint, not in the catalog). Labels and visual assets are resolved by the presentation boundary. Downstream GDDs specify the allowed tags, effect kinds, targeting, ordering, units and tuning for their own payloads.
 
    | Kind | Authored data supplied to consumers |
    |---|---|
@@ -110,7 +110,7 @@ The authored parameters behind pre-fight inspection and post-fight explanations 
 
 ## UI Requirements
 
-No screen is owned by System 2. The tooltip, door panels and breakdown can consume stable IDs, localization keys and authored values through their own interfaces.
+No screen is owned by System 2. The tooltip, door panels and breakdown can consume stable IDs, derived localization keys and authored values through their own interfaces.
 
 ## Cross-References
 
@@ -144,3 +144,4 @@ No screen is owned by System 2. The tooltip, door panels and breakdown can consu
 | Add the encounter data for System 16: a tier table (White, Green, Blue, Purple with `MinRoomForTier` 1, 2, 3, 5, the HP and damage kicks and the danger thresholds), a floor table (rooms 1 to 8 and one boss room, all combat), and a template record (ID, tier, `roomMin..roomMax`, a roster of monster IDs in slot order, 1 to 4 enemies in the MVP, and an integer weight of at least 1), plus the monster fields the validator reads (role, size class, elite flag). System 16 owns the content rules; System 2 validates the fields. | Systems 2 and 16 | Next System 2 revision. |
 | Add the drop data for System 18: an item tier (White, Green, Blue, Purple), the `direction` flag on tags (an allow-list of at most 16, at most two direction tags per item), the `droppable` flag and a base weight `1..100`, the door-tier item rows (four rows of four permille values summing to 1000), and the validator rules (at least two directions with five droppable definitions, at least five droppable definitions in each of the White, Green and Blue tiers). | Systems 2 and 18 | Next System 2 revision. |
 | Add the door data for System 17: a tier-weight table (one row per target room 2 to 8, four permille weights summing to 1000, zero below `MinRoomForTier`), a buff table (max HP and cells by tier: 4, 8, 12, 12 and 0, 0, 0, 1), `MinDistinctRoom`, `SafeCardRoom`, `DoorHpCap`, `DoorCellCap`, the quality-word keys per tier, and the validator rules (sum 1000, at least two positive tiers, White and Green positive from `SafeCardRoom`, non-decreasing buffs, at least `DoorCellCap` locked cells per hero). | Systems 2 and 17 | Next System 2 revision. |
+| Answered by System 7 ([localization-and-text.md](localization-and-text.md), 2026-11-13): keys are derived from the ID and a slot list per kind, so a record stores no key and the blank-key validation becomes a missing-slot check in System 7's lint; System 2 must supply the slot list per record kind (which slots each kind requires) and the namespace per kind. | System 2, System 7 | Next System 2 revision. |

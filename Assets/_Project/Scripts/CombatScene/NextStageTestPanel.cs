@@ -11,6 +11,7 @@ namespace Project05.CombatScene
     /// </summary>
     public sealed class NextStageTestPanel : MonoBehaviour
     {
+        private GameObject _panelRoot;
         private readonly Button[] _countButtons = new Button[6];
         private CombatSceneSpriteCatalog _sprites;
         private Button _applyNowButton;
@@ -26,14 +27,17 @@ namespace Project05.CombatScene
             _sprites = sprites;
             SelectedMonsterCount = Mathf.Clamp(initialCount, 1, 6);
 
+            var rootRect = CombatUiFactory.CreateRect("NextStageTestGroup", planningActionStrip, 0f, 0f, 640f, 360f);
+            _panelRoot = rootRect.gameObject;
+
             CombatUiFactory.CreateLabel(
                 "NextCountLabel",
-                planningActionStrip,
+                rootRect,
                 _sprites.font,
-                "Quái sau:",
+                "Quái:",
                 182f,
                 339f,
-                60f,
+                34f,
                 12f,
                 CombatUiFactory.Fog);
 
@@ -42,12 +46,12 @@ namespace Project05.CombatScene
                 int count = i + 1;
                 Button btn = CombatUiFactory.CreateSegmentButton(
                     "MonsterCount_" + count,
-                    planningActionStrip,
+                    rootRect,
                     _sprites,
                     count.ToString(),
-                    242f + i * 20f,
+                    216f + i * 19f,
                     335f,
-                    19f,
+                    18f,
                     20f,
                     selected: count == SelectedMonsterCount);
 
@@ -57,25 +61,33 @@ namespace Project05.CombatScene
 
             _applyNowButton = CombatUiFactory.CreateSegmentButton(
                 "ApplyMonstersNowButton",
-                planningActionStrip,
+                rootRect,
                 _sprites,
                 "Đổi ngay",
-                366f,
+                333f,
                 335f,
-                62f,
+                54f,
                 20f);
             _applyNowButton.onClick.AddListener(() => ApplyNowRequested?.Invoke(SelectedMonsterCount));
 
             _statusLabel = CombatUiFactory.CreateLabel(
                 "StageSeedInfo",
-                planningActionStrip,
+                rootRect,
                 _sprites.font,
-                "Màn 1 · 2 quái",
-                434f,
+                "M1",
+                390f,
                 339f,
-                114f,
+                24f,
                 12f,
                 CombatUiFactory.Fog);
+        }
+
+        public void SetVisible(bool visible)
+        {
+            if (_panelRoot != null && _panelRoot.activeSelf != visible)
+            {
+                _panelRoot.SetActive(visible);
+            }
         }
 
         public void SelectCount(int count)
@@ -96,7 +108,7 @@ namespace Project05.CombatScene
         {
             if (_statusLabel != null)
             {
-                _statusLabel.text = "Màn " + stage + " · " + currentEnemyCount + " quái";
+                _statusLabel.text = "M" + stage + "·" + currentEnemyCount;
             }
         }
 

@@ -14,7 +14,7 @@ Follows `item-trigger-and-cooldown.md`, `effect-resolution-model.md` (extended w
 | 4 | Mực Ấn / Seal Ink (`item_seal_ink`) | White | 1x1 (1 cells) | Cooldown 2 | Apply 2 Ấn → FirstEnemy | - | - | seal |
 | 5 | Đá Mài / Whetstone (`item_whetstone`) | White | 1x1 (1 cells) | Passive | - | - | blade: +3 damage | tool |
 | 6 | Áo Da / Leather Vest (`item_leather_vest`) | White | 2x2 (4 cells) | Passive | - | +12 max HP | - | armour |
-| 7 | Giày Gió / Swift Boots (`item_swift_boots`) | White | l (3 cells) | Passive | - | +3 speed | - | boots |
+| 7 | Giày Gió / Swift Boots (`item_swift_boots`) | White | l3 (3 cells) | Passive | - | +3 speed | - | boots |
 | 8 | Mũ Sắt / Iron Helm (`item_iron_helm`) | White | 1x1 (1 cells) | Passive | - | +6 max HP | - | armour |
 | 9 | Khiên Gai / Spiked Buckler (`item_spiked_buckler`) | White | 1x2 (2 cells) | Cooldown 2 | Shield +6 → Self; Damage 3 → FirstEnemy | - | - | armour, shield |
 | 10 | Khiên Gỗ Sồi / Oak Buckler (`item_oak_buckler`) | White | 1x1 (1 cells) | Cooldown 2 | Shield +5 → Self | - | - | armour, shield |
@@ -43,7 +43,7 @@ Follows `item-trigger-and-cooldown.md`, `effect-resolution-model.md` (extended w
 | 33 | Khiên Tháp / Tower Shield (`item_tower_shield`) | Purple | 2x3 (6 cells) | Passive | - | +30 max HP, -2 speed | - | armour |
 | 34 | Chuông Cộng Hưởng / Resonant Bell (`item_resonant_bell`) | Purple | 2x2 (4 cells) | Cooldown 4 | Detonate up to 8 Ấn × 3 → AllEnemies | - | - | detonator, bell |
 
-34 items. Per tier: {'White': 11, 'Green': 11, 'Blue': 8, 'Purple': 4}. Footprints used: 1x1, 1x2, 1x3, 2x1, 2x2, 2x3, l, s, t.
+34 items. Per tier: {'White': 11, 'Green': 11, 'Blue': 8, 'Purple': 4}. Footprints used: 1x1, 1x2, 1x3, 2x1, 2x2, 2x3, l, l3, s, t.
 
 ## Design intent
 

@@ -143,7 +143,7 @@ namespace Project05.CombatScene
                 if (_popup != null)
                 {
                     var hover = plate.gameObject.AddComponent<ItemHoverTarget>();
-                    hover.Configure(item.Id, 0, 0, null, _popup);
+                    hover.Configure(item.Id, "picker", 0, 0, 0, null, _popup);
                 }
 
                 _spawnedButtons.Add(plate.gameObject);

@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: e9a43c94154766c4392381c66efcbe1f
+guid: ef96cf208c40fe542a48f16434118ee5
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 122737780162892250
-    second: item_swift-boots_d_l_0
+      213: 3735018810487892090
+    second: ui_ghost_invalid_20x20_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -128,13 +128,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: item_swift-boots_d_l_0
+      name: ui_ghost_invalid_20x20_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 21
-        height: 36
+        width: 20
+        height: 20
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -143,8 +143,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: ad1112b5c5d04b100800000000000000
-      internalID: 122737780162892250
+      spriteID: a786884b1d375d330800000000000000
+      internalID: 3735018810487892090
       vertices: []
       indices: 
       edges: []

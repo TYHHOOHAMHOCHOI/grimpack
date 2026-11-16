@@ -12,6 +12,7 @@ namespace Project05.UI.Hud
         [SerializeField] private CombatHudView hud;
         [SerializeField] private HudFixture fixture = HudFixture.PartyActing;
 
+        // In Play Mode the screen controller owns what the HUD shows; this component is for the Editor and captures.
         private void OnEnable()
         {
             if (!Application.isPlaying) Show();
@@ -23,7 +24,7 @@ namespace Project05.UI.Hud
         {
             UnityEditor.EditorApplication.delayCall += () =>
             {
-                if (this != null && isActiveAndEnabled && !Application.isPlaying) Show();
+                if (this != null && isActiveAndEnabled) Show();
             };
         }
 #endif

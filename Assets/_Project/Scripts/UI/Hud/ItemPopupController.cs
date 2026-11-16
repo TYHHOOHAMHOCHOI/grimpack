@@ -6,16 +6,26 @@ namespace Project05.UI.Hud
 {
     /// <summary>
     /// Opens, swaps and closes the one item popup (hover-popup-and-glossary.md rules 2 to 5): a 300 ms hover opens it,
-    /// selection opens it at once, a 60 ms grace keeps it while the pointer crosses a gap, and it is placed once, inside
-    /// the workbench, never touching its source. The popup only reads definitions; it changes no game state.
+    /// selection opens it at once, a grace keeps it while the pointer crosses a gap or an empty cell, and it is placed
+    /// once, inside the workbench, never touching its source. After a popup has been seen, popups are "warm": another
+    /// item hovered soon after opens at once, so moving between items never waits or blinks. The popup only reads
+    /// definitions; it changes no game state.
     /// </summary>
     public sealed class ItemPopupController : MonoBehaviour
     {
         /// <summary>Delay before a hover opens the popup, in seconds.</summary>
         public const float HoverDelay = 0.3f;
 
-        /// <summary>Time the popup is kept after the pointer leaves, in seconds.</summary>
-        public const float Grace = 0.06f;
+        /// <summary>Default time the popup is kept after the pointer leaves, in seconds.</summary>
+        public const float DefaultGrace = 0.2f;
+
+        /// <summary>Default time after a popup closes during which a new hover opens at once, in seconds.</summary>
+        public const float DefaultWarmWindow = 0.5f;
+
+        [Tooltip("Seconds the popup stays after the pointer leaves an item (the GDD says 60 ms for a 1 px gap; 0.2 s also covers an empty cell).")]
+        [SerializeField] private float grace = DefaultGrace;
+        [Tooltip("Seconds after a popup closes during which hovering another item opens its popup without the hover delay.")]
+        [SerializeField] private float warmWindow = DefaultWarmWindow;
 
         [SerializeField] private TextAsset catalogJson;
         [SerializeField] private ItemPopupView view;
@@ -23,13 +33,26 @@ namespace Project05.UI.Hud
         [SerializeField] private RectTransform bounds;
 
         private ItemCatalog _catalog;
+        private bool _suppressed;
         private ItemHoverTarget _pending;
         private ItemHoverTarget _current;
         private float _pendingSince;
         private float _closeAt = -1f;
+        private float _closedAt = float.NegativeInfinity;
 
         /// <summary>The parsed catalog.</summary>
         public ItemCatalog Catalog => _catalog ??= ItemCatalog.Load(catalogJson.text);
+
+        /// <summary>While an item is held no normal popup appears (hover-popup-and-glossary.md rule 4).</summary>
+        public bool Suppressed
+        {
+            get => _suppressed;
+            set
+            {
+                _suppressed = value;
+                if (value) Close();
+            }
+        }
 
         /// <summary>The item whose popup is open, or null.</summary>
         public ItemHoverTarget Current => _current;
@@ -37,8 +60,10 @@ namespace Project05.UI.Hud
         /// <summary>The pointer entered an item: start the hover delay, or swap at once when a popup is already open.</summary>
         public void PointerEntered(ItemHoverTarget target)
         {
+            if (_suppressed) return;
             _closeAt = -1f;
-            if (_current != null) ShowNow(target);
+            if (_current == target) return;                     // came back during the grace: nothing to redo
+            if (_current != null || HoverTiming.IsWarm(Time.unscaledTime, _closedAt, warmWindow)) ShowNow(target);
             else
             {
                 _pending = target;
@@ -50,19 +75,24 @@ namespace Project05.UI.Hud
         public void PointerExited(ItemHoverTarget target)
         {
             if (_pending == target) _pending = null;
-            if (_current == target) _closeAt = Time.unscaledTime + Grace;
+            if (_current == target) _closeAt = Time.unscaledTime + grace;
         }
 
         /// <summary>Opens the popup for an item now (keyboard focus, or a swap while a popup is open).</summary>
         public void ShowNow(ItemHoverTarget target)
         {
             ItemRecord record = Catalog.Find(target.ItemId);
-            if (record == null) return;
+            if (record == null || _suppressed) return;
 
             IReadOnlyList<SynergyModifier> received = System.Array.Empty<SynergyModifier>();
-            if (target.Grid != null && target.Grid.Evaluate(Catalog).TryGetValue(target, out List<SynergyModifier> mods)) received = mods;
+            bool placed = false;
+            if (target.Board != null)
+            {
+                placed = target.Board.Describe(target, out List<SynergyModifier> mods);
+                received = mods;
+            }
 
-            PopupContent content = ItemTooltipText.Build(record, target.Grid != null, received);
+            PopupContent content = ItemTooltipText.Build(record, placed, received);
             Vector2 size = view.Build(content);
 
             var occupied = new List<Rect>();
@@ -81,6 +111,7 @@ namespace Project05.UI.Hud
         /// <summary>Closes the popup.</summary>
         public void Close()
         {
+            if (_current != null) _closedAt = Time.unscaledTime;
             view.Hide();
             _current = null;
             _pending = null;
@@ -94,15 +125,6 @@ namespace Project05.UI.Hud
         }
 
         /// <summary>A rectangle in safe-frame native pixels, x right and y down from the top-left corner.</summary>
-        private Rect ToFrameRect(RectTransform rt)
-        {
-            var corners = new Vector3[4];
-            rt.GetWorldCorners(corners);
-            Vector2 min = safeFrame.InverseTransformPoint(corners[0]);
-            Vector2 max = safeFrame.InverseTransformPoint(corners[2]);
-            float halfW = safeFrame.rect.width / 2f;
-            float halfH = safeFrame.rect.height / 2f;
-            return new Rect(min.x + halfW, halfH - max.y, max.x - min.x, max.y - min.y);
-        }
+        private Rect ToFrameRect(RectTransform rt) => FrameMath.RectOf(rt, safeFrame);
     }
 }

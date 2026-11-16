@@ -123,10 +123,10 @@ MonoBehaviour:
     sprite: {fileID: 21300000, guid: a41199b22e9c6934dad36d0303f6fea7, type: 3}
   - key: spiked-buckler_d_1x2
     sprite: {fileID: 21300000, guid: 43732e1909fb189439eb2f6b4a872481, type: 3}
-  - key: swift-boots_c_l
-    sprite: {fileID: 21300000, guid: 30a927bad544eee4295bd124dab4fa39, type: 3}
-  - key: swift-boots_d_l
-    sprite: {fileID: 21300000, guid: e9a43c94154766c4392381c66efcbe1f, type: 3}
+  - key: swift-boots_c_l3
+    sprite: {fileID: 21300000, guid: 425fcce70aef9f644ba14609f974e2bf, type: 3}
+  - key: swift-boots_d_l3
+    sprite: {fileID: 21300000, guid: 98f42aa48a3c9a640a3f825acee31828, type: 3}
   - key: thunder-gong_c_2x2
     sprite: {fileID: 21300000, guid: fdc451a09a8447a49a22e5c364538c0e, type: 3}
   - key: thunder-gong_d_2x2

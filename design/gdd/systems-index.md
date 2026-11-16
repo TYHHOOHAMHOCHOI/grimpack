@@ -32,13 +32,13 @@ The 37 systems fall into five groups.
 9. **Cause tracking is a requirement of the event schema (4)** (creative-director C1, Pillar 2). Every event that changes state records why: the item that fired, its hero, the adjacency modifiers that applied (10), and, for a detonation, the earlier hero's status that was detonated. The payoff (29) and the breakdown (30) use it to point back at grid cells. Validation at the weeks 5-6 checkpoint: for every damage number the log can name the item and hero that dealt it and the status it detonated.
 
 **Scope notes (PR-SCOPE: OPTIMISTIC, adjustments applied).**
-- The MVP estimate is restated as **about 6 months** (best case 4, worst case 8 or more; low confidence), not "a few months". There is a **hard checkpoint at weeks 5-6**: the engine-free combat core (systems 36, 3, 12 with 9, 11, 13, 14) must prove apply-then-detonate across two heroes with identical event logs in tests and in live play. If it does not, re-plan before building any UI on top of it.
-- **MVP stubs** (reduced to the minimum that still meets the concept's go/no-go criteria): 7 Localization (one string table with keys, one language, no font or diacritic work); 37 Settings (a playback-speed toggle only); 6 Input and Focus (mouse plus the R key); 31 Menus (an end-of-run screen with Restart); 26 Hover Popup (a tooltip only; the glossary is deferred); 16 Encounter Generation (a hand-authored room table for one floor); 13 Status Effects (only the statuses the 3-4 synergy types need); 30 Post-combat Breakdown (a filtered text view of the event log, no dedicated screen); 25 Backpack UI (item rotation is the first cut); 17 Door Generation (the MVP has **4 tiers: White, Green, Blue, Purple**, as the concept requires; dropping Purple is the second cut after item rotation, and only if the schedule slips).
+- The MVP estimate is owned by `production/milestones/mvp.md` (the `/estimate` of 2026-11-14, low confidence, no sprint history); it withdraws the earlier "about 6 months" figure, and day 0 is the start of the combat core spike. There is a **hard checkpoint at weeks 5-6**: the engine-free combat core (systems 36, 3, 12 with 9, 11, 13, 14) must prove apply-then-detonate across two heroes with identical event logs in tests and in live play. If it does not, re-plan before building any UI on top of it.
+- **MVP stubs** (reduced to the minimum that still meets the concept's go/no-go criteria): 7 Localization (keys-only text, Vietnamese and English tables, a minimal lint; pseudo-locale, status tracking and the table checksum wait for Vertical Slice); 37 Settings (speed, Vietnamese/English, reduced flashes/motion, input repeat and binding storage, and the user's chosen effects volume and mute; rebind screen is the first cut with waiver; globally validated Large text remains later); 6 Input and Focus (mouse and keyboard in full, gamepad contract only); 31 Menus (start, first-launch prompt, pause/settings, compact run-end summary with Restart and an explicit last-fight details button, and a technical-stop diagnostic; no saved-run Continue); 26 Hover Popup (a tooltip only; the glossary is deferred); 16 Encounter Generation (a hand-authored room table for one floor); 13 Status Effects (only the statuses the 3-4 synergy types need); 30 Post-combat Breakdown (user-selected in-context ranked item panel with contribution bars and event details, plus a small personal best retained across launches; no replay); 25 Backpack UI (item rotation is the first cut); 17 Door Generation (the MVP has **4 tiers: White, Green, Blue, Purple**, as the concept requires; dropping Purple is the second cut after item rotation, and only if the schedule slips).
 - A **thin command-line harness** (35) belongs in the MVP, because tuning the drop model and the value of N needs it and the engine-free core makes it nearly free; the full harness is a Vertical Slice item.
-- **Creative-director additions (CD-SYSTEMS, applied 2026-11-10).** (C2) System 29 gets a small placeholder sound layer in the MVP: 3-4 cues that rise with combo size from an asset pack, because the payoff kill signal is judged in the MVP and Pillar 2 includes sound; full audio (32) stays Vertical Slice. (C3) A higher door tier must have an explicit MVP price (for example a harder encounter, or something given up), written as a rule in the GDDs of 16 and 17; this keeps Pillar 5 alive before curses exist, without a curse subsystem (anti-pillar), and the go/no-go criterion about door-tier trade-offs depends on it. (C5) System 30 or the end-of-run screen in 31 shows the run's biggest hit, its longest chain and the session best, so escalation is measurable and the core fantasy has a carrier before Records (23) exists. (C6) System 22's GDD must limit unlocks to breadth (new items, heroes, door options), never starting power (Pillar 3: no run starts overpowered).
+- **Creative-director additions (CD-SYSTEMS, applied 2026-11-10).** (C2) System 29 gets a small placeholder sound layer in the MVP: 3-4 cues that rise with combo size from an asset pack, because the payoff kill signal is judged in the MVP and Pillar 2 includes sound; full audio (32) stays Vertical Slice. (C3) A higher door tier must have an explicit MVP price (for example a harder encounter, or something given up), written as a rule in the GDDs of 16 and 17; this keeps Pillar 5 alive before curses exist, without a curse subsystem (anti-pillar), and the go/no-go criterion about door-tier trade-offs depends on it. (C5) System 30 or the end-of-run screen in 31 shows the run's biggest hit, its longest chain and the personal best, so escalation is measurable and the core fantasy has a carrier before Records (23) exists. The user chose cross-launch retention for that small best on 2026-11-13; its owner and metrics remain open. (C6) System 22's GDD must limit unlocks to breadth (new items, heroes, door options), never starting power (Pillar 3: no run starts overpowered).
 - **Accessibility (34)** is limited to readability and colour-safe tier cues in the Vertical Slice (it is not in the concept's Tier 1.5 otherwise).
-- **Content is not a system** and is estimated separately: the MVP needs about 20 items, 3 heroes and 5-6 monsters (one boss); the concept's Tier 1.5 needs 2 floors and about 30 items, which no system row covers.
-- System 28 (Door and Room Panels UI) lists 21 (Room Types) as a dependency, but its MVP slice is door choice only and depends on 17 and 26; the room panels for shop, event and recruit are added when 21 is designed.
+- **Content is not a system** and is estimated separately: the MVP needs about 20 items, 4 heroes (the player picks 3) and 6 regular monster types plus one boss (System 16's table; the earlier estimates of 4-5 and 5-6 were too low); the concept's Tier 1.5 needs 2 floors and about 30 items, which no system row covers.
+- System 28 (Door and Room Panels UI) lists 21 (Room Types) as a dependency, but its MVP slice is the three reward-phase screens (BuffClaim, the reward shelf and door choice) and depends on 5, 17, 18 and 26; the room panels for shop, event and recruit are added when 21 is designed.
 
 ---
 
@@ -50,9 +50,9 @@ The 37 systems fall into five groups.
 | 2 | Game Data Definitions | Core | MVP | Designed | [GDD](game-data-definitions.md) | — |
 | 3 | Effect Resolution Model | Gameplay | MVP | Needs Revision | [GDD](effect-resolution-model.md) | 2, 4, 1, 10, 36 |
 | 4 | Event Log (inferred) | Core | MVP | In Review | [GDD](event-log.md) | — |
-| 5 | Run State and Flow (inferred) | Core | MVP | Not Started | — | 1, 2 |
-| 6 | Input and Focus (inferred) | Core | MVP | Not Started | — | — |
-| 7 | Localization and Text | Core | MVP | Not Started | — | — |
+| 5 | Run State and Flow | Core | MVP | Designed | [GDD](run-state-and-flow.md) | 1, 2 (8, 12, 14 to 18 through ports) |
+| 6 | Input and Focus | Core | MVP | Designed | [input-and-focus.md](input-and-focus.md) | 5, 8 (37 related) |
+| 7 | Localization and Text | Core | MVP | Designed | [localization-and-text.md](localization-and-text.md) | 2 |
 | 8 | Grid Backpack | Gameplay | MVP | In Review | [GDD](grid-backpack.md) | 2 |
 | 9 | Item Trigger and Cooldown | Gameplay | MVP | In Review | [GDD](item-trigger-and-cooldown.md) | 3, 8, 11, 36 |
 | 10 | Adjacency and Synergy | Gameplay | MVP | Designed | [GDD](adjacency-and-synergy.md) | 8, 2 |
@@ -64,25 +64,37 @@ The 37 systems fall into five groups.
 | 16 | Encounter Generation | Gameplay | MVP | Designed | [GDD](encounter-generation.md) | 2, 1, 14 (11, 15 soft) |
 | 17 | Door Generation and Tiers | Gameplay | MVP | Designed | [GDD](door-generation-and-tiers.md) | 2, 1, 16, 18 |
 | 18 | Commitment and Drop Model | Economy | MVP | Designed | [GDD](commitment-and-drop-model.md) | 8, 10, 2, 1 (12, 15 soft) |
-| 19 | Curses and Trade-offs | Gameplay | Vertical Slice | Not Started | — | 17, 3, 2 |
+| 19 | Curses and Trade-offs | Gameplay | Vertical Slice | Designed | [GDD](curses-and-trade-offs.md) | 17, 16, 8, 15, 5, 12, 13, 3, 2 |
 | 20 | Currency and Shop | Economy | Alpha | Not Started | — | 2, 18, 8, 5 |
 | 21 | Room Types (shop, event, recruit) | Gameplay | Alpha | Not Started | — | 5, 17, 20, 15 |
 | 22 | Meta Progression | Progression | Alpha | Not Started | — | 5, 2, 24 |
 | 23 | Records, Replay and Difficulty | Progression | Full Vision | Not Started | — | 1, 4, 5, 24 |
 | 24 | Run Save and Resume | Persistence | Vertical Slice | Not Started | — | 5, 2, 8, 15, 1, 37 |
-| 25 | Backpack UI | UI | MVP | Not Started | — | 8, 10, 9, 6 |
-| 26 | Hover Popup and Glossary | UI | MVP | Not Started | — | 2, 7, 6, 8 |
-| 27 | Combat HUD | UI | MVP | Not Started | — | 4, 36, 11, 14, 15 |
-| 28 | Door and Room Panels UI | UI | MVP | Not Started | — | 17, 26 (21 when designed) |
-| 29 | Payoff Presentation | UI | MVP | Not Started | — | 4, 3, 12, 8, 25, 37 |
-| 30 | Post-combat Breakdown (inferred) | UI | MVP | Not Started | — | 4, 12, 16, 8, 25 |
-| 31 | Menus and Screen Flow (inferred) | UI | MVP | Not Started | — | 5, 6, 37 |
+| 25 | Backpack UI | UI | MVP | Designed | [backpack-ui.md](backpack-ui.md) | 8, 10, 9, 6 |
+| 26 | Hover Popup and Glossary | UI | MVP | Designed | [hover-popup-and-glossary.md](hover-popup-and-glossary.md) | 2, 7, 6, 8 |
+| 27 | Combat HUD | UI | MVP | Designed | [combat-hud.md](combat-hud.md) | 4, 36, 11, 14, 15 |
+| 28 | Door and Room Panels UI | UI | MVP | Designed | [door-and-room-panels-ui.md](door-and-room-panels-ui.md) | 17, 26, 5, 18, 6, 7 (21 when designed) |
+| 29 | Payoff Presentation | UI | MVP | Designed | [payoff-presentation.md](payoff-presentation.md) | 4, 3, 12, 8, 25, 37 (5, 6, 36 through ports) |
+| 30 | Post-combat Breakdown (inferred) | UI | MVP | Designed | [post-combat-breakdown.md](post-combat-breakdown.md) | 4, 12, 16, 8, 25 |
+| 31 | Menus and Screen Flow (inferred) | UI | MVP | Designed | [menus-and-screen-flow.md](menus-and-screen-flow.md) | 5, 6, 37 (29, 30 interfaces) |
 | 32 | Audio | Audio | Vertical Slice | Not Started | — | 4, 29, 37 |
 | 33 | Tutorial and Onboarding (inferred) | Meta | Vertical Slice | Not Started | — | 25, 26, 27, 28 |
 | 34 | Accessibility (inferred) | Meta | Vertical Slice | Not Started | — | 6, 7, 29, 31, 37 |
-| 35 | Balance Simulation Harness | Meta | MVP (thin); Vertical Slice (full) | Not Started | — | 1, 2, 3, 5, 8, 10, 12, 15, 16, 17, 18, 36 |
+| 35 | Balance Simulation Harness | Meta | MVP (thin); Vertical Slice (full) | Designed | [balance-simulation-harness.md](balance-simulation-harness.md) | 1, 2, 3, 5, 8, 10, 12, 15, 16, 17, 18, 36 (29 for the shared classifier) |
 | 36 | Combat State and Step Model (inferred) | Core | MVP | In Review | [GDD](combat-state-and-step-model.md) | 2, 1, 4 |
-| 37 | Settings (inferred) | Persistence | MVP | Not Started | — | — |
+| 37 | Settings (inferred) | Persistence | MVP | Designed | [settings.md](settings.md) | 6, 7, 29, 31 (interfaces; 31 undesigned) |
+
+**UX flag — System 25:** create and review an arrangement-screen UX specification before UI stories. Validate the falling loose-item layer's overlap, overflow and retrieval before implementation; cross-hero preview and the loss-confirmation, playback and effect-target interfaces remain open in its GDD.
+
+**UX flag — System 26:** MVP includes inline keyword explanations in popup Details by user decision (2026-11-13); the separate menu glossary is deferred. Resolve safe placement/fallback, focus and paging, full-intent discovery and playback inspection with retained UX evidence before implementation.
+
+**UX flag — System 27:** create and review a combat HUD UX specification before UI stories. Validate read-only intent Details during playback, status overflow and protected-layer readability; the System 29 beat/cursor display contract remains open.
+
+**UX flag — System 30:** create and review the breakdown view before UI stories; validate ranked bars, historical placement, reward-screen coexistence and keyboard focus with retained evidence. Retention, metric identity and persistent-best ownership remain open.
+
+**UX flag — System 31:** design and review the first-launch prompt, pause, compact end summary, diagnostic and breakdown handoff before UI stories. Validate actual focus, abandon confirmation and mouse/keyboard paths; run-command and trace-retention contracts remain open.
+
+**UX flag — System 37:** design and review the settings menu and first-launch prompt before UI stories; validate focus, language reflow, volume/mute, reduced effects, rebind conflict and save-error feedback. System 31 and persistence interfaces are unresolved.
 
 ---
 
@@ -116,7 +128,7 @@ The 37 systems fall into five groups.
 
 *Why these tiers.* The MVP is "can a committed player reach a visible 'my build is going off' moment by the boss, and want another run?". That needs the whole simulation (a deterministic fight with apply-then-detonate across two heroes: Pillar 4), the bet on doors and the commitment-biased capped drops (Pillars 1 and 3), enough UI to read it (Pillar 2: the payoff and the cause must be visible), and the small foundations that are expensive to retrofit (string keys, input, settings). Curses are Vertical Slice because the concept defers Gold and Red; shop, events and recruiting are Alpha (the concept's Tier 2); records, replay and difficulty are Full Vision (Tier 3).
 
-> **Creative Director Note** (MVP): CD-SYSTEMS returned CONCERNS (2026-11-10): the decomposition is sound, every pillar has a carrier, and no system is clear scope creep. Pillar 5 has no MVP carrier (curses are Vertical Slice), so the price of a door tier must be an explicit MVP rule (concern C3). Legible cause (C1) is now a requirement of the event schema; the payoff gets a placeholder sound layer (C2); the run's records are shown on 30 or 31 (C5). The MVP keeps **4 door tiers** (concern C4, user decision: Purple is the first cut *if the schedule slips*, as the concept says, not a starting reduction). The MVP tests the core hypothesis provided C1 and C3 are met.
+> **Creative Director Note** (MVP): CD-SYSTEMS returned CONCERNS (2026-11-10): the decomposition is sound, every pillar has a carrier, and no system is clear scope creep. Pillar 5 has no MVP carrier (curses are Vertical Slice), so the price of a door tier must be an explicit MVP rule (concern C3). *(Concept re-review, 2026-11-14: the MVP price is the room's danger. It meets C3 as a rule, but it is not a build-shaping price, so Pillar 5's first real test is Gold with a curse in the Vertical Slice, and the concept says the MVP does not test it.)* Legible cause (C1) is now a requirement of the event schema; the payoff gets a placeholder sound layer (C2); the run's records are shown on 30 or 31 (C5). The MVP keeps **4 door tiers** (concern C4, user decision: Purple is the first cut *if the schedule slips*, as the concept says, not a starting reduction). The MVP tests the core hypothesis provided C1 and C3 are met.
 >
 > **Creative Director Note** (Alpha): concern C6: system 22 (Meta Progression) must unlock breadth, not power.
 
@@ -131,7 +143,7 @@ Systems are listed in dependency order within each layer. Design and build from 
 1. **Seeded RNG (1)**: one run seed with named substreams (doors, drops, intents); runs must be replayable.
 2. **Game Data Definitions (2)**: items, heroes, monsters, buffs and doors as plain-C# data with stable IDs; ScriptableObjects are authoring wrappers only.
 3. **Event Log (4)**: the single source of truth that VFX, audio, the breakdown, tests, the harness and replay all read; defines the event schema.
-4. **Input and Focus (6)**: mouse and keyboard primary, gamepad partial.
+4. **Input and Focus (6)**: mouse and keyboard in full, every action remappable once the rebind screen ships, gamepad as a designed contract only (Designed 2026-11-13).
 5. **Localization and Text (7)**: string tables (Vietnamese and English); the simulation carries keys only.
 6. **Settings (37)**: playback speed, volume, text size, key bindings; split out of Save so presentation systems can depend on it.
 
@@ -152,9 +164,9 @@ Systems are listed in dependency order within each layer. Design and build from 
 3. **Enemy and Intent (14)** — depends on: 2, 1, 3, 36.
 4. **Combat Resolution (12)** — depends on: 3, 9, 10, 11, 14, 15, 36, 4, 1. Encounter lifecycle.
 5. **Encounter Generation (16)** — depends on: 2, 1, 14 (11, 15 soft). Designed (2026-11-13). Its content needs 7 monster types (Hunter, Striker, Swarmer, Sweeper, Brute, Elite Bruiser, Boss), not the 5-6 estimated for the MVP; the two extra are cheap strike-only and multi-hit variants.
-6. **Commitment and Drop Model (18)** — depends on: 8, 10, 2, 1 (12, 15 soft). Designed (2026-11-13). Commitment is the leading direction tag (at least three items and a lead of two items' worth of score) read from the frozen arrangement; the offer is three cards, two leaning and one off-direction, with the item tier set by the door; System 17 reads only the capped bias function.
+6. **Commitment and Drop Model (18)** — depends on: 8, 10, 2, 1 (12, 15 soft). Designed (2026-11-13). Commitment is the leading direction tag (at least three items and a lead of two items' worth of score) read from the frozen arrangement; the offer is three cards, two leaning and one at base weight, with the item tier set by the door; System 17 reads only the capped bias function.
 7. **Door Generation and Tiers (17)** — depends on: 2, 1, 16, 18. Designed (2026-11-13). Three tier draws per row from a per-room table with masks on the third card; the buff is certain and neutral (max HP by tier, plus one cell at Purple) for one hero chosen at claim time; Purple's price is the room; `doors` sees 43 calls per run.
-8. **Curses and Trade-offs (19)** — depends on: 17, 3, 2.
+8. **Curses and Trade-offs (19)** — depends on: 17, 16, 8, 15, 5, 12, 13, 3, 2. Designed (2026-11-13). Gold ships only with a curse (Pinned item, Wither, Frailty or Sluggish), permanent for the run until an event room (Alpha); Red is deferred to Tier 3.
 9. **Currency and Shop (20)** — depends on: 2, 18, 8, 5.
 10. **Room Types (21)** — depends on: 5, 17, 20, 15.
 
@@ -163,8 +175,8 @@ Systems are listed in dependency order within each layer. Design and build from 
 1. **Backpack UI (25)** — depends on: 8, 10, 9, 6.
 2. **Hover Popup and Glossary (26)** — depends on: 2, 7, 6, 8.
 3. **Combat HUD (27)** — depends on: 4, 36, 11, 14, 15.
-4. **Payoff Presentation (29)** — depends on: 4, 3, 12, 8, 25, 37. Also owns playback pacing and the MVP placeholder sound layer.
-5. **Door and Room Panels UI (28)** — depends on: 17, 26 (and 21 when designed).
+4. **Payoff Presentation (29)** — depends on: 4, 3, 12, 8, 25, 37. Also owns playback pacing and the MVP placeholder sound layer. Designed (2026-11-14): a four-level ladder (Tick, Chain, Surge, Detonation) classified per root action, a Detonation that plays full timing at every speed and that Skip never passes (Skip fast-forwards to the next Detonation, plays it in full, then continues; revised 2026-11-14), a boss blow beat in the MVP, a clock that stops with the menu, Reduced flashes on by default until the analyser passes.
+5. **Door and Room Panels UI (28)** — depends on: 17, 26, 5, 18, 6, 7 (and 21 when designed). Designed (2026-11-13). It owns the right-column reward-phase panel: BuffClaim on the real hero pedestals, a one-row reward shelf and the door row, sharing one card mould, arm-then-Confirm, a step cluster with receipts, and a 250 ms lock.
 6. **Post-combat Breakdown (30)** — depends on: 4, 12, 16, 8, 25. Also shows the run's records (biggest hit, longest chain).
 7. **Menus and Screen Flow (31)** — depends on: 5, 6, 37. The Continue entry binds to 24 when 24 is designed.
 8. **Audio (32)** — depends on: 4, 29, 37.
@@ -176,7 +188,7 @@ Systems are listed in dependency order within each layer. Design and build from 
 3. **Records, Replay and Difficulty (23)** — depends on: 1, 4, 5, 24.
 4. **Tutorial and Onboarding (33)** — depends on: 25, 26, 27, 28.
 5. **Accessibility (34)** — depends on: 6, 7, 29, 31, 37.
-6. **Balance Simulation Harness (35)** — depends on: 1, 2, 3, 5, 8, 10, 12, 15, 16, 17, 18, 36, plus a player-policy component (automatic arrangement and door choice). Its thin form is an MVP item.
+6. **Balance Simulation Harness (35)** — depends on: 1, 2, 3, 5, 8, 10, 12, 15, 16, 17, 18, 36, plus a player-policy component (automatic arrangement and door choice). Its thin form is an MVP item. Designed (2026-11-14): a hybrid host (shared engine-free sources, a .NET console for sweeps, Unity parity fixtures), policy tiers 0 to 2, a run-defining predicate separate from System 29's thresholds, advisory balance gates, and a Stage A (fight-only distributions) before Stage B (full runs).
 
 ---
 
@@ -205,13 +217,13 @@ Combining the dependency sort with the priority tiers. Systems 3 and 12 are desi
 | 17 | 17 Door Generation and Tiers | MVP | Feature | game-designer, economy-designer | M |
 | 18 | 35 Balance Simulation Harness (thin) | MVP | Polish | tools-programmer, economy-designer | M |
 | 19 | 6 Input and Focus | MVP | Foundation | ux-designer, ui-programmer | S |
-| 20 | 7 Localization and Text | MVP | Foundation | localization-lead | S |
+| 20 | 7 Localization and Text | MVP | Foundation | localization-lead | M |
 | 21 | 37 Settings | MVP | Foundation | ux-designer | S |
 | 22 | 25 Backpack UI | MVP | Presentation | ux-designer, ui-programmer | L |
 | 23 | 26 Hover Popup and Glossary | MVP | Presentation | ux-designer | S |
 | 24 | 27 Combat HUD | MVP | Presentation | ux-designer, ui-programmer | M |
 | 25 | 29 Payoff Presentation | MVP | Presentation | technical-artist, game-designer | L |
-| 26 | 28 Door and Room Panels UI | MVP | Presentation | ux-designer | S |
+| 26 | 28 Door and Room Panels UI | MVP | Presentation | ux-designer | M |
 | 27 | 30 Post-combat Breakdown | MVP | Presentation | ux-designer | S |
 | 28 | 31 Menus and Screen Flow | MVP | Presentation | ux-designer | S |
 | 29 | 24 Run Save and Resume | Vertical Slice | Polish | lead-programmer | M |
@@ -260,11 +272,11 @@ Combining the dependency sort with the priority tiers. Systems 3 and 12 are desi
 | Metric | Count |
 |--------|-------|
 | Total systems identified | 37 |
-| Design docs started | 16 |
+| Design docs started | 29 |
 | Design docs reviewed | 5 |
 | Design docs approved | 0 |
-| MVP systems designed | 15/28 |
-| Vertical Slice systems designed | 0/5 |
+| MVP systems designed | 27/28 |
+| Vertical Slice systems designed | 1/5 |
 
 ---
 

@@ -3,6 +3,7 @@ using System.IO;
 using NUnit.Framework;
 using Project05.CombatCore;
 using Project05.CombatScene;
+using Project05.Items;
 using Project05.UI.Hud;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -105,41 +106,40 @@ namespace Project05.Tests.EditMode
             Assert.IsTrue(scene.IsValid());
 
             CombatSceneController controller = Object.FindFirstObjectByType<CombatSceneController>();
+            CombatScreenController screen = Object.FindFirstObjectByType<CombatScreenController>();
+            ItemBoardController board = Object.FindFirstObjectByType<ItemBoardController>();
+            ActionStripView strip = Object.FindFirstObjectByType<ActionStripView>();
+            ItemPopupController popup = Object.FindFirstObjectByType<ItemPopupController>();
+            CombatHudView hud = Object.FindFirstObjectByType<CombatHudView>();
             Assert.IsNotNull(controller, "Combat.unity must contain CombatSceneController.");
+            Assert.IsNotNull(screen, "Combat.unity must contain CombatScreenController.");
+            Assert.IsNotNull(board, "Combat.unity must contain ItemBoardController.");
+            Assert.IsNotNull(strip, "Combat.unity must contain ActionStripView.");
+            Assert.IsNotNull(hud, "Combat.unity must contain CombatHudView.");
 
-            controller.InitializeRuntime();
+            RectTransform safeFrame = GameObject.Find("SafeFrame").GetComponent<RectTransform>();
+            controller.InitializeIntegrated(board, hud, strip, popup, safeFrame, initialSpeedIndex: 0);
+
             Assert.IsNotNull(controller.Catalog);
             Assert.AreEqual("hero_crusader", controller.HeroDef.Id);
             Assert.AreEqual(CombatScenePhase.Planning, controller.Phase);
-            Assert.IsNotNull(controller.Workbench);
             Assert.IsNotNull(controller.NextStagePanel);
             Assert.IsNotNull(controller.Playback);
             Assert.IsNotNull(controller.PostCombatPanel);
 
             // 1-hero HUD check: HeroSlot1 active, HeroSlot2 & HeroSlot3 hidden.
-            CombatHudView hud = Object.FindFirstObjectByType<CombatHudView>();
-            Assert.IsNotNull(hud);
             Assert.IsTrue(hud.transform.Find("HeroSlot1").gameObject.activeSelf);
             Assert.IsFalse(hud.transform.Find("HeroSlot2").gameObject.activeSelf);
             Assert.IsFalse(hud.transform.Find("HeroSlot3").gameObject.activeSelf);
 
-            // Picker: switch to Chọn đồ tab and pick an item.
-            controller.Workbench.SwitchLowerTab(true);
-            Assert.IsTrue(controller.Workbench.IsPickerOpen);
-
-            int beforeCount = controller.Arrangement.CaptureView().HeroGrids[0].Items.Count
-                              + controller.Arrangement.CaptureView().Stash.Items.Count;
-            Assert.IsTrue(controller.Workbench.TryPickCatalogItem("item_crimson_vial"));
-            int afterPickCount = controller.Arrangement.CaptureView().HeroGrids[0].Items.Count
-                                 + controller.Arrangement.CaptureView().Stash.Items.Count;
-            Assert.AreEqual(beforeCount + 1, afterPickCount);
-
-            // Find an item in Stash and test move/rotate + remove.
-            IReadOnlyList<PlacedItemView> stashItems = controller.Arrangement.CaptureView().Stash.Items;
-            Assert.GreaterOrEqual(stashItems.Count, 1);
-            long stashItemId = stashItems[0].InstanceId;
-            Assert.IsTrue(controller.Workbench.TryMoveOrRotateItem(stashItemId, ContainerKind.Stash, 6, 0, orientation: 1));
-            Assert.IsTrue(controller.Workbench.TryRemoveItem(stashItemId));
+            // Picker spawn via ItemBoardController: add item_crimson_vial to stash/grid.
+            int beforeStash = board.ExportContainerItems("stash").Count;
+            ItemRecord vial = popup.Catalog.Find("item_crimson_vial");
+            Assert.IsNotNull(vial);
+            Sprite vialPlate = hud.Sprites.plateLift[0];
+            Assert.IsTrue(board.TrySpawnItem(vial, vialPlate, null, "stash", out ItemHoverTarget spawned));
+            Assert.IsNotNull(spawned);
+            Assert.AreEqual(beforeStash + 1, board.ExportContainerItems("stash").Count);
 
             // Next-stage monster count selector: test immediate apply for 1..6.
             for (int c = 1; c <= 6; c++)
@@ -148,14 +148,15 @@ namespace Project05.Tests.EditMode
                 Assert.AreEqual(c, controller.Prepared.BoundEnemies.Count);
             }
 
-            // Skip playback so StartFight completes synchronously in EditMode, then proceed to Next Stage with 5 monsters.
-            int heroItemsBeforeFight = controller.Arrangement.CaptureView().HeroGrids[0].Items.Count;
+            // Skip playback so StartIntegratedFight completes synchronously in EditMode, then proceed to Next Stage with 5 monsters.
+            int heroItemsBeforeFight = board.ExportContainerItems("grid").Count;
             controller.Playback.HandleSpeedRequested(3); // Skip
-            controller.StartFight();
+            Assert.IsTrue(controller.StartIntegratedFight(0));
 
             Assert.AreEqual(CombatScenePhase.PostCombat, controller.Phase);
             Assert.IsNotNull(controller.LastResult);
             Assert.AreEqual(CombatRunStatus.Completed, controller.LastResult.Status);
+            Assert.Greater(controller.LastResult.Trace.Events.Count, 4, "Real combat trace must have full event steps, not 3 fixture images.");
 
             controller.SetNextStageMonsterCount(5);
             controller.ProceedToNextStage();
@@ -163,7 +164,7 @@ namespace Project05.Tests.EditMode
             Assert.AreEqual(2, controller.CurrentStage);
             Assert.AreEqual(CombatScenePhase.Planning, controller.Phase);
             Assert.AreEqual(5, controller.Prepared.BoundEnemies.Count);
-            Assert.AreEqual(heroItemsBeforeFight, controller.Arrangement.CaptureView().HeroGrids[0].Items.Count);
+            Assert.AreEqual(heroItemsBeforeFight, board.ExportContainerItems("grid").Count);
         }
     }
 }

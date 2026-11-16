@@ -73,3 +73,65 @@ Vietnamese gate (7.7), any Unity capture of these assets.
 2. **Footprints beyond the four of 3.4.2** (1x3, 2x3, T, S) come from `grid-backpack.md`, which allows up to nine cells in a 3 x 3 box. The art bible lists only four.
 3. **Target names** `FirstEnemy` and `AllEnemies` are a proposal; Systems 3 and 9 own target selection.
 4. The catalog treats the working Ấn numbers (2 damage per unit) as fixture values, as `status-effects.md` does.
+
+## Drag, drop and rotate (added 2026-11-15)
+
+| Requirement | Ref | Status | Where |
+|---|---|---|---|
+| Pick up by drag, or click then click to place | 7.13 | Done in code; verified only through scripted captures, not with a real pointer | `ItemBoardController`, `ItemHoverTarget` |
+| Rotate: R, right mouse button; keyboard path Enter, arrows, Tab, Esc | 7.13, backpack-ui | Done in code, same caveat | `ItemBoardController.Update` |
+| Placement rules: inside the container, on free cells; invalid drop returns the item | grid-backpack 5, 7.12 | Done as pure code with 12 tests | `Scripts/Items/ItemBoard.cs`, `ItemShapes.cs` |
+| Ghost footprint: Fog-hi outline when valid, Fog outline and a cross on blocking cells when not | 7.11 | Done, captured | `ui_ghost_*`, `combat_scene_drag_*` |
+| Synergy and popup follow the arrangement, rotation included | adjacency-and-synergy | Done: popup reads the board, adjacency uses the rotated footprint | `ItemBoard.Evaluate` |
+| Popup suppressed while an item is held | hover-popup 4 | Done | `ItemPopupController.Suppressed` |
+| Snap, thunk, tier-edge pulse, invalid-release shudder, 100 ms lift | 7.12 | Missing: placement is instant, only the 2 px lift exists | |
+| Held plate ring and 2 px shadow, rotate prompt chip, gamepad | 7.11, 7.13 | Missing | |
+| Moving items between the three hero grids and a stash of the documented 5 x 5 size | grid-backpack, backpack-ui | Missing: one hero grid (4 x 4) and an 8 x 2 stash | |
+| Rotating a plate rotates its art, so the top-left light flips | 3.4.3 | Accepted for now, needs art-director sign-off | |
+
+## Buttons (added 2026-11-16)
+
+Spec: `design/ux/combat-screen-buttons.md`. Presentation only; playback is a fixture timeline.
+
+| Requirement | Ref | Status | Where |
+|---|---|---|---|
+| Start (primary button, Planning only, off while an item is held), Ctrl+Enter | 7.3, input-and-focus 6 | Done, driven in Play Mode | `ActionStripView`, `CombatScreenController.TryStart` |
+| Speed 1x, 2x, 4x (keys 1, 2, 3), remembered; progress of the beat kept | payoff-presentation 8, 19 | Done, logic tested | `CombatScreenModel`, `DemoPlayback`, `GameSettings.SpeedIndex` |
+| Skip (key K): refused inside 250 ms, never saved, label "Đang bỏ qua" while armed | payoff-presentation 11, 12, input-and-focus 7e | Done, driven in Play Mode (refused in lock, armed after, landed on Planning) | `SpeedControlView.SetSkipArmed` |
+| Menu button and pause menu: Resume, Settings, Abandon run; stage dimmed by the checker mask, workbench stays readable | menus-and-screen-flow 5 to 7, art bible 2.3.1 | Done, captured | `PauseMenuView`, `ui_dim-mask_default_4x4`, `combat_scene_buttons_pause-menu_z2` |
+| Abandon confirmation: Keep playing has initial focus; Esc keeps playing; Abandon loads Title | menus-and-screen-flow 7 | Done, driven in Play Mode | `ConfirmDialogView`, `combat_scene_buttons_confirm_z2` |
+| Settings panel: reduced flashes, reduced motion, Skip to end, each written in words; Back | settings 2 to 6 | Done for three settings, captured; saved by a stand-in store | `SettingsPanelView`, `GameSettings`, `combat_scene_buttons_settings_z2` |
+| Esc priority: confirm, settings, popup, held item, menu, open menu | input-and-focus 4 | Done, tested | `CombatScreenModel.Escape` |
+| Title: Chơi loads Combat, Cài đặt opens the same panel, Thoát quits | menus-and-screen-flow | Done, Chơi and Cài đặt driven in Play Mode; Thoát not exercised | `TitleMenuController` |
+| Modal traps pointer input; focus returns to the opener | input-and-focus | Pointer blocked by CanvasGroups; focus return done for the menu button only | `CombatScreenController.SyncModals` |
+| Per-segment prompt chips (1, 2, 3, K), menu button ring outside the frame | payoff-presentation 19, 7.11 | Missing (Tab chip removed) | |
+| Language, volume, key repeat, rebind, text size; first-launch Reduced flashes prompt; pause on window deactivation | settings, menus-and-screen-flow 5 | Missing (need Systems 6, 7, 31, 37) | |
+| Gamepad for these buttons | ui-code rules | Not tried: buttons use the EventSystem, so navigation exists, but nothing was run with a gamepad | |
+
+## Sell zone, enemy centring, centred modals (added 2026-11-16, user request)
+
+| Requirement | Status | Where |
+|---|---|---|
+| Sell zone under the stash: scale, framed drop area, hint, price of the held item; drop sells, Tab reaches it from the keyboard | Done, driven in Play Mode (item removed, currency +price); Planning only, refused during playback | `SellZoneView`, `ItemBoardController.Sell`, `ui_sell-*`, `combat_scene_drag_sell_z2` |
+| Sell prices | Provisional table by tier (1, 2, 3, 5, 8, 12) on the board controller; Currency and Shop (System 20) is not designed, so this needs an economy decision | `ItemSale.Price` |
+| No undo for a sale | Open: a drop on the zone sells at once | |
+| One enemy line stands in the middle of the enemy column; two lines share it | Done, captured | `CombatHudView.LayoutEnemies` |
+| Pause menu, confirm and settings centred on the screen; the whole frame is dimmed | Done, captured. Deviates from art bible 2.3.1 (only the stage dimmed); needs the art bible amended | `CombatSceneBuilder.BuildScreenController` |
+
+## Start button, cursor, popup swap (added 2026-11-16, user request)
+
+| Requirement | Status | Where |
+|---|---|---|
+| Start is the one filled button (Candle plate, dark text), at the right of the strip, Ctrl+Enter chip to its left, the reason it is off written at the left | Done, captured, driven in Play Mode (holding an item turns it off and shows the reason) | `ui_start_*`, `ActionStripView.SetStartEnabled` |
+| Pixel cursor: arrow, and a closed hand while an item is held; pre-scaled for zoom 1 to 4 | Done on Combat and Title; the look of the hardware cursor was not checked on screen | `PixelCursor`, `Art/UI/Cursors/` |
+| Popup swap between items without waiting or blinking: rows pooled (about 1 ms a swap), 0.2 s grace, 0.5 s warm window | Done, driven in Play Mode. Grace deviates from hover-popup-and-glossary rule 3 (60 ms); the GDD needs the matching change | `ItemPopupController`, `ItemPopupView`, `HoverTiming` |
+
+## Top strip, backpack, sell drawer (added 2026-11-16, user request)
+
+| Requirement | Status | Where |
+|---|---|---|
+| Top strip: the label "Lượt tới (dự kiến):" comes before the order chips; enemy chips carry the enemy's letter, which its stage slot also shows; cog on the menu button with an Esc chip | Done, captured | `OrderStripView`, `EnemySlot` letter chip, `ui_glyph-cog_bone_8x8` |
+| Stash 8 x 8; hero grid 4 x 4 at the start, ready to grow to 7 x 7 (the stash moves down; the column is exactly full at 7 x 7) | Done; growth driven in Play Mode (`ResizeHeroGrid(7)`), refused if it would cut an item | `WorkbenchLayout`, `WorkbenchView`, `ItemBoard.Resize` |
+| Sell moved into a drawer on the right edge of the stage: a tab with an arrow at the top opens it with a spring (about 20 px overshoot, then settles), the tab again tucks it away without a bounce; reduced motion moves it at once | Done, driven in Play Mode (path 460, 365, 304, 279, 272, 277 ... 292) | `SellDrawerView`, `DrawerSpring`, `ui_drawer-tab_*` |
+| Carrying an item over the closed tab opens the drawer; Tab from the keyboard reaches it too; a carried plate draws above the drawer | Done, driven in Play Mode | `ItemBoardController` (drag layer) |
+| The open drawer covers part of the enemy column | Open: acceptable while it is closed by default; revisit with the art director | |

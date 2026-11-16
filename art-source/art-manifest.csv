@@ -345,3 +345,82 @@ Assets/_Project/Art/Items/Plates/plate_white_rest_2x3.png,plate,2x3,pal_master_v
 Assets/_Project/Art/Items/Plates/plate_white_rest_l.png,plate,,pal_master_v01,gen,tools/art/plates.py,code-drawn,n/a,n/a,2026-11-15,generator rule
 Assets/_Project/Art/Items/Plates/plate_white_rest_s.png,plate,,pal_master_v01,gen,tools/art/plates.py,code-drawn,n/a,n/a,2026-11-15,generator rule
 Assets/_Project/Art/Items/Plates/plate_white_rest_t.png,plate,,pal_master_v01,gen,tools/art/plates.py,code-drawn,n/a,n/a,2026-11-15,generator rule
+Assets/_Project/Art/Items/Icons/item_breaking-bell_c_1x2.png,item,1x2,pal_master_v01,gen,tools/art/build_items.py,Pixellab pixen raw image (art-source/ai-raw) + palette mapping and outline,n/a,n/a,2026-11-15,generator rule
+Assets/_Project/Art/Items/Icons/item_breaking-bell_d_1x2.png,item,1x2,pal_master_v01,gen,tools/art/build_items.py,Pixellab pixen raw image (art-source/ai-raw) + palette mapping and outline,n/a,n/a,2026-11-15,generator rule
+Assets/_Project/Art/Items/Icons/item_crossbow_c_2x1.png,item,2x1,pal_master_v01,gen,tools/art/build_items.py,Pixellab pixen raw image (art-source/ai-raw) + palette mapping and outline,n/a,n/a,2026-11-15,generator rule
+Assets/_Project/Art/Items/Icons/item_crossbow_d_2x1.png,item,2x1,pal_master_v01,gen,tools/art/build_items.py,Pixellab pixen raw image (art-source/ai-raw) + palette mapping and outline,n/a,n/a,2026-11-15,generator rule
+Assets/_Project/Art/Items/Icons/item_dagger_d_1x1.png,item,1x1,pal_master_v01,gen,tools/art/build_items.py,Pixellab pixen raw image (art-source/ai-raw) + palette mapping and outline,n/a,n/a,2026-11-15,generator rule
+Assets/_Project/Art/Items/Icons/item_echo-charm_d_1x1.png,item,1x1,pal_master_v01,gen,tools/art/build_items.py,Pixellab pixen raw image (art-source/ai-raw) + palette mapping and outline,n/a,n/a,2026-11-15,generator rule
+Assets/_Project/Art/Items/Icons/item_hand-axe_c_l.png,item,,pal_master_v01,gen,tools/art/build_items.py,Pixellab pixen raw image (art-source/ai-raw) + palette mapping and outline,n/a,n/a,2026-11-15,generator rule
+Assets/_Project/Art/Items/Icons/item_hand-axe_d_l.png,item,,pal_master_v01,gen,tools/art/build_items.py,Pixellab pixen raw image (art-source/ai-raw) + palette mapping and outline,n/a,n/a,2026-11-15,generator rule
+Assets/_Project/Art/Items/Icons/item_heart-charm_d_1x1.png,item,1x1,pal_master_v01,gen,tools/art/build_items.py,Pixellab pixen raw image (art-source/ai-raw) + palette mapping and outline,n/a,n/a,2026-11-15,generator rule
+Assets/_Project/Art/Items/Icons/item_hourglass_c_1x2.png,item,1x2,pal_master_v01,gen,tools/art/build_items.py,Pixellab pixen raw image (art-source/ai-raw) + palette mapping and outline,n/a,n/a,2026-11-15,generator rule
+Assets/_Project/Art/Items/Icons/item_hourglass_d_1x2.png,item,1x2,pal_master_v01,gen,tools/art/build_items.py,Pixellab pixen raw image (art-source/ai-raw) + palette mapping and outline,n/a,n/a,2026-11-15,generator rule
+Assets/_Project/Art/Items/Icons/item_ink-pot_d_1x1.png,item,1x1,pal_master_v01,gen,tools/art/build_items.py,Pixellab pixen raw image (art-source/ai-raw) + palette mapping and outline,n/a,n/a,2026-11-15,generator rule
+Assets/_Project/Art/Items/Icons/item_iron-helm_d_1x1.png,item,1x1,pal_master_v01,gen,tools/art/build_items.py,Pixellab pixen raw image (art-source/ai-raw) + palette mapping and outline,n/a,n/a,2026-11-15,generator rule
+Assets/_Project/Art/Items/Icons/item_iron-sword_c_1x3.png,item,1x3,pal_master_v01,gen,tools/art/build_items.py,Pixellab pixen raw image (art-source/ai-raw) + palette mapping and outline,n/a,n/a,2026-11-15,generator rule
+Assets/_Project/Art/Items/Icons/item_iron-sword_d_1x3.png,item,1x3,pal_master_v01,gen,tools/art/build_items.py,Pixellab pixen raw image (art-source/ai-raw) + palette mapping and outline,n/a,n/a,2026-11-15,generator rule
+Assets/_Project/Art/Items/Icons/item_leather-vest_c_2x2.png,item,2x2,pal_master_v01,gen,tools/art/build_items.py,Pixellab pixen raw image (art-source/ai-raw) + palette mapping and outline,n/a,n/a,2026-11-15,generator rule
+Assets/_Project/Art/Items/Icons/item_leather-vest_d_2x2.png,item,2x2,pal_master_v01,gen,tools/art/build_items.py,Pixellab pixen raw image (art-source/ai-raw) + palette mapping and outline,n/a,n/a,2026-11-15,generator rule
+Assets/_Project/Art/Items/Icons/item_scholar-lens_d_1x1.png,item,1x1,pal_master_v01,gen,tools/art/build_items.py,Pixellab pixen raw image (art-source/ai-raw) + palette mapping and outline,n/a,n/a,2026-11-15,generator rule
+Assets/_Project/Art/Items/Icons/item_seal-chain_c_s.png,item,,pal_master_v01,gen,tools/art/build_items.py,Pixellab pixen raw image (art-source/ai-raw) + palette mapping and outline,n/a,n/a,2026-11-15,generator rule
+Assets/_Project/Art/Items/Icons/item_seal-chain_d_s.png,item,,pal_master_v01,gen,tools/art/build_items.py,Pixellab pixen raw image (art-source/ai-raw) + palette mapping and outline,n/a,n/a,2026-11-15,generator rule
+Assets/_Project/Art/Items/Icons/item_seal-ink_d_1x1.png,item,1x1,pal_master_v01,gen,tools/art/build_items.py,Pixellab pixen raw image (art-source/ai-raw) + palette mapping and outline,n/a,n/a,2026-11-15,generator rule
+Assets/_Project/Art/Items/Icons/item_seal-stamp_c_1x2.png,item,1x2,pal_master_v01,gen,tools/art/build_items.py,Pixellab pixen raw image (art-source/ai-raw) + palette mapping and outline,n/a,n/a,2026-11-15,generator rule
+Assets/_Project/Art/Items/Icons/item_seal-stamp_d_1x2.png,item,1x2,pal_master_v01,gen,tools/art/build_items.py,Pixellab pixen raw image (art-source/ai-raw) + palette mapping and outline,n/a,n/a,2026-11-15,generator rule
+Assets/_Project/Art/Items/Icons/item_swift-boots_c_l3.png,item,,pal_master_v01,gen,tools/art/build_items.py,Pixellab pixen raw image (art-source/ai-raw) + palette mapping and outline,n/a,n/a,2026-11-15,generator rule
+Assets/_Project/Art/Items/Icons/item_swift-boots_d_l3.png,item,,pal_master_v01,gen,tools/art/build_items.py,Pixellab pixen raw image (art-source/ai-raw) + palette mapping and outline,n/a,n/a,2026-11-15,generator rule
+Assets/_Project/Art/Items/Icons/item_thunder-gong_c_2x2.png,item,2x2,pal_master_v01,gen,tools/art/build_items.py,Pixellab pixen raw image (art-source/ai-raw) + palette mapping and outline,n/a,n/a,2026-11-15,generator rule
+Assets/_Project/Art/Items/Icons/item_thunder-gong_d_2x2.png,item,2x2,pal_master_v01,gen,tools/art/build_items.py,Pixellab pixen raw image (art-source/ai-raw) + palette mapping and outline,n/a,n/a,2026-11-15,generator rule
+Assets/_Project/Art/Items/Icons/item_tower-shield_c_2x3.png,item,2x3,pal_master_v01,gen,tools/art/build_items.py,Pixellab pixen raw image (art-source/ai-raw) + palette mapping and outline,n/a,n/a,2026-11-15,generator rule
+Assets/_Project/Art/Items/Icons/item_tower-shield_d_2x3.png,item,2x3,pal_master_v01,gen,tools/art/build_items.py,Pixellab pixen raw image (art-source/ai-raw) + palette mapping and outline,n/a,n/a,2026-11-15,generator rule
+Assets/_Project/Art/Items/Icons/item_void-censer_c_2x3.png,item,2x3,pal_master_v01,gen,tools/art/build_items.py,Pixellab pixen raw image (art-source/ai-raw) + palette mapping and outline,n/a,n/a,2026-11-15,generator rule
+Assets/_Project/Art/Items/Icons/item_void-censer_d_2x3.png,item,2x3,pal_master_v01,gen,tools/art/build_items.py,Pixellab pixen raw image (art-source/ai-raw) + palette mapping and outline,n/a,n/a,2026-11-15,generator rule
+Assets/_Project/Art/Items/Icons/item_war-banner_c_1x3.png,item,1x3,pal_master_v01,gen,tools/art/build_items.py,Pixellab pixen raw image (art-source/ai-raw) + palette mapping and outline,n/a,n/a,2026-11-15,generator rule
+Assets/_Project/Art/Items/Icons/item_war-banner_d_1x3.png,item,1x3,pal_master_v01,gen,tools/art/build_items.py,Pixellab pixen raw image (art-source/ai-raw) + palette mapping and outline,n/a,n/a,2026-11-15,generator rule
+Assets/_Project/Art/Items/Icons/item_war-drum_c_1x2.png,item,1x2,pal_master_v01,gen,tools/art/build_items.py,Pixellab pixen raw image (art-source/ai-raw) + palette mapping and outline,n/a,n/a,2026-11-15,generator rule
+Assets/_Project/Art/Items/Icons/item_war-drum_d_1x2.png,item,1x2,pal_master_v01,gen,tools/art/build_items.py,Pixellab pixen raw image (art-source/ai-raw) + palette mapping and outline,n/a,n/a,2026-11-15,generator rule
+Assets/_Project/Art/Items/Icons/item_war-hammer_c_t.png,item,,pal_master_v01,gen,tools/art/build_items.py,Pixellab pixen raw image (art-source/ai-raw) + palette mapping and outline,n/a,n/a,2026-11-15,generator rule
+Assets/_Project/Art/Items/Icons/item_war-hammer_d_t.png,item,,pal_master_v01,gen,tools/art/build_items.py,Pixellab pixen raw image (art-source/ai-raw) + palette mapping and outline,n/a,n/a,2026-11-15,generator rule
+Assets/_Project/Art/Items/Icons/item_whetstone_d_1x1.png,item,1x1,pal_master_v01,gen,tools/art/build_items.py,Pixellab pixen raw image (art-source/ai-raw) + palette mapping and outline,n/a,n/a,2026-11-15,generator rule
+Assets/_Project/Art/UI/ui_ghost_cross_20x20.png,ui,20x20,pal_master_v01,gen,tools/art/build_combat_ui.py,code-drawn,n/a,n/a,2026-11-15,generator rule
+Assets/_Project/Art/UI/ui_ghost_invalid_20x20.png,ui,20x20,pal_master_v01,gen,tools/art/build_combat_ui.py,code-drawn,n/a,n/a,2026-11-15,generator rule
+Assets/_Project/Art/UI/ui_ghost_valid_20x20.png,ui,20x20,pal_master_v01,gen,tools/art/build_combat_ui.py,code-drawn,n/a,n/a,2026-11-15,generator rule
+Assets/_Project/Art/UI/ui_chipbtn_default_9s.png,ui,9s,pal_master_v01,gen,tools/art/build_combat_ui.py,code-drawn,n/a,n/a,2026-11-15,generator rule
+Assets/_Project/Art/UI/ui_chipbtn_disabled_9s.png,ui,9s,pal_master_v01,gen,tools/art/build_combat_ui.py,code-drawn,n/a,n/a,2026-11-15,generator rule
+Assets/_Project/Art/UI/ui_chipbtn_focus_9s.png,ui,9s,pal_master_v01,gen,tools/art/build_combat_ui.py,code-drawn,n/a,n/a,2026-11-15,generator rule
+Assets/_Project/Art/UI/ui_chipbtn_hover_9s.png,ui,9s,pal_master_v01,gen,tools/art/build_combat_ui.py,code-drawn,n/a,n/a,2026-11-15,generator rule
+Assets/_Project/Art/UI/ui_chipbtn_pressed_9s.png,ui,9s,pal_master_v01,gen,tools/art/build_combat_ui.py,code-drawn,n/a,n/a,2026-11-15,generator rule
+Assets/_Project/Art/UI/ui_dim-mask_default_4x4.png,ui,4x4,pal_master_v01,gen,tools/art/build_combat_ui.py,code-drawn,n/a,n/a,2026-11-15,generator rule
+Assets/_Project/Art/UI/ui_primary_default_9s.png,ui,9s,pal_master_v01,gen,tools/art/build_combat_ui.py,code-drawn,n/a,n/a,2026-11-15,generator rule
+Assets/_Project/Art/UI/ui_primary_disabled_9s.png,ui,9s,pal_master_v01,gen,tools/art/build_combat_ui.py,code-drawn,n/a,n/a,2026-11-15,generator rule
+Assets/_Project/Art/UI/ui_primary_focus_9s.png,ui,9s,pal_master_v01,gen,tools/art/build_combat_ui.py,code-drawn,n/a,n/a,2026-11-15,generator rule
+Assets/_Project/Art/UI/ui_primary_hover_9s.png,ui,9s,pal_master_v01,gen,tools/art/build_combat_ui.py,code-drawn,n/a,n/a,2026-11-15,generator rule
+Assets/_Project/Art/UI/ui_primary_pressed_9s.png,ui,9s,pal_master_v01,gen,tools/art/build_combat_ui.py,code-drawn,n/a,n/a,2026-11-15,generator rule
+Assets/_Project/Art/UI/ui_sell-frame_active_9s.png,ui,9s,pal_master_v01,gen,tools/art/build_combat_ui.py,code-drawn,n/a,n/a,2026-11-15,generator rule
+Assets/_Project/Art/UI/ui_sell-frame_default_9s.png,ui,9s,pal_master_v01,gen,tools/art/build_combat_ui.py,code-drawn,n/a,n/a,2026-11-15,generator rule
+Assets/_Project/Art/UI/ui_sell-frame_hover_9s.png,ui,9s,pal_master_v01,gen,tools/art/build_combat_ui.py,code-drawn,n/a,n/a,2026-11-15,generator rule
+Assets/_Project/Art/UI/ui_sell-scale_active_48x28.png,ui,48x28,pal_master_v01,gen,tools/art/build_combat_ui.py,code-drawn,n/a,n/a,2026-11-15,generator rule
+Assets/_Project/Art/UI/ui_sell-scale_default_48x28.png,ui,48x28,pal_master_v01,gen,tools/art/build_combat_ui.py,code-drawn,n/a,n/a,2026-11-15,generator rule
+Assets/_Project/Art/UI/ui_sell-tile_default_20x20.png,ui,20x20,pal_master_v01,gen,tools/art/build_combat_ui.py,code-drawn,n/a,n/a,2026-11-15,generator rule
+Assets/_Project/Art/UI/Cursors/ui_cursor-arrow_x1_11x16.png,ui,11x16,pal_master_v01,gen,tools/art/build_menu_kit.py,code-drawn,n/a,n/a,2026-11-15,generator rule
+Assets/_Project/Art/UI/Cursors/ui_cursor-arrow_x2_22x32.png,ui,22x32,pal_master_v01,gen,tools/art/build_menu_kit.py,code-drawn,n/a,n/a,2026-11-15,generator rule
+Assets/_Project/Art/UI/Cursors/ui_cursor-arrow_x3_33x48.png,ui,33x48,pal_master_v01,gen,tools/art/build_menu_kit.py,code-drawn,n/a,n/a,2026-11-15,generator rule
+Assets/_Project/Art/UI/Cursors/ui_cursor-arrow_x4_44x64.png,ui,44x64,pal_master_v01,gen,tools/art/build_menu_kit.py,code-drawn,n/a,n/a,2026-11-15,generator rule
+Assets/_Project/Art/UI/Cursors/ui_cursor-grab_x1_14x11.png,ui,14x11,pal_master_v01,gen,tools/art/build_menu_kit.py,code-drawn,n/a,n/a,2026-11-15,generator rule
+Assets/_Project/Art/UI/Cursors/ui_cursor-grab_x2_28x22.png,ui,28x22,pal_master_v01,gen,tools/art/build_menu_kit.py,code-drawn,n/a,n/a,2026-11-15,generator rule
+Assets/_Project/Art/UI/Cursors/ui_cursor-grab_x3_42x33.png,ui,42x33,pal_master_v01,gen,tools/art/build_menu_kit.py,code-drawn,n/a,n/a,2026-11-15,generator rule
+Assets/_Project/Art/UI/Cursors/ui_cursor-grab_x4_56x44.png,ui,56x44,pal_master_v01,gen,tools/art/build_menu_kit.py,code-drawn,n/a,n/a,2026-11-15,generator rule
+Assets/_Project/Art/UI/ui_start_default_9s.png,ui,9s,pal_master_v01,gen,tools/art/build_combat_ui.py,code-drawn,n/a,n/a,2026-11-15,generator rule
+Assets/_Project/Art/UI/ui_start_disabled_9s.png,ui,9s,pal_master_v01,gen,tools/art/build_combat_ui.py,code-drawn,n/a,n/a,2026-11-15,generator rule
+Assets/_Project/Art/UI/ui_start_focus_9s.png,ui,9s,pal_master_v01,gen,tools/art/build_combat_ui.py,code-drawn,n/a,n/a,2026-11-15,generator rule
+Assets/_Project/Art/UI/ui_start_hover_9s.png,ui,9s,pal_master_v01,gen,tools/art/build_combat_ui.py,code-drawn,n/a,n/a,2026-11-15,generator rule
+Assets/_Project/Art/UI/ui_start_pressed_9s.png,ui,9s,pal_master_v01,gen,tools/art/build_combat_ui.py,code-drawn,n/a,n/a,2026-11-15,generator rule
+Assets/_Project/Art/UI/ui_cell-bed_default_20x20.png,ui,20x20,pal_master_v01,gen,tools/art/build_combat_ui.py,code-drawn,n/a,n/a,2026-11-15,generator rule
+Assets/_Project/Art/UI/ui_drawer-tab_default_14x28.png,ui,14x28,pal_master_v01,gen,tools/art/build_combat_ui.py,code-drawn,n/a,n/a,2026-11-15,generator rule
+Assets/_Project/Art/UI/ui_drawer-tab_focus_14x28.png,ui,14x28,pal_master_v01,gen,tools/art/build_combat_ui.py,code-drawn,n/a,n/a,2026-11-15,generator rule
+Assets/_Project/Art/UI/ui_drawer-tab_hover_14x28.png,ui,14x28,pal_master_v01,gen,tools/art/build_combat_ui.py,code-drawn,n/a,n/a,2026-11-15,generator rule
+Assets/_Project/Art/UI/ui_drawer-tab_pressed_14x28.png,ui,14x28,pal_master_v01,gen,tools/art/build_combat_ui.py,code-drawn,n/a,n/a,2026-11-15,generator rule
+Assets/_Project/Art/UI/ui_glyph-arrow-left_bone_5x7.png,ui,5x7,pal_master_v01,gen,tools/art/ui_glyphs.py,code-drawn,n/a,n/a,2026-11-15,generator rule
+Assets/_Project/Art/UI/ui_glyph-arrow-right_bone_5x7.png,ui,5x7,pal_master_v01,gen,tools/art/ui_glyphs.py,code-drawn,n/a,n/a,2026-11-15,generator rule
+Assets/_Project/Art/UI/ui_glyph-cog_bone_8x8.png,ui,8x8,pal_master_v01,gen,tools/art/ui_glyphs.py,code-drawn,n/a,n/a,2026-11-15,generator rule

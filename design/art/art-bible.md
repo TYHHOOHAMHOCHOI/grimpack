@@ -1179,11 +1179,11 @@ Placement rules: effects aim at the target's **body centre**, never at its tab, 
 | 1x | As above |
 | 2x | Holds and cadence halved; luminance rises keep their 100 ms floor. Key frames kept; none shorter than 80 ms. |
 | 4x | Avatars appear in groups of up to 3 side by side, each group held 160 ms. Chips aggregate per target. |
-| Skip | The turn resolves instantly. One aggregated chip per target per stat. The grid plates still sweep, one plate starting per frame, each easing over 6 frames (see the envelope rule below). |
+| Skip | A fast-forward leg: no per-event effect. The grid plates sweep at each cut before a Detonation, and the Detonation then plays in full (see the envelope rule below). |
 
-- **Speed never removes a key frame, a chip or the Detonation level.** The Detonation peak plays at 1x on any setting except Skip (Pillar 2: the payoff is the product). This is a proposal for the UX designer.
+- **Speed never removes a key frame, a chip or the Detonation level.** The Detonation peak plays at 1x on any setting, including Skip, which fast-forwards to the next Detonation and plays it in full (Pillar 2: the payoff is the product; amended 2026-11-14). This is a proposal for the UX designer.
 - Speed is a data multiplier on hold times, not a different animation set.
-- **Speed scales holds and cadence only, never rise and fall envelopes (amended by Section 7.5).** Every luminance rise, including the avatar pop-in, stays at least 100 ms (6 frames) at any speed, so 2x and 4x cannot break the 4.12 rule. At Skip each plate in the grid sweep still eases over 6 frames.
+- **Speed scales holds and cadence only, never rise and fall envelopes (amended by Section 7.5).** Every luminance rise, including the avatar pop-in, stays at least 100 ms (6 frames) at any speed, so 2x and 4x cannot break the 4.12 rule. In a Skip cut each plate in the grid sweep still eases over 6 frames.
 
 #### 5.10.8 Enemies: the intent glyph acts (approved)
 
@@ -1721,12 +1721,12 @@ Focusing or hovering a tab lifts the target hero's join numeral on the pedestal 
 **Turn order: the order strip, not a badge on the pedestal.** Pedestals already carry the join numeral (identity); adding a second numeral for turn order would collide. The **order strip** (top strip, right part) is a row of 14 px square plain chips: hero chips show the **join numeral**, enemy chips show the **intent glyph**. The active chip carries the **Candle chevron** beneath it (the same turn-marker meaning as under the unit's feet). The strip is visible in planning (the order the fight will play) and in combat. Focusing a hero's HP block or a chip names the order in words in the popup ("acts 2nd"). *This depends on the combat GDD: if turn order is a fixed hero sequence, the strip shows only that and the layout is unchanged.*
 
 **The left grid follows the acting hero in combat.** At the start of each hero's Ready phase the workbench swaps to that hero's grid, so the plate echo (5.10.9) and the firing-order pulses are visible.
-- **Swap envelope:** a 100 ms (6-frame) fade-in. It is **not speed-scaled**, so it also meets 4.12 rule 5 at 2x and 4x. At **Skip** there is no follow; the grid stays where it was.
+- **Swap envelope:** a 100 ms (6-frame) fade-in. It is **not speed-scaled**, so it also meets 4.12 rule 5 at 2x and 4x. In a **Skip fast-forward leg** there is no follow; the grid stays where it was. A Skip Forced span (a Detonation played in full) follows the acting hero again.
 - **Marker:** the name plate shows the Candle chevron beside the join numeral, so the player knows the grid belongs to the acting hero. The Candle halo is planning-only.
 - **After combat** the workbench returns to the hero the player had selected.
 - **Manual hero switching in combat is off for the MVP** (revisit with a "pin to hero" action later).
 
-**Speed control.** Lives in the action strip during combat (7.3). Speed scales *holds and cadence only, never rise and fall envelopes*. Every luminance rise stays at least 100 ms at any speed (this refines 5.10.7, amended below). At Skip the plate sweep is one plate per frame but each plate still eases over 6 frames (about 0.45 s total for 20 plates). The Detonation peak plays at 1x on any setting except Skip (Pillar 2).
+**Speed control.** Lives in the action strip during combat (7.3). Speed scales *holds and cadence only, never rise and fall envelopes*. Every luminance rise stays at least 100 ms at any speed (this refines 5.10.7, amended below). In a Skip cut the plates start up to 6 frames apart (the final settle up to 20) and each plate still eases over 6 frames (about 0.2 s for a cut and at most about 0.44 s for the final settle). The Detonation peak plays at 1x on any setting, including Skip (Pillar 2; amended 2026-11-14).
 
 **Post-combat breakdown.** Because the 1.5 s peak is too short to read which items fired, a **result panel** replaces the enemy zone when combat ends (the whole right column, about 9 rows of 28 px, because both enemy lines are gone; popups open over it by the rules in 7.9).
 - One row per contributing item, **ranked by contribution**: rank numeral (8 px), the item's **avatar plate** (zero new art), name (Body, Bone), and the contribution in the 12 px numeral face. A Bone bar on an INK-2 track shows the share. **No hue gradient.**
@@ -2087,6 +2087,8 @@ These must be recorded in `design/accessibility-requirements.md`, which does not
 - The planning lit budget: **measured with a compact popup open at 3.59% (C = 24) and 3.24% (C = 20)**, far under 12%, so **the budget stays 12% and is not raised**. A pinned expanded popup (about 2.5% lit by estimate) is still to be measured.
 - Font candidates, unverified and to be tested: FatPix (itch.io, ngndang), Tonemark Pixel (paid; vendor claims full Vietnamese coverage), and a Vietnamese 8x24 pixel font pack on itch.io (licence not stated).
 - `design/accessibility-requirements.md` must be created and carry 7.13.
+- System 29 (`design/gdd/payoff-presentation.md`, 2026-11-14) asks for amendments, pending art-director approval: 2.3.5, 4.12 and 8.B.5 (the 30 percent Candle wash and the bloom are built from a stepped dither mask, not alpha blending; the bloom counts as exactly one flash with a 500 ms minimum gap and at most 2 flash-class events per second; 4.12 rule 8's small-area argument for 4x is not accepted without a measured capture); 2.3.5 (Detonation is a large Seal detonation or a rare very large chain, not only 'run-defining'); 5.10.7 (speed 'never removes a key frame or a chip' against the Tick-only shortcut; Skip described as 'the turn resolves instantly' against the revised Skip, which fast-forwards to the next Detonation and plays it in full, with no stamp (amended 2026-11-14)); 7.5 versus 5.10.7 on Skip; 7.3 (a prompt chip per speed segment instead of one cycle chip); 5.10.3 (three avatars side by side at 4x); a Surge avatar edge rank; combat visuals for UnitDowned, Draw, Victory and Defeat; the 16 and 24 px numeral cuts (8.9); a dark intent-glyph slot frame for a stunned enemy.
+- System 28 (`design/gdd/door-and-room-panels-ui.md`, 2026-11-13) asks for amendments, pending art-director approval: 7.3 (action strip and right-column rows for the claim, the shelf, the step cluster with receipts and the Skip button); 7.9 (popup placement under the shelf; the popup width is 144 in the 7.7 test and 152 in 7.9); 7.10 (rewrite the door card anatomy to the 131 of 132 px budget, add Reward and BuffClaim subsections, the Purple cue decision); 7.11 (pedestal claim and plate element notes); 7.12 (rows for the shelf reveal, the claim and the pivot); 7.8 (glyph budget with 3 to 4 direction tags); 7.13 (Large layout); and a check of frame thickness in 3.4.4 and 8.8, which the System 28 budget assumed.
 
 ## 8. Asset Standards
 
@@ -3061,6 +3063,7 @@ The user named no film, book, music, artist or other non-game source. None is re
 2. The user answers any of the three questions in 9.6.
 3. Whether any reference notes or images are stored in the project, and where. Rule 3 forbids storing the screenshots in `assets/`. A path under `design/art/` has not been decided.
 4. Confirm the Dead Cells principles against the full developer post before external quotation.
+5. System 7 (`design/gdd/localization-and-text.md`, 2026-11-13) asks for amendments, pending art-director approval: 7.5 shows "1.2K" and 7.7 lists K and M and writes "12x3" (numbers use digit grouping only, no K or M, and `×` U+00D7 for hits); add a missing-string form (a bracketed key in Fog) and a missing-glyph form (a 5 x 7 hollow box) under 7.7; define a line pitch for the Large cuts and a 20 numeral cut; 7.13 still says `accessibility-requirements.md` does not exist (it now exists as a draft).
 
 ### 9.9 Alternatives considered
 

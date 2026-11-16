@@ -25,11 +25,16 @@ namespace Project05.CombatScene
         private int _currency = 120;
         private int _speedIndex;
         private bool _skipRequested;
+        private bool _paused;
 
         public bool IsPlaying { get; private set; }
         public int SpeedIndex => _speedIndex;
 
         public event Action<CombatResult> PlaybackCompleted;
+
+        public void SetPaused(bool paused) => _paused = paused;
+
+        public void SetSpeedIndex(int index) => HandleSpeedRequested(index);
 
         public void Initialize(CombatHudView hud)
         {
@@ -51,7 +56,7 @@ namespace Project05.CombatScene
 
         private void Update()
         {
-            if (!IsPlaying) return;
+            if (!IsPlaying || _paused) return;
             if (Keyboard.current != null && Keyboard.current.tabKey.wasPressedThisFrame)
             {
                 HandleSpeedRequested((_speedIndex + 1) % 4);
@@ -102,6 +107,7 @@ namespace Project05.CombatScene
 
         public void HandleSpeedRequested(int index)
         {
+            if (_paused) return;
             _speedIndex = Mathf.Clamp(index, 0, 3);
             if (_speedIndex == 3 && IsPlaying)
             {
@@ -146,7 +152,7 @@ namespace Project05.CombatScene
                 float elapsed = 0f;
                 while (elapsed < wait && !_skipRequested)
                 {
-                    elapsed += Time.unscaledDeltaTime;
+                    if (!_paused) elapsed += Time.unscaledDeltaTime;
                     yield return null;
                 }
             }

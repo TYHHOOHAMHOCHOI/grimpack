@@ -175,8 +175,8 @@ If the owner is stunned on `a = 3`, `IT-A` stays ready and fires on `a = 4` (the
 | 12 Combat Resolution | Peer | Hard | The call order of Rule 5, the pre-fight action, skip results, the 200 limit. | Updated. |
 | 36 Combat State and Step Model | Upstream | Hard | Stores `a` and `nextReadyAt`; the data model of Rule 2. | Updated. |
 | 13 Status Effects | Peer | Hard (provisional) | The stun status; status IDs in reaction patterns. | Updated. |
-| 25 Backpack UI | Downstream | Hard | Forecast, numerals, cooldown numbers, remaining waits. | Not designed. |
-| 26 Hover Popup | Downstream | Soft | Trigger text for the popup. | Not designed. |
+| 25 Backpack UI | Downstream | Hard | Forecast, numerals, cooldown numbers, remaining waits. | Designed, pending review. |
+| 26 Hover Popup | Downstream | Soft | Trigger text and cooldown/source breakdown for the popup. | Designed, pending review; in-combat reaction-readiness inspection remains blocked on the presentation/state contract. |
 | 35 Balance Simulation Harness | Downstream | Soft | Calls `Forecast`. | Not designed. |
 | 15 Party and Heroes | Peer | Soft | Party slot; stat bonuses from passive items (`hpBonus`, `speedBonus`); each hero's innate item. System 15 is Designed ([party-and-heroes.md](party-and-heroes.md), pending review). | Present (System 15, Dependencies). |
 | 14 Enemy and Intent | None | n/a | Enemy actions are System 14's; this system never schedules them. | No change. |

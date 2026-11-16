@@ -27,8 +27,11 @@ namespace Project05.UI.Hud
         /// <summary>Height of the stage scene area, in native px.</summary>
         public const int StageHeight = 314;
 
-        /// <summary>Horizontal centre of enemy line 1; line 2 is 140 px to the right.</summary>
-        public const int Line1Center = 384;
+        /// <summary>Horizontal centre of the enemy column (between the section line at 314 and the frame edge at 637).</summary>
+        public const int ColumnCenter = 476;
+
+        /// <summary>Distance between the centres of enemy line 1 and line 2.</summary>
+        public const int LineGap = 140;
 
         [SerializeField] private HudSpriteSet sprites;
         [SerializeField] private HeroSlotView[] heroes = Array.Empty<HeroSlotView>();
@@ -42,6 +45,12 @@ namespace Project05.UI.Hud
 
         /// <summary>The speed control, so playback can listen to it.</summary>
         public SpeedControlView Speed => speed;
+
+        /// <summary>The sprite set the HUD draws with.</summary>
+        public HudSpriteSet Sprites => sprites;
+
+        /// <summary>Redraws only the currency readout.</summary>
+        public void SetCurrency(int value) => currency.Text = value.ToString();
 
         /// <summary>Draws a full HUD state.</summary>
         public void Apply(CombatHudData data)
@@ -71,8 +80,11 @@ namespace Project05.UI.Hud
         /// </summary>
         public void LayoutEnemies(CombatHudData data)
         {
+            // One line stands in the middle of the enemy column; two lines share it, one either side of the middle.
+            bool twoLines = Slot(data, 3) != null || Slot(data, 4) != null || Slot(data, 5) != null;
             for (int line = 0; line < 2; line++)
             {
+                float centreX = twoLines ? ColumnCenter + LineGap * (line - 0.5f) : ColumnCenter;
                 int total = 0;
                 for (int k = 0; k < 3; k++)
                 {
@@ -87,7 +99,7 @@ namespace Project05.UI.Hud
                     EnemySlotData e = Slot(data, index);
                     if (e == null) continue;
                     var rt = (RectTransform)enemies[index].transform;
-                    rt.anchoredPosition = new Vector2(Line1Center + 140 * line, -y);
+                    rt.anchoredPosition = new Vector2(centreX, -y);
                     y += EnemySlotView.Pitch(sprites.monsters[e.Visual].bodyHeight);
                 }
             }

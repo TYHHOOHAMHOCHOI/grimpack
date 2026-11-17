@@ -264,6 +264,11 @@ namespace Project05.CombatCore
         public IReadOnlyList<string> StartingItems { get; }
         public string SignatureItemId { get; }
         public InnateItemDef InnateItem { get; }
+        /// <summary>
+        /// Where each starting item sits in the starting grid (balance-three-item-start.md): one entry per starting item,
+        /// X = -1 when the data gives no cell (the item is then auto-placed).
+        /// </summary>
+        public IReadOnlyList<StartingPlacement> StartingLayout { get; }
 
         public HeroDef(
             string id,
@@ -278,7 +283,8 @@ namespace Project05.CombatCore
             BackpackProfileDef backpackProfile,
             IReadOnlyList<string> startingItems,
             string signatureItemId,
-            InnateItemDef innateItem)
+            InnateItemDef innateItem,
+            IReadOnlyList<StartingPlacement> startingLayout = null)
         {
             Id = id ?? string.Empty;
             Art = art ?? string.Empty;
@@ -293,6 +299,49 @@ namespace Project05.CombatCore
             StartingItems = startingItems ?? Array.Empty<string>();
             SignatureItemId = signatureItemId ?? string.Empty;
             InnateItem = innateItem;
+            StartingLayout = startingLayout ?? Array.Empty<StartingPlacement>();
+        }
+    }
+
+    /// <summary>A starting item's cell and quarter turns in the hero's starting grid (X = -1: auto-place).</summary>
+    public readonly struct StartingPlacement
+    {
+        public readonly string ItemId;
+        public readonly int X;
+        public readonly int Y;
+        public readonly int Rotation;
+
+        public StartingPlacement(string itemId, int x, int y, int rotation)
+        {
+            ItemId = itemId ?? string.Empty;
+            X = x;
+            Y = y;
+            Rotation = rotation;
+        }
+    }
+
+    /// <summary>
+    /// A fusion recipe (design/gdd/item-fusion.md Rule 1): 2 or 3 base ingredient items become one Gold-tier result at
+    /// the Fusion Door. An ingredient may be named twice. Immutable.
+    /// </summary>
+    public sealed class RecipeDef
+    {
+        public string Id { get; }
+
+        /// <summary>The base item ids consumed, in authored order (never + items).</summary>
+        public IReadOnlyList<string> Ingredients { get; }
+
+        /// <summary>The fused item created.</summary>
+        public string ResultId { get; }
+
+        /// <summary>How many items the recipe consumes (2 or 3); the fusion cost depends on it.</summary>
+        public int Size => Ingredients.Count;
+
+        public RecipeDef(string id, IReadOnlyList<string> ingredients, string resultId)
+        {
+            Id = id ?? string.Empty;
+            Ingredients = ingredients ?? Array.Empty<string>();
+            ResultId = resultId ?? string.Empty;
         }
     }
 

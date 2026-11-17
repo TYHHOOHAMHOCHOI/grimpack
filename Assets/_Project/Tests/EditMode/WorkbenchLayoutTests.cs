@@ -16,7 +16,7 @@ namespace Project05.Tests.EditMode
             WorkbenchRects r = WorkbenchLayout.For(size);
 
             float gridBottom = r.GridOrigin.y + size * WorkbenchLayout.Cell;
-            float stashBottom = r.StashOrigin.y + WorkbenchLayout.Stash * WorkbenchLayout.Cell;
+            float stashBottom = r.StashOrigin.y + WorkbenchLayout.StashRows * WorkbenchLayout.Cell;
             Assert.Greater(r.SectionLineY, gridBottom);
             Assert.Greater(r.StashOrigin.y, r.StashLabelY + 11);
             Assert.LessOrEqual(stashBottom, WorkbenchLayout.Bottom);

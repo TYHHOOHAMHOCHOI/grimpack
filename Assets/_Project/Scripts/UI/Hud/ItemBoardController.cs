@@ -101,6 +101,43 @@ namespace Project05.UI.Hud
         /// <summary>Raised whenever items on the board change (move, rotate, sell, or spawn).</summary>
         public event Action BoardChanged;
 
+        private UnityEngine.UI.Image _hoverRing;
+
+        /// <summary>P-01: a 1 px Candle ring, 1 px gap, around the hovered plate (at once, before the popup).</summary>
+        public void HoverEnter(ItemHoverTarget target)
+        {
+            if (Feedback == null || target == null || _held != null) return;
+            if (_hoverRing == null)
+            {
+                var go = new GameObject("HoverRing", typeof(RectTransform), typeof(UnityEngine.UI.Image));
+                _hoverRing = go.GetComponent<UnityEngine.UI.Image>();
+                _hoverRing.type = UnityEngine.UI.Image.Type.Sliced;
+                _hoverRing.raycastTarget = false;
+            }
+
+            _hoverRing.transform.SetParent(target.transform, false);
+            var rt = _hoverRing.rectTransform;
+            rt.anchorMin = Vector2.zero;
+            rt.anchorMax = Vector2.one;
+            rt.offsetMin = new Vector2(-2f, -2f);
+            rt.offsetMax = new Vector2(2f, 2f);
+            if (hoverRingSprite != null) _hoverRing.sprite = hoverRingSprite;
+            _hoverRing.enabled = hoverRingSprite != null;
+            _hoverRing.transform.SetAsLastSibling();
+        }
+
+        /// <summary>Hides the hover ring.</summary>
+        public void HoverExit(ItemHoverTarget target)
+        {
+            if (_hoverRing != null && (target == null || _hoverRing.transform.parent == target.transform)) _hoverRing.enabled = false;
+        }
+
+        /// <summary>The ring sprite for P-01 (the generated kit), set by the scene.</summary>
+        public Sprite hoverRingSprite { get; set; }
+
+        /// <summary>Reactions to the player's actions (feedback-motion.md P-01 to P-12); null in tests.</summary>
+        public Project05.UI.Motion.FeedbackFx Feedback { get; set; }
+
         /// <summary>When true (during combat playback), picking up or moving items is disabled.</summary>
         public bool InputLocked { get; set; }
 
@@ -216,7 +253,10 @@ namespace Project05.UI.Hud
             Sprite plateSprite,
             Sprite iconSprite,
             string preferredContainer,
-            out ItemHoverTarget spawned)
+            out ItemHoverTarget spawned,
+            int atX = -1,
+            int atY = -1,
+            int atRotation = 0)
         {
             spawned = null;
             if (record == null || plateSprite == null) return false;
@@ -227,10 +267,21 @@ namespace Project05.UI.Hud
             int chosenY = 0;
             int chosenRot = 0;
 
+            // A requested cell (a hero's starting layout) wins when it is free; otherwise the first free spot is used.
+            if (atX >= 0 && atY >= 0 && !string.IsNullOrEmpty(preferredContainer) && FindView(preferredContainer) != null &&
+                _board.Check(new BoardItem { Id = -1, Record = record, Container = preferredContainer }, preferredContainer, atX, atY, atRotation) == PlaceResult.Ok)
+            {
+                chosenContainer = preferredContainer;
+                chosenX = atX;
+                chosenY = atY;
+                chosenRot = atRotation;
+            }
+
             string fallback = preferredContainer == "stash" ? "grid" : "stash";
             string[] tryOrder = { preferredContainer, fallback };
             foreach (string cid in tryOrder)
             {
+                if (chosenContainer != null) break;
                 if (string.IsNullOrEmpty(cid)) continue;
                 ContainerView view = FindView(cid);
                 if (view == null) continue;
@@ -345,12 +396,14 @@ namespace Project05.UI.Hud
             if (_held == null && _map.TryGetValue(target, out BoardItem pinned) && pinned.Pinned)
             {
                 PinnedRefused?.Invoke();   // a cursed item never leaves its cells
+                Feedback?.Shudder(target.Rect);   // P-08
                 return;
             }
 
             if (_held != null || !_map.TryGetValue(target, out _heldItem)) return;
 
             _held = target;
+            HoverExit(null);
             _gesture.Picked(Time.frameCount, byClick);
             _origin = (_heldItem.Container, _heldItem.X, _heldItem.Y, _heldItem.Rotation);
             _heldRotation = _heldItem.Rotation;
@@ -401,7 +454,10 @@ namespace Project05.UI.Hud
                 _board.Move(_heldItem, _origin.container, _origin.x, _origin.y, _origin.rot);
             }
 
+            ItemHoverTarget landed = _held;
+            Vector2 from = landed.Rect.anchoredPosition;
             End();
+            Land(landed, from, result == PlaceResult.Ok);
             BoardChanged?.Invoke();
         }
 
@@ -410,7 +466,33 @@ namespace Project05.UI.Hud
         {
             if (_held == null) return;
             _board.Move(_heldItem, _origin.container, _origin.x, _origin.y, _origin.rot);
+            ItemHoverTarget back = _held;
+            Vector2 from = back.Rect.anchoredPosition;
             End();
+            Land(back, from, false);
+        }
+
+        /// <summary>
+        /// P-06 / P-07: the plate slides from where it was held to its cells (83 ms) and thunks, or returns (150 ms) and
+        /// shudders. Logic already changed; this only presents it.
+        /// </summary>
+        private void Land(ItemHoverTarget target, Vector2 from, bool ok)
+        {
+            if (Feedback == null || target == null) return;
+            RectTransform rt = target.Rect;
+            Vector2 to = rt.anchoredPosition;
+            if (ok)
+            {
+                Feedback.Motion.MoveFrom(rt, from, to, 0.083f, Project05.UI.Motion.Ease.OutQuad, () =>
+                {
+                    Feedback.Thunk(rt);
+                    Feedback.RingPulse(rt, 0.15f);
+                });
+            }
+            else
+            {
+                Feedback.Motion.MoveFrom(rt, from, to, 0.15f, Project05.UI.Motion.Ease.OutQuad, () => Feedback.Shudder(rt));
+            }
         }
 
         private void End()
@@ -439,6 +521,7 @@ namespace Project05.UI.Hud
             RestoreParent();
             _held.gameObject.SetActive(false);
             Release();
+            if (Feedback != null && sellArea != null) Feedback.CoinSpray(SellRect().center, price);   // P-10
             ItemSold?.Invoke(record, price);
             BoardChanged?.Invoke();
         }
@@ -465,6 +548,7 @@ namespace Project05.UI.Hud
             {
                 Cancel();
                 forgeZone?.Show(ForgeZoneState.Refused, quote);
+                if (Feedback != null && forgeArea != null) Feedback.Shudder(forgeArea);   // P-12
                 return;
             }
 
@@ -477,6 +561,14 @@ namespace Project05.UI.Hud
             target.Configure(quote.Upgrade.id, item.Container, item.X, item.Y, item.Rotation, this, popup);
             AddPlusBadge(target);
             forgeZone?.Strike();
+            if (Feedback != null)
+            {
+                // P-11: sparks from the anvil, the plate glows twice, the + badge drops 2 px into place
+                if (forgeArea != null) Feedback.Sparks(FrameMath.RectOf(forgeArea, safeFrame).center - new Vector2(0f, 30f));
+                Feedback.RingPulse(target.Rect, 0.1f, 2);
+                if (target.transform.Find("PlusBadge") is RectTransform badge)
+                    Feedback.Motion.MoveFrom(badge, badge.anchoredPosition + new Vector2(0f, 2f), badge.anchoredPosition, 0.05f);
+            }
             ItemUpgraded?.Invoke(from, quote.Upgrade, quote.Cost);
             BoardChanged?.Invoke();
         }
@@ -848,6 +940,86 @@ namespace Project05.UI.Hud
             BoardChanged?.Invoke();
         }
 
+        /// <summary>
+        /// Takes one item off the board (a fusion ingredient, item-fusion.md Rule 8). With keepPlate its plate stays in
+        /// the scene, inert, so the caller can fly it away and destroy it; otherwise the plate is destroyed. Returns the
+        /// plate, or null when the item is not on the board.
+        /// </summary>
+        public RectTransform TakeOff(BoardItem item, bool keepPlate)
+        {
+            EnsureBoard();
+            ItemHoverTarget target = null;
+            foreach (KeyValuePair<ItemHoverTarget, BoardItem> pair in _map)
+            {
+                if (pair.Value != item) continue;
+                target = pair.Key;
+                break;
+            }
+
+            if (target == null) return null;
+            _board.Remove(item);
+            _map.Remove(target);
+            HoverExit(target);
+            RectTransform plate = target.Rect;
+            if (keepPlate && target != null)
+            {
+                var button = target.GetComponent<Button>();
+                if (button != null) button.enabled = false;
+                foreach (Graphic g in target.GetComponentsInChildren<Graphic>(true)) g.raycastTarget = false;
+                target.enabled = false;
+            }
+            else if (target != null)
+            {
+                target.gameObject.SetActive(false);
+                if (Application.isPlaying) Destroy(target.gameObject);
+                else DestroyImmediate(target.gameObject);
+                plate = null;
+            }
+
+            _separatorsDirty = true;
+            BoardChanged?.Invoke();
+            return plate;
+        }
+
+        private readonly List<Image> _marks = new List<Image>();
+
+        /// <summary>Rings the plates of the given items (the fusion ingredients that would be consumed); null clears.</summary>
+        public void MarkItems(IEnumerable<BoardItem> marked)
+        {
+            foreach (Image m in _marks)
+            {
+                if (m != null) m.enabled = false;
+            }
+
+            if (marked == null || hoverRingSprite == null) return;
+            int used = 0;
+            foreach (BoardItem item in marked)
+            {
+                RectTransform plate = PlateOf(item);
+                if (plate == null) continue;
+                if (used >= _marks.Count || _marks[used] == null)
+                {
+                    var go = new GameObject("FusionMark", typeof(RectTransform), typeof(Image));
+                    Image img = go.GetComponent<Image>();
+                    img.type = Image.Type.Sliced;
+                    img.raycastTarget = false;
+                    if (used >= _marks.Count) _marks.Add(img);
+                    else _marks[used] = img;
+                }
+
+                Image ring = _marks[used++];
+                ring.sprite = hoverRingSprite;
+                ring.transform.SetParent(plate, false);
+                var rt = ring.rectTransform;
+                rt.anchorMin = Vector2.zero;
+                rt.anchorMax = Vector2.one;
+                rt.offsetMin = new Vector2(-2f, -2f);
+                rt.offsetMax = new Vector2(2f, 2f);
+                ring.enabled = true;
+                ring.transform.SetAsLastSibling();
+            }
+        }
+
         /// <summary>The plate of a board item, or null.</summary>
         public RectTransform PlateOf(BoardItem item)
         {
@@ -865,6 +1037,18 @@ namespace Project05.UI.Hud
             if (!_separatorsDirty || _board == null) return;
             _separatorsDirty = false;
             RebuildSeparators();
+            if (workbench != null)
+            {
+                bool empty = true;
+                foreach (BoardItem item in _map.Values)
+                {
+                    if (item.Container != "stash") continue;
+                    empty = false;
+                    break;
+                }
+
+                workbench.SetStashEmpty(empty && _held == null);
+            }
         }
 
         /// <summary>

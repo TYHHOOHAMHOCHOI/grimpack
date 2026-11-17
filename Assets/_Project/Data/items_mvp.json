@@ -4432,6 +4432,666 @@
    "flavorVi": "Một hồi chuông vang, mọi vết thương cùng cộng hưởng.",
    "flavorEn": "One toll, and every affliction rings together.",
    "upgradeOf": "item_resonant_bell"
+  },
+  {
+   "id": "item_honed_sword",
+   "art": "honed-sword",
+   "tier": "Gold",
+   "footprint": "1x3",
+   "cells": [
+    {
+     "x": 0,
+     "y": 0
+    },
+    {
+     "x": 0,
+     "y": 1
+    },
+    {
+     "x": 0,
+     "y": 2
+    }
+   ],
+   "tags": [
+    "weapon",
+    "blade"
+   ],
+   "trigger": {
+    "kind": "Cooldown",
+    "n": 2,
+    "s": 0,
+    "eventKind": "",
+    "eventStatus": "",
+    "eventSide": ""
+   },
+   "effects": [
+    {
+     "kind": "Damage",
+     "target": "FirstEnemy",
+     "base": 28,
+     "status": "",
+     "amount": 0,
+     "units": 0,
+     "perUnit": 0
+    }
+   ],
+   "hpBonus": 0,
+   "speedBonus": 0,
+   "synergy": [],
+   "nameVi": "Kiếm Mài Bén",
+   "nameEn": "Honed Sword",
+   "flavorVi": "Lưỡi kiếm và hòn đá đã thành một.",
+   "flavorEn": "Blade and stone, now one edge."
+  },
+  {
+   "id": "item_thornwall",
+   "art": "thornwall",
+   "tier": "Gold",
+   "footprint": "1x2",
+   "cells": [
+    {
+     "x": 0,
+     "y": 0
+    },
+    {
+     "x": 0,
+     "y": 1
+    }
+   ],
+   "tags": [
+    "armour",
+    "shield"
+   ],
+   "trigger": {
+    "kind": "Cooldown",
+    "n": 2,
+    "s": 0,
+    "eventKind": "",
+    "eventStatus": "",
+    "eventSide": ""
+   },
+   "effects": [
+    {
+     "kind": "ShieldGain",
+     "target": "Self",
+     "base": 0,
+     "status": "",
+     "amount": 24,
+     "units": 0,
+     "perUnit": 0
+    },
+    {
+     "kind": "Damage",
+     "target": "FirstEnemy",
+     "base": 10,
+     "status": "",
+     "amount": 0,
+     "units": 0,
+     "perUnit": 0
+    }
+   ],
+   "hpBonus": 0,
+   "speedBonus": 0,
+   "synergy": [],
+   "nameVi": "Khiên Gai Kép",
+   "nameEn": "Thornwall",
+   "flavorVi": "Hai tấm khiên ghép lại, gai chĩa ra mọi phía.",
+   "flavorEn": "Two shields bound as one, spikes on every side."
+  },
+  {
+   "id": "item_twin_axe",
+   "art": "twin-axe",
+   "tier": "Gold",
+   "footprint": "l",
+   "cells": [
+    {
+     "x": 0,
+     "y": 0
+    },
+    {
+     "x": 1,
+     "y": 0
+    },
+    {
+     "x": 0,
+     "y": 1
+    }
+   ],
+   "tags": [
+    "weapon",
+    "axe",
+    "blade"
+   ],
+   "trigger": {
+    "kind": "Cooldown",
+    "n": 2,
+    "s": 0,
+    "eventKind": "",
+    "eventStatus": "",
+    "eventSide": ""
+   },
+   "effects": [
+    {
+     "kind": "Damage",
+     "target": "FirstEnemy",
+     "base": 38,
+     "status": "",
+     "amount": 0,
+     "units": 0,
+     "perUnit": 0
+    }
+   ],
+   "hpBonus": 0,
+   "speedBonus": 0,
+   "synergy": [],
+   "nameVi": "Rìu Song Nhận",
+   "nameEn": "Twin Axe",
+   "flavorVi": "Một cán, hai lưỡi, không lúc nào ngơi.",
+   "flavorEn": "One haft, two edges, never idle."
+  },
+  {
+   "id": "item_venom_dart",
+   "art": "venom-dart",
+   "tier": "Gold",
+   "footprint": "1x1",
+   "cells": [
+    {
+     "x": 0,
+     "y": 0
+    }
+   ],
+   "tags": [
+    "weapon",
+    "ranged",
+    "affliction"
+   ],
+   "trigger": {
+    "kind": "Cooldown",
+    "n": 1,
+    "s": 0,
+    "eventKind": "",
+    "eventStatus": "",
+    "eventSide": ""
+   },
+   "effects": [
+    {
+     "kind": "Damage",
+     "target": "FirstEnemy",
+     "base": 7,
+     "status": "",
+     "amount": 0,
+     "units": 0,
+     "perUnit": 0
+    },
+    {
+     "kind": "ApplyStatus",
+     "target": "FirstEnemy",
+     "base": 0,
+     "status": "poison",
+     "amount": 7,
+     "units": 0,
+     "perUnit": 0
+    }
+   ],
+   "hpBonus": 0,
+   "speedBonus": 0,
+   "synergy": [],
+   "nameVi": "Phi Tiêu Kịch Độc",
+   "nameEn": "Venom Dart",
+   "flavorVi": "Mũi gai ngâm cả lọ độc, chạm là thấm.",
+   "flavorEn": "A thorn steeped in the whole vial."
+  },
+  {
+   "id": "item_firebomb",
+   "art": "firebomb",
+   "tier": "Gold",
+   "footprint": "1x2",
+   "cells": [
+    {
+     "x": 0,
+     "y": 0
+    },
+    {
+     "x": 0,
+     "y": 1
+    }
+   ],
+   "tags": [
+    "affliction",
+    "potion"
+   ],
+   "trigger": {
+    "kind": "Cooldown",
+    "n": 2,
+    "s": 0,
+    "eventKind": "",
+    "eventStatus": "",
+    "eventSide": ""
+   },
+   "effects": [
+    {
+     "kind": "ApplyStatus",
+     "target": "FirstEnemy",
+     "base": 0,
+     "status": "burn",
+     "amount": 8,
+     "units": 0,
+     "perUnit": 0
+    },
+    {
+     "kind": "ApplyStatus",
+     "target": "AllEnemies",
+     "base": 0,
+     "status": "burn",
+     "amount": 4,
+     "units": 0,
+     "perUnit": 0
+    }
+   ],
+   "hpBonus": 0,
+   "speedBonus": 0,
+   "synergy": [],
+   "nameVi": "Bom Dầu Lửa",
+   "nameEn": "Firebomb",
+   "flavorVi": "Than hồng nhét vào bình dầu, ném là cháy lan.",
+   "flavorEn": "An ember sealed in oil; thrown, it spreads."
+  },
+  {
+   "id": "item_venom_crossbow",
+   "art": "venom-crossbow",
+   "tier": "Gold",
+   "footprint": "2x1",
+   "cells": [
+    {
+     "x": 0,
+     "y": 0
+    },
+    {
+     "x": 1,
+     "y": 0
+    }
+   ],
+   "tags": [
+    "weapon",
+    "ranged",
+    "affliction"
+   ],
+   "trigger": {
+    "kind": "Cooldown",
+    "n": 2,
+    "s": 0,
+    "eventKind": "",
+    "eventStatus": "",
+    "eventSide": ""
+   },
+   "effects": [
+    {
+     "kind": "Damage",
+     "target": "FirstEnemy",
+     "base": 32,
+     "status": "",
+     "amount": 0,
+     "units": 0,
+     "perUnit": 0
+    },
+    {
+     "kind": "ApplyStatus",
+     "target": "FirstEnemy",
+     "base": 0,
+     "status": "poison",
+     "amount": 13,
+     "units": 0,
+     "perUnit": 0
+    }
+   ],
+   "hpBonus": 0,
+   "speedBonus": 0,
+   "synergy": [],
+   "nameVi": "Nỏ Gai Độc",
+   "nameEn": "Venom Crossbow",
+   "flavorVi": "Tên nỏ tẩm nhựa gai, trúng là rỉ độc.",
+   "flavorEn": "Bolts dipped in thorn sap; every hit seeps."
+  },
+  {
+   "id": "item_lullaby_bell",
+   "art": "lullaby-bell",
+   "tier": "Gold",
+   "footprint": "1x2",
+   "cells": [
+    {
+     "x": 0,
+     "y": 0
+    },
+    {
+     "x": 0,
+     "y": 1
+    }
+   ],
+   "tags": [
+    "affliction",
+    "bell"
+   ],
+   "trigger": {
+    "kind": "Cooldown",
+    "n": 2,
+    "s": 0,
+    "eventKind": "",
+    "eventStatus": "",
+    "eventSide": ""
+   },
+   "effects": [
+    {
+     "kind": "ApplyStatus",
+     "target": "FirstEnemy",
+     "base": 0,
+     "status": "slow",
+     "amount": 5,
+     "units": 0,
+     "perUnit": 0
+    },
+    {
+     "kind": "ApplyStatus",
+     "target": "FirstEnemy",
+     "base": 0,
+     "status": "weaken",
+     "amount": 5,
+     "units": 0,
+     "perUnit": 0
+    }
+   ],
+   "hpBonus": 0,
+   "speedBonus": 0,
+   "synergy": [],
+   "nameVi": "Chuông Ru",
+   "nameEn": "Lullaby Bell",
+   "flavorVi": "Tiếng chuông sau chiếc mặt nạ, nghe là rã rời.",
+   "flavorEn": "A bell behind a mask; hear it and wilt."
+  },
+  {
+   "id": "item_elixir",
+   "art": "elixir",
+   "tier": "Gold",
+   "footprint": "1x1",
+   "cells": [
+    {
+     "x": 0,
+     "y": 0
+    }
+   ],
+   "tags": [
+    "potion",
+    "heal"
+   ],
+   "trigger": {
+    "kind": "Cooldown",
+    "n": 3,
+    "s": 0,
+    "eventKind": "",
+    "eventStatus": "",
+    "eventSide": ""
+   },
+   "effects": [
+    {
+     "kind": "Heal",
+     "target": "Self",
+     "base": 0,
+     "status": "",
+     "amount": 25,
+     "units": 0,
+     "perUnit": 0
+    },
+    {
+     "kind": "ShieldGain",
+     "target": "Self",
+     "base": 0,
+     "status": "",
+     "amount": 13,
+     "units": 0,
+     "perUnit": 0
+    }
+   ],
+   "hpBonus": 0,
+   "speedBonus": 0,
+   "synergy": [],
+   "nameVi": "Huyết Dược Cô Đặc",
+   "nameEn": "Elixir",
+   "flavorVi": "Cô lại ba lần, một giọt bằng cả lọ.",
+   "flavorEn": "Boiled down thrice; one drop is a whole vial."
+  },
+  {
+   "id": "item_oathkeeper",
+   "art": "oathkeeper",
+   "tier": "Gold",
+   "footprint": "1x3",
+   "cells": [
+    {
+     "x": 0,
+     "y": 0
+    },
+    {
+     "x": 0,
+     "y": 1
+    },
+    {
+     "x": 0,
+     "y": 2
+    }
+   ],
+   "tags": [
+    "weapon",
+    "blade",
+    "shield"
+   ],
+   "trigger": {
+    "kind": "Cooldown",
+    "n": 2,
+    "s": 0,
+    "eventKind": "",
+    "eventStatus": "",
+    "eventSide": ""
+   },
+   "effects": [
+    {
+     "kind": "Damage",
+     "target": "FirstEnemy",
+     "base": 36,
+     "status": "",
+     "amount": 0,
+     "units": 0,
+     "perUnit": 0
+    },
+    {
+     "kind": "ShieldGain",
+     "target": "Self",
+     "base": 0,
+     "status": "",
+     "amount": 29,
+     "units": 0,
+     "perUnit": 0
+    }
+   ],
+   "hpBonus": 0,
+   "speedBonus": 0,
+   "synergy": [],
+   "nameVi": "Kiếm Thánh Thệ",
+   "nameEn": "Oathkeeper",
+   "flavorVi": "Lời thề, tấm khiên và trái tim rèn chung một lưỡi.",
+   "flavorEn": "Oath, shield and heart forged into one blade."
+  },
+  {
+   "id": "item_plague_heart",
+   "art": "plague-heart",
+   "tier": "Gold",
+   "footprint": "1x2",
+   "cells": [
+    {
+     "x": 0,
+     "y": 0
+    },
+    {
+     "x": 0,
+     "y": 1
+    }
+   ],
+   "tags": [
+    "detonator",
+    "alchemy",
+    "affliction"
+   ],
+   "trigger": {
+    "kind": "Cooldown",
+    "n": 3,
+    "s": 0,
+    "eventKind": "",
+    "eventStatus": "",
+    "eventSide": ""
+   },
+   "effects": [
+    {
+     "kind": "ApplyStatus",
+     "target": "AllEnemies",
+     "base": 0,
+     "status": "poison",
+     "amount": 7,
+     "units": 0,
+     "perUnit": 0
+    },
+    {
+     "kind": "DetonateAll",
+     "target": "AllEnemies",
+     "base": 0,
+     "status": "",
+     "amount": 0,
+     "units": 0,
+     "perUnit": 0
+    }
+   ],
+   "hpBonus": 0,
+   "speedBonus": 0,
+   "synergy": [
+    {
+     "targetTags": [
+      "affliction"
+     ],
+     "kind": "StatusAmount",
+     "amount": 1,
+     "statusId": ""
+    }
+   ],
+   "nameVi": "Tim Dịch Hạch",
+   "nameEn": "Plague Heart",
+   "flavorVi": "Xúc tác đập như tim, mỗi nhịp một cơn dịch.",
+   "flavorEn": "The catalyst beats like a heart; every beat, a plague."
+  },
+  {
+   "id": "item_everfrost_maul",
+   "art": "everfrost-maul",
+   "tier": "Gold",
+   "footprint": "2x2",
+   "cells": [
+    {
+     "x": 0,
+     "y": 0
+    },
+    {
+     "x": 1,
+     "y": 0
+    },
+    {
+     "x": 0,
+     "y": 1
+    },
+    {
+     "x": 1,
+     "y": 1
+    }
+   ],
+   "tags": [
+    "weapon",
+    "blunt",
+    "affliction"
+   ],
+   "trigger": {
+    "kind": "Cooldown",
+    "n": 2,
+    "s": 0,
+    "eventKind": "",
+    "eventStatus": "",
+    "eventSide": ""
+   },
+   "effects": [
+    {
+     "kind": "Damage",
+     "target": "AllEnemies",
+     "base": 67,
+     "status": "",
+     "amount": 0,
+     "units": 0,
+     "perUnit": 0
+    },
+    {
+     "kind": "ApplyStatus",
+     "target": "AllEnemies",
+     "base": 0,
+     "status": "frost",
+     "amount": 4,
+     "units": 0,
+     "perUnit": 0
+    }
+   ],
+   "hpBonus": 0,
+   "speedBonus": 0,
+   "synergy": [],
+   "nameVi": "Chùy Băng Vĩnh Cửu",
+   "nameEn": "Everfrost Maul",
+   "flavorVi": "Băng ba lớp không bao giờ tan.",
+   "flavorEn": "Three layers of ice that never thaw."
+  },
+  {
+   "id": "item_storm_crossbow",
+   "art": "storm-crossbow",
+   "tier": "Gold",
+   "footprint": "2x1",
+   "cells": [
+    {
+     "x": 0,
+     "y": 0
+    },
+    {
+     "x": 1,
+     "y": 0
+    }
+   ],
+   "tags": [
+    "weapon",
+    "ranged"
+   ],
+   "trigger": {
+    "kind": "Cooldown",
+    "n": 1,
+    "s": 0,
+    "eventKind": "",
+    "eventStatus": "",
+    "eventSide": ""
+   },
+   "effects": [
+    {
+     "kind": "Damage",
+     "target": "FirstEnemy",
+     "base": 24,
+     "status": "",
+     "amount": 0,
+     "units": 0,
+     "perUnit": 0
+    }
+   ],
+   "hpBonus": 0,
+   "speedBonus": 0,
+   "synergy": [],
+   "nameVi": "Nỏ Cuồng Phong",
+   "nameEn": "Storm Crossbow",
+   "flavorVi": "Dây nỏ kéo bằng gió, cát chảy ngược để bắn lại.",
+   "flavorEn": "Strung with wind; the sand runs back to fire again."
   }
  ],
  "statuses": [
@@ -4524,6 +5184,108 @@
    "detonateValue": 0,
    "nameVi": "Đóng Băng",
    "nameEn": "Frozen"
+  }
+ ],
+ "recipes": [
+  {
+   "id": "recipe_honed_sword",
+   "ingredients": [
+    "item_iron_sword",
+    "item_whetstone"
+   ],
+   "result": "item_honed_sword"
+  },
+  {
+   "id": "recipe_thornwall",
+   "ingredients": [
+    "item_spiked_buckler",
+    "item_oak_buckler"
+   ],
+   "result": "item_thornwall"
+  },
+  {
+   "id": "recipe_twin_axe",
+   "ingredients": [
+    "item_hand_axe",
+    "item_dagger"
+   ],
+   "result": "item_twin_axe"
+  },
+  {
+   "id": "recipe_venom_dart",
+   "ingredients": [
+    "item_thorn_dart",
+    "item_venom_vial"
+   ],
+   "result": "item_venom_dart"
+  },
+  {
+   "id": "recipe_firebomb",
+   "ingredients": [
+    "item_ember_charm",
+    "item_oil_flask"
+   ],
+   "result": "item_firebomb"
+  },
+  {
+   "id": "recipe_venom_crossbow",
+   "ingredients": [
+    "item_crossbow",
+    "item_thorn_dart"
+   ],
+   "result": "item_venom_crossbow"
+  },
+  {
+   "id": "recipe_lullaby_bell",
+   "ingredients": [
+    "item_drowsy_bell",
+    "item_cracked_mask"
+   ],
+   "result": "item_lullaby_bell"
+  },
+  {
+   "id": "recipe_elixir",
+   "ingredients": [
+    "item_field_bandage",
+    "item_crimson_vial"
+   ],
+   "result": "item_elixir"
+  },
+  {
+   "id": "recipe_oathkeeper",
+   "ingredients": [
+    "item_oath_blade",
+    "item_spiked_buckler",
+    "item_heart_charm"
+   ],
+   "result": "item_oathkeeper"
+  },
+  {
+   "id": "recipe_plague_heart",
+   "ingredients": [
+    "item_plague_catalyst",
+    "item_mortar",
+    "item_venom_vial"
+   ],
+   "result": "item_plague_heart"
+  },
+  {
+   "id": "recipe_everfrost_maul",
+   "ingredients": [
+    "item_glacier_maul",
+    "item_frost_shard",
+    "item_runed_mace"
+   ],
+   "result": "item_everfrost_maul"
+  },
+  {
+   "id": "recipe_storm_crossbow",
+   "ingredients": [
+    "item_crossbow",
+    "item_swift_boots",
+    "item_hourglass"
+   ],
+   "result": "item_storm_crossbow"
   }
  ]
 }

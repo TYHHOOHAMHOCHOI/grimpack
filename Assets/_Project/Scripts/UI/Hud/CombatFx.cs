@@ -174,6 +174,10 @@ namespace Project05.UI.Hud
             }
 
             if (amount > 0) ShowNumber(targetHero, slot, (targetHero ? "-" : string.Empty) + amount, detonation ? 24 : 16, targetHero);
+            // C-05 escalation ladder: small hits stay quiet; heavy hits and detonations throw pixels (Bone for the party's
+            // hits on enemies, Fog-hi for enemy hits on the hero; never red, feedback-motion.md G13)
+            if (Feedback != null && !ReducedFlashes && (detonation || amount >= 8))
+                Feedback.Pixels(BodyFrame(targetHero, slot, 0.45f), targetHero ? "fog" : "bone", detonation ? 16 : 8);
         }
 
         /// <summary>Shield or heal on a unit: a rising "+N" and a one-pixel hop.</summary>
@@ -381,6 +385,25 @@ namespace Project05.UI.Hud
             m = new Motion { Rect = (RectTransform)view.transform, Body = _hud.Body(hero, slot), Extra = view is EnemySlotView e ? e.Eyes : null };
             _motions[(hero, slot)] = m;
             return m;
+        }
+
+        /// <summary>Reactions layer for pixel bursts and the death dissolve (feedback-motion.md C-05, C-14); null in tests.</summary>
+        public Project05.UI.Motion.FeedbackFx Feedback { get; set; }
+
+        private Vector2 BodyFrame(bool hero, int slot, float v)
+        {
+            Image body = _hud != null ? _hud.Body(hero, slot) : null;
+            if (body == null || Feedback == null) return Vector2.zero;
+            var corners = new Vector3[4];
+            body.rectTransform.GetWorldCorners(corners);
+            return Feedback.FromWorld(Vector3.Lerp((corners[1] + corners[2]) / 2f, (corners[0] + corners[3]) / 2f, v));
+        }
+
+        /// <summary>C-14 (enemy) / C-15 (hero): the unit goes down; an enemy dissolves into pixels that drift up.</summary>
+        public void Down(bool hero, int slot)
+        {
+            if (Feedback == null || hero) return;
+            Feedback.Dissolve(BodyFrame(false, slot, 0.5f), null);
         }
 
         /// <summary>A point on a unit's body in effects-layer coordinates; v is 0 at the top of the body and 1 at the bottom.</summary>

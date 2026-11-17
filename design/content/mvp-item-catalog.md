@@ -66,3 +66,23 @@ Follows `item-trigger-and-cooldown.md`, `effect-resolution-model.md` (extended w
 - **Passive stats are small and honest.** `hpBonus` stays inside the `-20..40` range, and the Tower Shield trades 2 speed for 30 HP.
 - **Synergy is local.** Every rule sits on a neighbour link (System 10); none crosses hero grids.
 - **Shapes match the object.** A sword/halberd is 1×3, a hammer/whirlwind axe a T, a chain an S, a bell 1×2, a gong/resonant bell 2×2. Art fills the footprint.
+
+## Fusion recipes (design/gdd/item-fusion.md)
+
+Results are Gold-tier, made only at the Fusion Door (6 gold for 2 ingredients, 10 for 3), never dropped and never upgraded.
+Power is item-fusion.md Formula 1 (per owner action, one enemy).
+
+| Recipe | Ingredients | Result | Shape | Skill (effects) | Power | Cells |
+|---|---|---|---|---|---|---|
+| `recipe_honed_sword` | Iron Sword + Whetstone | Kiếm Mài Bén / Honed Sword | 1x3 | Cooldown 2: Damage 28 → FirstEnemy | 7.50 → 14.00 (×1.87) | 4 → 3 |
+| `recipe_thornwall` | Spiked Buckler + Oak Buckler | Khiên Gai Kép / Thornwall | 1x2 | Cooldown 2: Shield +24; Damage 10 → FirstEnemy | 9.50 → 17.00 (×1.79) | 3 → 2 |
+| `recipe_twin_axe` | Hand Axe + Dagger | Rìu Song Nhận / Twin Axe | l | Cooldown 2: Damage 38 → FirstEnemy | 10.33 → 19.00 (×1.84) | 4 → 3 |
+| `recipe_venom_dart` | Thorn Dart + Venom Vial | Phi Tiêu Kịch Độc / Venom Dart | 1x1 | Cooldown 1: Damage 7 → FirstEnemy; Apply 7 poison → FirstEnemy | 8.00 → 14.00 (×1.75) | 2 → 1 |
+| `recipe_firebomb` | Ember Charm + Oil Flask | Bom Dầu Lửa / Firebomb | 1x2 | Cooldown 2: Apply 8 burn → FirstEnemy; Apply 4 burn → AllEnemies | 3.50 → 6.00 (×1.71) | 3 → 2 |
+| `recipe_venom_crossbow` | Crossbow + Thorn Dart | Nỏ Gai Độc / Venom Crossbow | 2x1 | Cooldown 2: Damage 32 → FirstEnemy; Apply 13 poison → FirstEnemy | 12.67 → 22.50 (×1.78) | 3 → 2 |
+| `recipe_lullaby_bell` | Drowsy Bell + Cracked Mask | Chuông Ru / Lullaby Bell | 1x2 | Cooldown 2: Apply 5 slow → FirstEnemy; Apply 5 weaken → FirstEnemy | 2.50 → 5.00 (×2.00) | 3 → 2 |
+| `recipe_elixir` | Field Bandage + Crimson Vial | Huyết Dược Cô Đặc / Elixir | 1x1 | Cooldown 3: Heal +25; Shield +13 | 7.00 → 12.67 (×1.81) | 2 → 1 |
+| `recipe_oathkeeper` | Oath Blade + Spiked Buckler + Heart Charm | Kiếm Thánh Thệ / Oathkeeper | 1x3 | Cooldown 2: Damage 36 → FirstEnemy; Shield +29 | 16.63 → 32.50 (×1.95) | 6 → 3 |
+| `recipe_plague_heart` | Plague Catalyst + Mortar + Venom Vial | Tim Dịch Hạch / Plague Heart | 1x2 | Cooldown 3: Apply 7 poison → AllEnemies; Detonate every debuff → all enemies | 8.50 → 15.67 (×1.84) | 4 → 2 |
+| `recipe_everfrost_maul` | Glacier Maul + Frost Shard + Runed Mace | Chùy Băng Vĩnh Cửu / Everfrost Maul | 2x2 | Cooldown 2: Damage 67 → AllEnemies; Apply 4 frost → AllEnemies | 18.17 → 35.50 (×1.95) | 9 → 4 |
+| `recipe_storm_crossbow` | Crossbow + Swift Boots + Hourglass | Nỏ Cuồng Phong / Storm Crossbow | 2x1 | Cooldown 1: Damage 24 → FirstEnemy | 11.62 → 24.00 (×2.07) | 7 → 2 |

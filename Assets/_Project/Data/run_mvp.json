@@ -1,5 +1,5 @@
 {
- "_comment": "Run tuning for the MVP floor (Systems 5, 16, 17, 18, 19). Every value is provisional until System 35 measures it. Gold and upgrade costs: item-upgrades.md.",
+ "_comment": "Run tuning for the MVP floor (Systems 5, 16, 17, 18, 19). Every value is provisional until System 35 measures it. Gold and upgrade costs: item-upgrades.md. Rosters re-authored for one hero: design/quick-specs/balance-three-item-start.md (2026-11-17, simulated).",
  "version": 1,
  "rooms": 8,
  "tiers": [
@@ -247,8 +247,7 @@
    "roomMax": 2,
    "weight": 1,
    "roster": [
-    "mon_hunter",
-    "mon_hunter"
+    "mon_striker"
    ],
    "curseId": ""
   },
@@ -259,8 +258,8 @@
    "roomMax": 3,
    "weight": 1,
    "roster": [
-    "mon_swarmer",
-    "mon_hunter"
+    "mon_hunter",
+    "mon_striker"
    ],
    "curseId": ""
   },
@@ -271,8 +270,8 @@
    "roomMax": 4,
    "weight": 1,
    "roster": [
-    "mon_sweeper",
-    "mon_hunter"
+    "mon_brute",
+    "mon_striker"
    ],
    "curseId": ""
   },
@@ -283,9 +282,9 @@
    "roomMax": 5,
    "weight": 1,
    "roster": [
-    "mon_swarmer",
+    "mon_sweeper",
     "mon_hunter",
-    "mon_swarmer"
+    "mon_striker"
    ],
    "curseId": ""
   },
@@ -296,6 +295,7 @@
    "roomMax": 6,
    "weight": 1,
    "roster": [
+    "mon_swarmer",
     "mon_brute",
     "mon_hunter"
    ],
@@ -309,7 +309,7 @@
    "weight": 1,
    "roster": [
     "mon_brute",
-    "mon_swarmer",
+    "mon_sweeper",
     "mon_hunter"
    ],
    "curseId": ""
@@ -323,7 +323,7 @@
    "roster": [
     "mon_brute",
     "mon_sweeper",
-    "mon_hunter"
+    "mon_striker"
    ],
    "curseId": ""
   },
@@ -335,8 +335,7 @@
    "weight": 1,
    "roster": [
     "mon_hunter",
-    "mon_hunter",
-    "mon_striker"
+    "mon_hunter"
    ],
    "curseId": ""
   },
@@ -347,9 +346,8 @@
    "roomMax": 3,
    "weight": 1,
    "roster": [
-    "mon_swarmer",
-    "mon_hunter",
-    "mon_striker"
+    "mon_brute",
+    "mon_hunter"
    ],
    "curseId": ""
   },
@@ -360,9 +358,9 @@
    "roomMax": 4,
    "weight": 1,
    "roster": [
-    "mon_sweeper",
+    "mon_swarmer",
     "mon_hunter",
-    "mon_striker"
+    "mon_sweeper"
    ],
    "curseId": ""
   },
@@ -374,9 +372,8 @@
    "weight": 1,
    "roster": [
     "mon_swarmer",
-    "mon_hunter",
-    "mon_swarmer",
-    "mon_striker"
+    "mon_brute",
+    "mon_hunter"
    ],
    "curseId": ""
   },
@@ -388,8 +385,8 @@
    "weight": 1,
    "roster": [
     "mon_brute",
-    "mon_hunter",
-    "mon_striker"
+    "mon_sweeper",
+    "mon_hunter"
    ],
    "curseId": ""
   },
@@ -402,8 +399,7 @@
    "roster": [
     "mon_brute",
     "mon_swarmer",
-    "mon_hunter",
-    "mon_striker"
+    "mon_hunter"
    ],
    "curseId": ""
   },
@@ -415,9 +411,8 @@
    "weight": 1,
    "roster": [
     "mon_brute",
-    "mon_sweeper",
-    "mon_hunter",
-    "mon_swarmer"
+    "mon_swarmer",
+    "mon_hunter"
    ],
    "curseId": ""
   },
@@ -428,8 +423,7 @@
    "roomMax": 3,
    "weight": 1,
    "roster": [
-    "mon_elite_bruiser",
-    "mon_hunter"
+    "mon_elite_bruiser"
    ],
    "curseId": ""
   },
@@ -440,9 +434,8 @@
    "roomMax": 4,
    "weight": 1,
    "roster": [
-    "mon_elite_bruiser",
     "mon_sweeper",
-    "mon_hunter"
+    "mon_elite_bruiser"
    ],
    "curseId": ""
   },
@@ -454,8 +447,7 @@
    "weight": 1,
    "roster": [
     "mon_elite_bruiser",
-    "mon_swarmer",
-    "mon_hunter"
+    "mon_brute"
    ],
    "curseId": ""
   },
@@ -467,8 +459,7 @@
    "weight": 1,
    "roster": [
     "mon_elite_bruiser",
-    "mon_brute",
-    "mon_hunter"
+    "mon_striker"
    ],
    "curseId": ""
   },
@@ -479,9 +470,9 @@
    "roomMax": 7,
    "weight": 1,
    "roster": [
+    "mon_swarmer",
     "mon_elite_bruiser",
-    "mon_brute",
-    "mon_swarmer"
+    "mon_sweeper"
    ],
    "curseId": ""
   },
@@ -492,9 +483,9 @@
    "roomMax": 8,
    "weight": 1,
    "roster": [
+    "mon_swarmer",
     "mon_elite_bruiser",
-    "mon_brute",
-    "mon_sweeper"
+    "mon_brute"
    ],
    "curseId": ""
   },
@@ -506,8 +497,7 @@
    "weight": 1,
    "roster": [
     "mon_elite_bruiser",
-    "mon_sweeper",
-    "mon_swarmer"
+    "mon_striker"
    ],
    "curseId": ""
   },
@@ -519,8 +509,7 @@
    "weight": 1,
    "roster": [
     "mon_elite_bruiser",
-    "mon_sweeper",
-    "mon_swarmer"
+    "mon_brute"
    ],
    "curseId": ""
   },
@@ -532,7 +521,6 @@
    "weight": 1,
    "roster": [
     "mon_elite_bruiser",
-    "mon_sweeper",
     "mon_swarmer"
    ],
    "curseId": ""
@@ -544,9 +532,9 @@
    "roomMax": 8,
    "weight": 1,
    "roster": [
+    "mon_swarmer",
     "mon_elite_bruiser",
-    "mon_sweeper",
-    "mon_swarmer"
+    "mon_hunter"
    ],
    "curseId": ""
   },
@@ -558,7 +546,6 @@
    "weight": 1,
    "roster": [
     "mon_elite_bruiser",
-    "mon_sweeper",
     "mon_swarmer"
    ],
    "curseId": "curse_anchor"
@@ -571,7 +558,6 @@
    "weight": 1,
    "roster": [
     "mon_elite_bruiser",
-    "mon_sweeper",
     "mon_swarmer"
    ],
    "curseId": "curse_wither"
@@ -583,9 +569,9 @@
    "roomMax": 7,
    "weight": 1,
    "roster": [
+    "mon_swarmer",
     "mon_elite_bruiser",
-    "mon_sweeper",
-    "mon_swarmer"
+    "mon_hunter"
    ],
    "curseId": "curse_sluggish"
   },
@@ -597,8 +583,8 @@
    "weight": 1,
    "roster": [
     "mon_elite_bruiser",
-    "mon_sweeper",
-    "mon_swarmer"
+    "mon_brute",
+    "mon_hunter"
    ],
    "curseId": "curse_frailty"
   },
@@ -610,8 +596,8 @@
    "weight": 1,
    "roster": [
     "mon_elite_bruiser",
-    "mon_sweeper",
-    "mon_swarmer"
+    "mon_brute",
+    "mon_hunter"
    ],
    "curseId": "curse_anchor"
   }
@@ -626,6 +612,15 @@
    "mon_boss"
   ],
   "curseId": ""
+ },
+ "fusion": {
+  "_comment": "item-fusion.md: rows to rooms minRoom..8 may hold a Fusion Door (chance per mille, max per run, never two rows in a row, forced from guaranteeRoom if none yet). Fusion costs cost2 gold for 2 ingredients, cost3 for 3.",
+  "minRoom": 3,
+  "chance": 350,
+  "guaranteeRoom": 6,
+  "maxPerRun": 2,
+  "cost2": 6,
+  "cost3": 10
  },
  "nonDroppable": [
   "item_cursed_anchor",

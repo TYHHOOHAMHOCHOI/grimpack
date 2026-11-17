@@ -93,6 +93,7 @@ namespace Project05.UI.Hud
             }
 
             PopupContent content = ItemTooltipText.Build(record, placed, received);
+            ItemTooltipText.AddRecipeLines(content, record, Catalog);
             Vector2 size = view.Build(content);
 
             var occupied = new List<Rect>();

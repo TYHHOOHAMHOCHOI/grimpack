@@ -109,6 +109,28 @@ namespace Project05.Editor
         public static Button Primary(string name, Transform parent, TMP_FontAsset font, string label, float x, float y, float w,
             string style, Color labelColour, out TMP_Text text)
         {
+            if (style == "wood" || style == "wood-primary")
+            {
+                // generated kit (ui-kit-generated.md K4/K5): a wooden board with iron end straps; the primary one carries
+                // the Candle rim (user decision 2026-11-17: dark wood face, Candle rim, Candle fill only while pressed)
+                RectTransform wrt = Rect(name, parent, x, y, w, 20);
+                var wimage = wrt.gameObject.AddComponent<Image>();
+                wimage.sprite = Sprite("Gen/ui_board-wood_" + (style == "wood-primary" ? "primary" : "default") + "_9s.png");
+                wimage.type = Image.Type.Sliced;
+                var wbutton = wrt.gameObject.AddComponent<Button>();
+                wbutton.targetGraphic = wimage;
+                wbutton.transition = Selectable.Transition.SpriteSwap;
+                wbutton.spriteState = new SpriteState
+                {
+                    highlightedSprite = Sprite("Gen/ui_board-wood_hover_9s.png"),
+                    pressedSprite = Sprite("Gen/ui_board-wood_pressed_9s.png"),
+                    selectedSprite = Sprite("Gen/ui_board-wood_hover_9s.png"),
+                    disabledSprite = Sprite("Gen/ui_board-wood_disabled_9s.png"),
+                };
+                text = Text("Label", wrt, font, label, 0, 4, w, labelColour, TextAlignmentOptions.Top);
+                return wbutton;
+            }
+
             RectTransform rt = Rect(name, parent, x, y, w, 24);
             var image = rt.gameObject.AddComponent<Image>();
             image.sprite = Sprite("ui_" + style + "_default_9s.png");

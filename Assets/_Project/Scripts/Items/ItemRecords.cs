@@ -118,10 +118,20 @@ namespace Project05.Items
         public bool HasTag(string tag) => Array.IndexOf(tags, tag) >= 0;
     }
 
+    /// <summary>A fusion recipe as authored in items_mvp.json (design/gdd/item-fusion.md).</summary>
+    [Serializable]
+    public sealed class RecipeRecord
+    {
+        public string id = string.Empty;
+        public string[] ingredients = Array.Empty<string>();
+        public string result = string.Empty;
+    }
+
     [Serializable]
     internal sealed class ItemCatalogFile
     {
         public ItemRecord[] items = Array.Empty<ItemRecord>();
+        public RecipeRecord[] recipes = Array.Empty<RecipeRecord>();
     }
 
     /// <summary>Read-only lookup over the parsed item catalog.</summary>
@@ -132,10 +142,37 @@ namespace Project05.Items
         /// <summary>Every item in authored order.</summary>
         public IReadOnlyList<ItemRecord> All { get; }
 
-        private ItemCatalog(ItemRecord[] items)
+        /// <summary>The fusion recipes in authored order (empty for a catalog without them).</summary>
+        public IReadOnlyList<RecipeRecord> Recipes { get; }
+
+        private ItemCatalog(ItemRecord[] items, RecipeRecord[] recipes)
         {
             All = items;
+            Recipes = recipes ?? Array.Empty<RecipeRecord>();
             foreach (ItemRecord i in items) _byId[i.id] = i;
+        }
+
+        /// <summary>The recipe that makes this item, or null.</summary>
+        public RecipeRecord RecipeMaking(string resultId)
+        {
+            foreach (RecipeRecord r in Recipes)
+            {
+                if (r.result == resultId) return r;
+            }
+
+            return null;
+        }
+
+        /// <summary>The recipes that consume this base item, in authored order.</summary>
+        public List<RecipeRecord> RecipesUsing(string baseId)
+        {
+            var list = new List<RecipeRecord>();
+            foreach (RecipeRecord r in Recipes)
+            {
+                if (Array.IndexOf(r.ingredients, baseId) >= 0) list.Add(r);
+            }
+
+            return list;
         }
 
         /// <summary>Parses the catalog JSON written by tools/art/item_catalog.py.</summary>
@@ -146,7 +183,7 @@ namespace Project05.Items
             // renamed here to the field "base_".
             string fixedJson = json.Replace("\"base\":", "\"base_\":");
             ItemCatalogFile file = JsonUtility.FromJson<ItemCatalogFile>(fixedJson);
-            return new ItemCatalog(file.items);
+            return new ItemCatalog(file.items, file.recipes);
         }
 
         /// <summary>Finds an item by id, or null.</summary>

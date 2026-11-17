@@ -150,6 +150,7 @@ The full list of `+` definitions is content, authored with the item catalog. The
 | 25 Backpack UI, 26 Hover Popup, 29 Payoff | Downstream | Forge tab, preview, badge, pulse | Pending |
 | 35 Balance Harness | Downstream | Verifies the target of about 5 upgrades per run | Pending |
 | 38 Debuffs and Detonation | Peer | Coin Purse, Catalyst+ | [debuffs-and-detonation.md](debuffs-and-detonation.md) |
+| 40 Item Fusion | Peer | Shares run gold; fused (Gold-tier) items have no `+`; a consumed `+` ingredient loses its upgrade | [item-fusion.md](item-fusion.md) |
 
 ## Tuning Knobs
 

@@ -316,6 +316,18 @@ namespace Project05.CombatCore
             return new SeededRng(Seed, copies);
         }
 
+        /// <summary>
+        /// A stream derived from the run seed exactly like the named substreams, but owned by its caller and outside the
+        /// snapshot set (item-fusion.md Rule 4: the "fusion" stream never touches "doors"). The name must not be one of
+        /// <see cref="StreamNames"/>.
+        /// </summary>
+        public static RngStream DeriveSideStream(ulong seed, string streamName)
+        {
+            if (string.IsNullOrEmpty(streamName) || Array.IndexOf(StreamNames, streamName) >= 0)
+                throw new ArgumentException("A side stream needs its own name: " + (streamName ?? "<null>"), nameof(streamName));
+            return DeriveStream(seed, streamName);
+        }
+
         private static RngStream DeriveStream(ulong seed, string streamName)
         {
             ulong h1 = SplitMix64(seed ^ 0x9E3779B97F4A7C15UL);

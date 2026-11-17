@@ -360,6 +360,12 @@ def node(kind: str, tier: str | None = None) -> np.ndarray:
         if tier == "gold":                 # the curse taken here: a Plum notch hanging from the sill
             a[NODE_H - 1, 3:6] = (*P.rgb("PLUM-E"), 255)
             a[NODE_H - 2, 4] = (*P.rgb("PLUM"), 255)
+    elif kind == "fusion":                 # a fusion room (item-fusion.md): the door lit Candle, molten metal in a bowl
+        put(a, inner, "INK-2"); put(a, line, "CANDLE-D")
+        for x, y in ((4, 4), (5, 4), (3, 5), (4, 5), (5, 5), (6, 5)):
+            a[y, x] = (*P.rgb("CANDLE"), 255)
+        for x, y in ((3, 6), (6, 6), (4, 7), (5, 7)):
+            a[y, x] = (*P.rgb("INK-4"), 255)
     elif kind == "preview":                # armed, not confirmed: the ahead door outlined in that tier, dotted
         T = tier.upper()
         put(a, inner, "INK-1"); put(a, dotted(line), f"{T}-BASE")
@@ -416,6 +422,7 @@ def sprites() -> dict[str, tuple[np.ndarray, tuple[int, int, int, int] | None]]:
     out["ui_glyph-elite_bone_6x6"] = (flat(ELITE, 6, 6), None)
     out["ui_map-node_ahead_10x11"] = (node("ahead"), None)
     out["ui_map-node_entrance_10x11"] = (node("entrance"), None)
+    out["ui_map-node_fusion_10x11"] = (node("fusion"), None)
     for t in TIERS:
         out[f"ui_map-node_{t}_10x11"] = (node("cleared", t), None)
     for t in TIERS:

@@ -20,6 +20,8 @@ namespace Project05.CombatScene
         [SerializeField] private TextAsset runJson;
         [Tooltip("Debug policy (System 19 Rule 1): card 3 is Gold whenever Gold is allowed, so curses can be tested.")]
         [SerializeField] private bool forceGoldDoor;
+        [Tooltip("Debug policy (item-fusion.md): every eligible row (rooms 3..8, not two in a row, max 2) holds a Fusion Door.")]
+        [SerializeField] private bool forceFusionDoor;
         [Tooltip("A new seed every run; off uses Stage Seed so a run can be replayed.")]
         [SerializeField] private bool randomRunSeed = true;
         [Tooltip("Keep the old 1..6 monster test selector instead of the run's rooms.")]
@@ -71,7 +73,7 @@ namespace Project05.CombatScene
             }
 
             ulong seed = randomRunSeed ? (ulong)System.DateTime.UtcNow.Ticks : stageSeed;
-            _run = new RunSession(cfg, Catalog, seed == 0 ? 1UL : seed, heroCount: 1) { ForceGold = forceGoldDoor };
+            _run = new RunSession(cfg, Catalog, seed == 0 ? 1UL : seed, heroCount: 1) { ForceGold = forceGoldDoor, ForceFusion = forceFusionDoor };
             CurrentStage = _run.Room;
             Currency = cfg.StartGold;   // item-upgrades.md: start 5, then gold by door
             _heroPicked = false;
@@ -87,7 +89,7 @@ namespace Project05.CombatScene
             _runPanel.RewardTaken += HandleRewardTaken;
             _runPanel.RewardSkipped += HandleRewardSkipped;
             _runPanel.DoorChosen += HandleDoorChosen;
-            _runPanel.DoorArmed += i => _corridor?.Preview(i >= 0 && i < _run.Row.Count ? _run.Row[i].Tier : (TierKind?)null);
+            _runPanel.DoorArmed += i => _corridor?.Preview(i >= 0 && i < _run.Row.Count && !_run.Row[i].IsFusion ? _run.Row[i].Tier : (TierKind?)null);
             _runPanel.HeroPicked += HandleHeroPicked;
 
             var hudRt = (RectTransform)hudView.transform;
@@ -104,8 +106,58 @@ namespace Project05.CombatScene
                 _externalBoard.ItemUpgraded += HandleItemUpgraded;
             }
 
-            _runPanel.ShowHeroPick(PickableHeroes, h => h.Art == "alchemist" ? hudView.Sprites.alchemistPoses[0] : hudView.Sprites.heroPoses[0]);
+            WireFusion();   // item-fusion.md: the fusion room's step
+
+            // hero-select.md: the hero pick is its own full-screen step after Play
+            _motion = safeFrame.GetComponent<Project05.UI.Motion.UiMotion>();
+            if (_motion == null) _motion = safeFrame.gameObject.AddComponent<Project05.UI.Motion.UiMotion>();
+            _feedback = Project05.UI.Motion.FeedbackFx.Create(safeFrame, _motion, key => spriteCatalog.GetRunSprite(key));
+            _runPanel.Feedback = _feedback;
+            if (Playback != null) Playback.Feedback = _feedback;
+            if (_externalBoard != null)
+            {
+                _externalBoard.Feedback = _feedback;
+                _externalBoard.hoverRingSprite = spriteCatalog.GetRunSprite("ui_ring-gen_hover_9s");
+            }
+            var heroSelectGo = new GameObject("HeroSelectView");
+            heroSelectGo.transform.SetParent(transform, false);
+            _heroSelect = heroSelectGo.AddComponent<HeroSelectView>();
+            _heroSelect.Initialize(safeFrame, spriteCatalog, Catalog, _motion);
+            _heroSelect.Picked += HandleHeroPicked;
+            _heroSelect.Show(PickableHeroes, h => h.Art == "alchemist" ? hudView.Sprites.alchemistPoses[0] : hudView.Sprites.heroPoses[0]);
         }
+
+        private TMPro.TextMeshProUGUI _roomPlateText;
+        private RectTransform _roomPlate;
+
+        /// <summary>planning-screen.md P25: "Phòng 3/8 · Nguy hiểm 2: Vừa" over the enemy zone, in planning only.</summary>
+        private void UpdateRoomPlate()
+        {
+            if (!RunActive || safeFrame == null || spriteCatalog == null) return;
+            if (_roomPlate == null)
+            {
+                _roomPlate = CombatUiFactory.CreateRect("RoomPlate", safeFrame, 324f, 24f, 200f, 19f);
+                CombatUiFactory.CreateImage("Board", _roomPlate, spriteCatalog.GetRunSprite("ui_board-wood_default_9s") ?? spriteCatalog.panelDefault, 0f, 0f, 200f, 19f, sliced: true);
+                _roomPlateText = CombatUiFactory.CreateLabel("Text", _roomPlate, spriteCatalog.font, string.Empty, 0f, 3f, 200f, 12f, CombatUiFactory.Bone, TMPro.TextAlignmentOptions.Top);
+            }
+
+            bool show = Phase == CombatScenePhase.Planning && _heroPicked && (_runPanel == null || !_runPanel.IsVisible) &&
+                        (_heroSelect == null || !_heroSelect.IsVisible);
+            if (_roomPlate.gameObject.activeSelf != show) _roomPlate.gameObject.SetActive(show);
+            if (!show) return;
+            string text = _run.IsBossRoom
+                ? "Phòng boss"
+                : _run.CurrentEncounter == null
+                    ? "Phòng " + _run.Room + "/" + _run.Config.Rooms + " · Lò Dung Hợp"
+                    : "Phòng " + _run.Room + "/" + _run.Config.Rooms + " · Nguy hiểm " + _run.CurrentEncounter.Danger + ": " + RunPanelView.DangerWord(_run.CurrentEncounter.Danger);
+            if (_roomPlateText.text != text) _roomPlateText.text = text;
+        }
+
+        private HeroSelectView _heroSelect;
+        private Project05.UI.Motion.UiMotion _motion;
+
+        /// <summary>The full-screen hero pick (tests and probes).</summary>
+        public HeroSelectView HeroSelect => _heroSelect;
 
         // ------------------------------------------------------------------ hero pick
         private void HandleHeroPicked(int index)
@@ -114,19 +166,22 @@ namespace Project05.CombatScene
             if (index < 0 || index >= heroes.Count) return;
             HeroDef pick = heroes[index];
             _heroPicked = true;
-            if (pick != HeroDef)
+            HeroDef = pick;
+            // balance-three-item-start.md: the run starts with the hero's kit only (3 items) and an empty stash, whatever
+            // the scene had laid out for the editor preview.
             {
-                HeroDef = pick;
                 if (_externalBoard != null && popupController != null)
                 {
                     _externalBoard.RemoveAllIn("grid");
-                    foreach (string id in pick.StartingItems)
+                    _externalBoard.RemoveAllIn("stash");
+                    // the authored starting layout (cells and turns) so the kit's adjacency links hold from turn 1
+                    foreach (StartingPlacement at in pick.StartingLayout)
                     {
-                        Project05.Items.ItemRecord record = popupController.Catalog.Find(id);
+                        Project05.Items.ItemRecord record = popupController.Catalog.Find(at.ItemId);
                         if (record == null) continue;
                         Sprite plate = spriteCatalog.GetAuthoredPlate(record.tier.ToLowerInvariant(), false, record.footprint);
                         Sprite icon = spriteCatalog.GetItemIcon(record.art, record.footprint, compact: false);
-                        _externalBoard.TrySpawnItem(record, plate, icon, "grid", out _);
+                        _externalBoard.TrySpawnItem(record, plate, icon, "grid", out _, at.X, at.Y, at.Rotation);
                     }
                 }
             }
@@ -136,6 +191,9 @@ namespace Project05.CombatScene
             string[] words = pick.NameVi.Split(' ');
             if (title != null && title.GetComponent<TMPro.TMP_Text>() != null)
                 title.GetComponent<TMPro.TMP_Text>().text = words.Length >= 2 ? words[0] + " " + words[1] : pick.NameVi;   // "Kỵ Sĩ", "Dược Sư"
+            Transform innate = safeFrame != null ? safeFrame.Find("Workbench/InnateText") : null;
+            if (innate != null && innate.GetComponent<TMPro.TMP_Text>() != null && pick.InnateItem != null)
+                innate.GetComponent<TMPro.TMP_Text>().text = pick.InnateItem.NameVi + ". " + pick.InnateItem.DescVi;   // planning-screen.md P18
             _runPanel.Hide();
             SyncArrangementFromExternalBoard();
             PrepareStage(CurrentStage, NextMonsterCount);
@@ -259,7 +317,7 @@ namespace Project05.CombatScene
             if (result != null && result.Outcome == CombatOutcome.Victory)
             {
                 int gold = RoomGold();
-                if (gold > 0) AddCurrency(gold);
+                if (gold > 0) AddCurrency(gold, new Vector2(476f, 150f));   // R-10: coins hop from the enemy zone to the counter
                 if (_runPanel != null) _runPanel.TitleNote = gold > 0 ? "+" + gold + " vàng" : string.Empty;
                 _run.OnVictory();
             }
@@ -305,6 +363,10 @@ namespace Project05.CombatScene
                     break;
                 case RunPhase.DoorChoice:
                     _runPanel.ShowDoors(_run.Room, _run.Row);
+                    break;
+                case RunPhase.Fusion:
+                    _runPanel.ShowFusion(_run.Room);
+                    MarkFusionIngredients(_runPanel.Armed);
                     break;
                 default:
                     EnterRoom();   // after room 8 the boss follows with no door
@@ -359,10 +421,25 @@ namespace Project05.CombatScene
             if (record == null || _externalBoard == null) return;
             Sprite plate = spriteCatalog.GetAuthoredPlate(record.tier.ToLowerInvariant(), false, record.footprint);
             Sprite icon = spriteCatalog.GetItemIcon(record.art, record.footprint, compact: false);
-            if (!_externalBoard.TrySpawnItem(record, plate, icon, "stash", out _))
+            RectTransform card = _runPanel.CardRect(index);
+            Vector3? cardWorld = card != null ? card.TransformPoint(card.rect.center) : (Vector3?)null;
+            if (!_externalBoard.TrySpawnItem(record, plate, icon, "stash", out Project05.UI.Hud.ItemHoverTarget spawned))
             {
                 _runPanel.ShowMessage("Kho và balo đã đầy: bán hoặc dời bớt đồ.");
                 return;
+            }
+
+            // R-01: the taken item flies from its card to its cell, then lands (thunk and ring)
+            if (_feedback != null && spawned != null && cardWorld.HasValue)
+            {
+                RectTransform rt = spawned.Rect;
+                Vector2 to = rt.anchoredPosition;
+                Vector2 from = ((RectTransform)rt.parent).InverseTransformPoint(cardWorld.Value);
+                _feedback.Motion.MoveFrom(rt, from, to, 0.28f, Project05.UI.Motion.Ease.InOutQuad, () =>
+                {
+                    _feedback.Thunk(rt);
+                    _feedback.RingPulse(rt, 0.15f);
+                });
             }
 
             _run.TakeReward(index);
@@ -377,7 +454,8 @@ namespace Project05.CombatScene
         private void HandleDoorChosen(int index)
         {
             if (!_run.ChooseDoor(index)) return;
-            EnterRoom();
+            if (_run.Phase == RunPhase.Fusion) EnterFusionRoom();   // item-fusion.md Rule 6: no fight
+            else EnterRoom();
         }
 
         /// <summary>Room entry: the chosen door's room (or the boss) becomes the next fight.</summary>

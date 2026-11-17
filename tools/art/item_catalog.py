@@ -203,6 +203,112 @@ ITEMS = [
 ]
 
 
+# ---- Gold: fused items (design/gdd/item-fusion.md). Made only at the Fusion Door, never dropped, never upgraded.
+FUSED = [
+    item("honed-sword", "Gold", "1x3", "Kiếm Mài Bén", "Honed Sword", "Lưỡi kiếm và hòn đá đã thành một.", "Blade and stone, now one edge.",
+         ["weapon", "blade"], cd(2), [dmg(28)]),
+    item("thornwall", "Gold", "1x2", "Khiên Gai Kép", "Thornwall", "Hai tấm khiên ghép lại, gai chĩa ra mọi phía.", "Two shields bound as one, spikes on every side.",
+         ["armour", "shield"], cd(2), [shield(24), dmg(10)]),
+    item("twin-axe", "Gold", "l", "Rìu Song Nhận", "Twin Axe", "Một cán, hai lưỡi, không lúc nào ngơi.", "One haft, two edges, never idle.",
+         ["weapon", "axe", "blade"], cd(2), [dmg(38)]),
+    item("venom-dart", "Gold", "1x1", "Phi Tiêu Kịch Độc", "Venom Dart", "Mũi gai ngâm cả lọ độc, chạm là thấm.", "A thorn steeped in the whole vial.",
+         ["weapon", "ranged", "affliction"], cd(1), [dmg(7), status("poison", 7)]),
+    item("firebomb", "Gold", "1x2", "Bom Dầu Lửa", "Firebomb", "Than hồng nhét vào bình dầu, ném là cháy lan.", "An ember sealed in oil; thrown, it spreads.",
+         ["affliction", "potion"], cd(2), [status("burn", 8), status("burn", 4, "AllEnemies")]),
+    item("venom-crossbow", "Gold", "2x1", "Nỏ Gai Độc", "Venom Crossbow", "Tên nỏ tẩm nhựa gai, trúng là rỉ độc.", "Bolts dipped in thorn sap; every hit seeps.",
+         ["weapon", "ranged", "affliction"], cd(2), [dmg(32), status("poison", 13)]),
+    item("lullaby-bell", "Gold", "1x2", "Chuông Ru", "Lullaby Bell", "Tiếng chuông sau chiếc mặt nạ, nghe là rã rời.", "A bell behind a mask; hear it and wilt.",
+         ["affliction", "bell"], cd(2), [status("slow", 5), status("weaken", 5)]),
+    item("elixir", "Gold", "1x1", "Huyết Dược Cô Đặc", "Elixir", "Cô lại ba lần, một giọt bằng cả lọ.", "Boiled down thrice; one drop is a whole vial.",
+         ["potion", "heal"], cd(3), [heal(25), shield(13)]),
+    item("oathkeeper", "Gold", "1x3", "Kiếm Thánh Thệ", "Oathkeeper", "Lời thề, tấm khiên và trái tim rèn chung một lưỡi.", "Oath, shield and heart forged into one blade.",
+         ["weapon", "blade", "shield"], cd(2), [dmg(36), shield(29)]),
+    item("plague-heart", "Gold", "1x2", "Tim Dịch Hạch", "Plague Heart", "Xúc tác đập như tim, mỗi nhịp một cơn dịch.", "The catalyst beats like a heart; every beat, a plague.",
+         ["detonator", "alchemy", "affliction"], cd(3), [status("poison", 7, "AllEnemies"), detonate_all()],
+         rules=[rule("StatusAmount", 1, ["affliction"])]),
+    item("everfrost-maul", "Gold", "2x2", "Chùy Băng Vĩnh Cửu", "Everfrost Maul", "Băng ba lớp không bao giờ tan.", "Three layers of ice that never thaw.",
+         ["weapon", "blunt", "affliction"], cd(2), [dmg(67, "AllEnemies"), status("frost", 4, "AllEnemies")]),
+    item("storm-crossbow", "Gold", "2x1", "Nỏ Cuồng Phong", "Storm Crossbow", "Dây nỏ kéo bằng gió, cát chảy ngược để bắn lại.", "Strung with wind; the sand runs back to fire again.",
+         ["weapon", "ranged"], cd(1), [dmg(24)]),
+]
+
+
+def recipe(result, *ingredients):
+    """A fusion recipe (item-fusion.md Rule 1): 2 or 3 base ingredients -> one Gold-tier result."""
+    rid = result.replace("-", "_")
+    return {"id": "recipe_" + rid, "ingredients": ["item_" + i.replace("-", "_") for i in ingredients], "result": "item_" + rid}
+
+
+RECIPES = [
+    recipe("honed-sword", "iron-sword", "whetstone"),
+    recipe("thornwall", "spiked-buckler", "oak-buckler"),
+    recipe("twin-axe", "hand-axe", "dagger"),
+    recipe("venom-dart", "thorn-dart", "venom-vial"),
+    recipe("firebomb", "ember-charm", "oil-flask"),
+    recipe("venom-crossbow", "crossbow", "thorn-dart"),
+    recipe("lullaby-bell", "drowsy-bell", "cracked-mask"),
+    recipe("elixir", "field-bandage", "crimson-vial"),
+    recipe("oathkeeper", "oath-blade", "spiked-buckler", "heart-charm"),
+    recipe("plague-heart", "plague-catalyst", "mortar", "venom-vial"),
+    recipe("everfrost-maul", "glacier-maul", "frost-shard", "runed-mace"),
+    recipe("storm-crossbow", "crossbow", "swift-boots", "hourglass"),
+]
+
+FUSION_MULTIPLIER = {2: 1.60, 3: 1.75}   # item-fusion.md Formula 1 (M_2, M_3), against the ingredients' + versions (user decision 2026-11-17 after simulation)
+REF_STACKS = 6                           # a detonation counts 3 per stack at a reference of 6 stacks
+SPEED_VALUE = 0.27                       # Swift Boots +3 speed is about 0.8 per action of its partners
+
+
+def _active_power(it, n=None):
+    """Formula 1 for an item with a cooldown: (damage + stacks + shield + heal) / n against one enemy."""
+    t = it["trigger"]
+    if t["kind"] not in ("Cooldown", "Reaction"):
+        return 0.0
+    n = n or t["n"]
+    total = 0.0
+    for e in it["effects"]:
+        if e["kind"] == "Damage":
+            total += e["base"]
+        elif e["kind"] in ("ApplyStatus", "ShieldGain", "Heal"):
+            total += e["amount"]
+        elif e["kind"] == "DetonateAll":
+            total += 3 * REF_STACKS + 3 * sum(x["amount"] for x in it["effects"] if x["kind"] == "ApplyStatus")
+    return total / n
+
+
+def _support_power(it, partners):
+    """What a passive or synergy item gives its recipe partners per action (Formula 1)."""
+    v = it["hpBonus"] / 10.0 + max(0, it["speedBonus"]) * SPEED_VALUE
+    for r in it["synergy"]:
+        for q in partners:
+            if r["targetTags"] and not set(r["targetTags"]) & set(q["tags"]):
+                continue
+            n = q["trigger"]["n"] if q["trigger"]["kind"] in ("Cooldown", "Reaction") else 0
+            if not n:
+                continue
+            if r["kind"] == "DamageFlat":
+                v += r["amount"] / n
+            elif r["kind"] == "StatusAmount":
+                v += sum(1 for e in q["effects"] if e["kind"] == "ApplyStatus") / n
+            elif r["kind"] == "CooldownReduction" and n > 1:
+                v += _active_power(q, n - r["amount"]) - _active_power(q, n)
+    return v
+
+
+def recipe_power(rec, plus=True):
+    """(sum of ingredient power, result power) per item-fusion.md Formula 1; plus=True values each ingredient as its
+    + version, so a fused item must beat the forged pieces, not only the plain ones (retuned 2026-11-17)."""
+    by = {i["id"]: i for i in ITEMS + FUSED + PLUS}
+    ings = [by.get(i + "_plus", by[i]) if plus else by[i] for i in rec["ingredients"]]
+    total = 0.0
+    for k, it in enumerate(ings):
+        partners = ings[:k] + ings[k + 1:]
+        total += _active_power(it) + _support_power(it, partners)
+    res = by[rec["result"]]
+    rp = _active_power(res) + sum(1.0 / res["trigger"]["n"] for r in res["synergy"] if r["kind"] == "StatusAmount")
+    return total, rp
+
+
 def _up(n):
     """x4/3 rounded half up, at least +1 (item-upgrades.md)."""
     if n == 0:
@@ -265,7 +371,7 @@ def make_plus(base):
 
 NO_UPGRADE = {"item_cursed_anchor"}
 PLUS = [make_plus(it) for it in ITEMS if it["id"] not in NO_UPGRADE]
-ALL_ITEMS = ITEMS + PLUS
+ALL_ITEMS = ITEMS + PLUS + FUSED
 
 
 def validate() -> list[str]:
@@ -311,6 +417,36 @@ def validate() -> list[str]:
                     stack.append(n)
         if len(seen) != len(cells):
             errors.append(f"{it['id']}: footprint is not edge-connected")
+    # fusion recipes (item-fusion.md Rules 1 to 3, acceptance criterion 1)
+    by = {i["id"]: i for i in ALL_ITEMS}
+    results = {r["result"] for r in RECIPES}
+    multisets = set()
+    for r in RECIPES:
+        ings = r["ingredients"]
+        if not 2 <= len(ings) <= 3:
+            errors.append(f"{r['id']}: needs 2 or 3 ingredients")
+        key = tuple(sorted(ings))
+        if key in multisets:
+            errors.append(f"{r['id']}: another recipe has the same ingredients")
+        multisets.add(key)
+        for i in ings:
+            if i not in by:
+                errors.append(f"{r['id']}: unknown ingredient {i}")
+            elif by[i].get("upgradeOf") or i in results or by[i]["tier"] in ("Gold", "Red"):
+                errors.append(f"{r['id']}: ingredient {i} must be a White to Purple base item")
+        res = by.get(r["result"])
+        if res is None or not all(i in by for i in ings):
+            errors.append(f"{r['id']}: unknown result or ingredient")
+            continue
+        if res["tier"] != "Gold" or res.get("upgradeId"):
+            errors.append(f"{r['id']}: the result must be Gold-tier with no upgrade")
+        if len(res["cells"]) >= sum(len(by[i]["cells"]) for i in ings):
+            errors.append(f"{r['id']}: the result must take fewer cells than its ingredients")
+        total, rp = recipe_power(r)
+        if rp < FUSION_MULTIPLIER.get(len(ings), 9) * total - 1e-6:
+            errors.append(f"{r['id']}: power {rp:.2f} below x{FUSION_MULTIPLIER.get(len(ings))} of {total:.2f}")
+    if {i["id"] for i in FUSED} != results:
+        errors.append("every fused item is the result of exactly one recipe")
     return errors
 
 
@@ -379,7 +515,35 @@ def md() -> str:
         "- **Synergy is local.** Every rule sits on a neighbour link (System 10); none crosses hero grids.",
         "- **Shapes match the object.** A sword/halberd is 1×3, a hammer/whirlwind axe a T, a chain an S, a bell 1×2, a gong/resonant bell 2×2. Art fills the footprint.",
         "",
+        "## Fusion recipes (design/gdd/item-fusion.md)",
+        "",
+        "Results are Gold-tier, made only at the Fusion Door (6 gold for 2 ingredients, 10 for 3), never dropped and never upgraded.",
+        "Power is item-fusion.md Formula 1 (per owner action, one enemy).",
+        "",
+        "| Recipe | Ingredients | Result | Shape | Skill (effects) | Power | Cells |",
+        "|---|---|---|---|---|---|---|",
     ]
+    by = {i["id"]: i for i in ALL_ITEMS}
+    for r in RECIPES:
+        res = by[r["result"]]
+        t, p = recipe_power(r)
+        names = " + ".join(by[i]["nameEn"] for i in r["ingredients"])
+        fx = []
+        for e in res["effects"]:
+            if e["kind"] == "Damage":
+                fx.append(f"Damage {e['base']} → {e['target']}")
+            elif e["kind"] == "ApplyStatus":
+                fx.append(f"Apply {e['amount']} {e['status']} → {e['target']}")
+            elif e["kind"] == "DetonateAll":
+                fx.append("Detonate every debuff → all enemies")
+            elif e["kind"] == "ShieldGain":
+                fx.append(f"Shield +{e['amount']}")
+            elif e["kind"] == "Heal":
+                fx.append(f"Heal +{e['amount']}")
+        cells = sum(len(by[i]["cells"]) for i in r["ingredients"])
+        lines.append(f"| `{r['id']}` | {names} | {res['nameVi']} / {res['nameEn']} | {res['footprint']} | Cooldown {res['trigger']['n']}: {'; '.join(fx)} | "
+                     f"{t:.2f} → {p:.2f} (×{p / t:.2f}) | {cells} → {len(res['cells'])} |")
+    lines.append("")
     return "\n".join(lines)
 
 
@@ -389,10 +553,13 @@ def main() -> int:
         print("\n".join(errors))
         return 1
     (ROOT / "Assets/_Project/Data").mkdir(parents=True, exist_ok=True)
-    (ROOT / "Assets/_Project/Data/items_mvp.json").write_text(json.dumps({"items": ALL_ITEMS, "statuses": STATUSES}, ensure_ascii=False, indent=1), encoding="utf-8")
+    (ROOT / "Assets/_Project/Data/items_mvp.json").write_text(json.dumps({"items": ALL_ITEMS, "statuses": STATUSES, "recipes": RECIPES}, ensure_ascii=False, indent=1), encoding="utf-8")
     (ROOT / "design/content").mkdir(parents=True, exist_ok=True)
     (ROOT / "design/content/mvp-item-catalog.md").write_text(md(), encoding="utf-8")
-    print(f"{len(ITEMS)} items + {len(PLUS)} upgrades validated and written")
+    print(f"{len(ITEMS)} items + {len(PLUS)} upgrades + {len(FUSED)} fused items, {len(RECIPES)} recipes validated and written")
+    for r in RECIPES:
+        t, p = recipe_power(r)
+        print(f"  {r['id']:<24} {t:5.2f} -> {p:5.2f}  x{p / t:.2f}")
     return 0
 
 

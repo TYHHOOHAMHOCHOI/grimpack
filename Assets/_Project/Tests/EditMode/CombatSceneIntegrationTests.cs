@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using NUnit.Framework;
 using Project05.CombatCore;
 using Project05.CombatScene;
@@ -190,13 +191,18 @@ namespace Project05.Tests.EditMode
             Assert.AreEqual(controller.Run.CurrentEncounter.Roster.Count, controller.Prepared.BoundEnemies.Count);
             Assert.AreEqual(5, controller.Currency, "a run starts with 5 gold (item-upgrades.md)");
 
-            // the run starts with the hero pick; nothing can start before it
-            Assert.AreEqual(RunPanelView.Step.HeroPick, controller.RunPanel.Current);
+            // the run starts with the full-screen hero pick (hero-select.md); nothing can start before it
+            Assert.IsTrue(controller.HeroSelect.IsVisible);
+            Assert.AreEqual(RunPanelView.Step.Hidden, controller.RunPanel.Current);
             Assert.IsFalse(controller.CanStartFight);
             Assert.IsFalse(controller.StartIntegratedFight(0));
-            controller.RunPanel.Command(1);   // the Plague Alchemist
+            controller.HeroSelect.Select(1);   // the Plague Alchemist
+            controller.HeroSelect.Confirm();
+            Assert.IsFalse(controller.HeroSelect.IsVisible);
             Assert.AreEqual("hero_alchemist", controller.HeroDef.Id);
             Assert.IsTrue(board.ExportContainerItems("grid").Exists(i => i.Record.id == "item_plague_catalyst"), "the core is in the grid");
+            Assert.AreEqual(3, board.ExportContainerItems("grid").Count, "a hero starts with exactly 3 items (balance-three-item-start.md)");
+            Assert.AreEqual(0, board.ExportContainerItems("stash").Count, "the stash starts empty");
             Assert.IsTrue(controller.CanStartFight);
 
             // the forge quotes from gold and the catalog (item-upgrades.md)
@@ -236,6 +242,83 @@ namespace Project05.Tests.EditMode
             Assert.AreEqual(controller.Run.CurrentEncounter.Roster.Count, controller.Prepared.BoundEnemies.Count);
             Assert.IsFalse(controller.RunPanel.IsVisible);
             Assert.IsTrue(controller.CanStartFight);
+        }
+
+        [Test]
+        public void CombatScene_FusionRoom_FusesTheKitAndLeaves()
+        {
+            // Arrange: a Crusader run with the fusion debug policy (item-fusion.md), so the row to room 3 holds the door
+            EditorSceneManager.OpenScene("Assets/_Project/Scenes/Combat.unity", OpenSceneMode.Single);
+            CombatSceneController controller = Object.FindFirstObjectByType<CombatSceneController>();
+            ItemBoardController board = Object.FindFirstObjectByType<ItemBoardController>();
+            ActionStripView strip = Object.FindFirstObjectByType<ActionStripView>();
+            ItemPopupController popup = Object.FindFirstObjectByType<ItemPopupController>();
+            CombatHudView hud = Object.FindFirstObjectByType<CombatHudView>();
+            RectTransform safeFrame = GameObject.Find("SafeFrame").GetComponent<RectTransform>();
+            controller.InitializeIntegrated(board, hud, strip, popup, safeFrame, initialSpeedIndex: 0);
+            controller.Run.ForceFusion = true;
+            controller.HeroSelect.Select(0);
+            controller.HeroSelect.Confirm();
+            Assert.AreEqual("hero_crusader", controller.HeroDef.Id);
+            for (int room = 1; room <= 2; room++)
+            {
+                controller.Playback.HandleSpeedRequested(3);   // room entry resets the speed: skip again
+                Assert.IsTrue(controller.StartIntegratedFight(0));
+                if (controller.LastResult.Outcome != CombatOutcome.Victory) Assert.Inconclusive("room " + room + " was lost with this seed");
+                if (controller.RunPanel.Current == RunPanelView.Step.Claim) controller.RunPanel.Command(0);
+                Assert.AreEqual(RunPanelView.Step.Reward, controller.RunPanel.Current);
+                controller.RunPanel.CommandSkip();
+                Assert.AreEqual(RunPanelView.Step.Doors, controller.RunPanel.Current);
+                int pick = -1, fusionCard = -1;
+                for (int i = 0; i < controller.Run.Row.Count; i++)
+                {
+                    if (controller.Run.Row[i].IsFusion) fusionCard = i;
+                    else if (pick < 0 && controller.Run.Row[i].Tier != Project05.CombatCore.TierKind.Gold) pick = i;
+                }
+
+                if (room == 1)
+                {
+                    Assert.AreEqual(-1, fusionCard, "no fusion door before room 3");
+                    controller.RunPanel.Command(pick);
+                    continue;
+                }
+
+                Assert.GreaterOrEqual(fusionCard, 0, "the debug policy puts a fusion door in the row to room 3");
+                int gold = controller.Currency;
+                Assert.GreaterOrEqual(gold, 6);
+
+                // Act: enter the fusion room
+                controller.RunPanel.Command(fusionCard);
+                Assert.AreEqual(Project05.CombatCore.Run.RunPhase.Fusion, controller.Run.Phase);
+                Assert.AreEqual(3, controller.Run.Room);
+                Assert.AreEqual(RunPanelView.Step.Fusion, controller.RunPanel.Current);
+                Assert.AreEqual(CombatScenePhase.RunReward, controller.Phase);
+                Assert.IsFalse(controller.CanStartFight, "a fusion room has no fight");
+                Assert.AreEqual(gold, controller.Currency, "a fusion room pays nothing");
+                Assert.AreEqual(12, controller.RunPanel.ShownRows.Count);
+                int honed = controller.RunPanel.ShownRows.ToList().FindIndex(r => r.Recipe.Id == "recipe_honed_sword");
+                Assert.IsTrue(controller.RunPanel.ShownRows[honed].Makeable, "the Crusader's kit holds both ingredients");
+
+                // fuse the Honed Sword
+                controller.RunPanel.Command(honed);
+
+                // Assert
+                Assert.AreEqual(gold - 6, controller.Currency);
+                List<BoardItem> all = board.ExportContainerItems("grid");
+                all.AddRange(board.ExportContainerItems("stash"));
+                Assert.IsFalse(all.Exists(i => i.Record.id == "item_iron_sword" || i.Record.id == "item_whetstone"), "the ingredients are consumed");
+                Assert.IsTrue(board.ExportContainerItems("stash").Exists(i => i.Record.id == "item_honed_sword"), "the result goes to the stash");
+                Assert.IsTrue(controller.Run.FusedThisRoom);
+                Assert.IsTrue(controller.RunPanel.FusionLocked);
+                controller.RunPanel.Command(honed);
+                Assert.AreEqual(gold - 6, controller.Currency, "one fusion per visit");
+
+                // leave: the row to room 4 (never a fusion door right after one)
+                controller.RunPanel.CommandLeave();
+                Assert.AreEqual(RunPanelView.Step.Doors, controller.RunPanel.Current);
+                Assert.AreEqual(Project05.CombatCore.Run.RunPhase.DoorChoice, controller.Run.Phase);
+                foreach (Project05.CombatCore.Run.DoorCard c in controller.Run.Row) Assert.IsFalse(c.IsFusion);
+            }
         }
 
         [Test]

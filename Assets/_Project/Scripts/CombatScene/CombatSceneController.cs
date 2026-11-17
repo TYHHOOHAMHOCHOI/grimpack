@@ -161,11 +161,34 @@ namespace Project05.CombatScene
             return true;
         }
 
-        public void AddCurrency(int delta)
+        public void AddCurrency(int delta) => AddCurrency(delta, null);
+
+        /// <summary>
+        /// Changes the gold at once (game state) and presents it: the counter ticks, and with a source point the coins first
+        /// hop from there to the counter (feedback-motion.md P-10, P-11, R-10).
+        /// </summary>
+        public void AddCurrency(int delta, Vector2? coinsFrom)
         {
+            int before = Currency;
             Currency = Mathf.Max(0, Currency + delta);
-            if (hudView != null) hudView.SetCurrency(Currency);
+            if (hudView == null) return;
+            if (_feedback == null || !Application.isPlaying)
+            {
+                hudView.SetCurrency(Currency);
+                return;
+            }
+
+            int after = Currency;
+            if (coinsFrom.HasValue && delta > 0)
+                _feedback.CoinFlight(coinsFrom.Value, new Vector2(10f, 8f), Mathf.Clamp(delta, 3, 10), () => _feedback.Tick(hudView.SetCurrencyText, before, after));
+            else
+                _feedback.Tick(hudView.SetCurrencyText, before, after);
         }
+
+        private Project05.UI.Motion.FeedbackFx _feedback;
+
+        /// <summary>The reactions layer (tests and probes).</summary>
+        public Project05.UI.Motion.FeedbackFx Feedback => _feedback;
 
         public void SetMonsterSelectorVisible(bool visible)
         {
@@ -278,8 +301,8 @@ namespace Project05.CombatScene
                 heroCount: 1,
                 heroProfiles: new[] { HeroDef.BackpackProfile },
                 idSource: _idSource,
-                stashWidth: 8,
-                stashHeight: 8,
+                stashWidth: WorkbenchLayout.Stash,
+                stashHeight: WorkbenchLayout.StashRows,
                 rotationEnabled: true);
 
             if (_externalBoard == null) return;
@@ -341,6 +364,11 @@ namespace Project05.CombatScene
                 _integratedPicker.Populate(Catalog);
                 _integratedPicker.ItemClicked += HandleIntegratedPickerClicked;
                 _pickerOverlay.gameObject.SetActive(false);
+
+                // planning-screen.md P19: a developer tool, not a player feature. Hidden in a run unless F9 shows it;
+                // absent from release builds.
+                _pickerDebugShown = !RunActive && (Application.isEditor || Debug.isDebugBuild);
+                _pickerToggleBtn.gameObject.SetActive(_pickerDebugShown);
             }
 
             // Playback & Post-Combat panels
@@ -635,25 +663,40 @@ namespace Project05.CombatScene
             return CombatRunner.TryPrepare(Catalog, setup, rng, out prepared, out error);
         }
 
+        private bool _pickerDebugShown;
+
+        private void Update()
+        {
+            UpdateRoomPlate();
+            if (_pickerToggleBtn == null) return;
+            var kb = UnityEngine.InputSystem.Keyboard.current;
+            if ((Application.isEditor || Debug.isDebugBuild) && kb != null && kb.f9Key.wasPressedThisFrame)
+            {
+                _pickerDebugShown = !_pickerDebugShown;   // planning-screen.md P19: F9 shows the debug item picker
+                if (!_pickerDebugShown) SetPickerOpen(false);
+            }
+
+            bool show = _pickerDebugShown && (Application.isEditor || Debug.isDebugBuild);
+            if (_pickerToggleBtn.gameObject.activeSelf != show) _pickerToggleBtn.gameObject.SetActive(show);
+        }
+
         private void PopulateInitialLoadout()
         {
-            if (HeroDef.StartingItems != null)
+            if (HeroDef.StartingLayout != null)
             {
-                for (int i = 0; i < HeroDef.StartingItems.Count; i++)
+                foreach (StartingPlacement at in HeroDef.StartingLayout)
                 {
-                    PlaceNewItem(HeroDef.StartingItems[i], ContainerKind.Hero0);
+                    if (at.X >= 0 && Catalog.FindItem(at.ItemId) != null && Arrangement.CreateInTray(at.ItemId, out long itemId).IsOk)
+                    {
+                        if (Arrangement.Place(itemId, ContainerKind.Hero0, at.X, at.Y, at.Rotation).IsOk) continue;
+                        Arrangement.DestroyTrayItem(itemId);
+                    }
+
+                    PlaceNewItem(at.ItemId, ContainerKind.Hero0);
                 }
             }
 
-            // Seed a few starter options into Stash so players can swap immediately without opening Chọn đồ.
-            string[] starterSpares = { "item_dagger", "item_oak_buckler", "item_drowsy_bell" };
-            for (int i = 0; i < starterSpares.Length; i++)
-            {
-                if (Catalog.FindItem(starterSpares[i]) != null)
-                {
-                    PlaceNewItem(starterSpares[i], ContainerKind.Stash);
-                }
-            }
+            // balance-three-item-start.md: no stash spares; the run starts with the hero's 3-item kit only.
         }
 
         private void PlaceNewItem(string defId, ContainerKind container)

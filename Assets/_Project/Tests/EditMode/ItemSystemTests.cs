@@ -22,7 +22,7 @@ namespace Project05.Tests.EditMode
         {
             ItemCatalog c = LoadCatalog();
 
-            Assert.AreEqual(91, c.All.Count);   // 46 items + 45 upgraded (+) versions (item-upgrades.md)
+            Assert.AreEqual(103, c.All.Count);   // 46 items + 45 upgraded (+) versions (item-upgrades.md) + 12 fused (item-fusion.md)
             var seen = new HashSet<string>();
             foreach (ItemRecord i in c.All) Assert.IsTrue(seen.Add(i.id), i.id);
         }

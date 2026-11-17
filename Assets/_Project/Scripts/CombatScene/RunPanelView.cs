@@ -13,17 +13,19 @@ namespace Project05.CombatScene
     /// <summary>
     /// The post-victory panel in the right column (door-and-room-panels-ui.md, System 28): three steps of one flow,
     /// BuffClaim, Reward shelf and DoorChoice, sharing one card mould, one arm-then-Confirm grammar and one detail box.
-    /// Display only: it shows what the run session offers and raises commands; it decides nothing.
+    /// Display only: it shows what the run session offers and raises commands; it decides nothing. The fusion room's
+    /// step (item-fusion.md) lives in RunPanelView.Fusion.cs.
     /// Vietnamese literals are TEMPORARY until the localisation pass (System 7).
     /// </summary>
-    public sealed class RunPanelView : MonoBehaviour
+    public sealed partial class RunPanelView : MonoBehaviour
     {
         /// <summary>Which step the panel shows.</summary>
-        public enum Step { Hidden, Claim, Reward, Doors, HeroPick }
+        public enum Step { Hidden, Claim, Reward, Doors, HeroPick, Fusion }
 
-        private const float PanelX = 315f, PanelY = 19f, PanelW = 322f, PanelH = 314f;
-        private const float CardW = 90f, CardH = 140f, CardGap = 20f, CardX0 = 6f, CardY = 24f;
-        private const float DetailY = 170f, DetailH = 108f;
+        // planning-screen.md section 5: an overlay on the enemy zone (P24, x 316..637, y 19..333); R rects relative to it
+        private const float PanelX = 316f, PanelY = 19f, PanelW = 321f, PanelH = 314f;
+        private const float CardW = 90f, CardH = 140f, CardGap = 12f, CardX0 = 9f, CardY = 32f;
+        private const float DetailY = 180f, DetailH = 98f;
 
         public event Action ClaimConfirmed;
         public event Action<int> RewardTaken;
@@ -47,7 +49,10 @@ namespace Project05.CombatScene
         private TextMeshProUGUI _message;
         private Button _confirm;
         private Button _skip;
+        private TextMeshProUGUI _skipLabel;
         private TextMeshProUGUI _confirmLabel;
+        private RectTransform _actions;
+        private Image _skipKey;
         private readonly List<Card> _cards = new List<Card>();
         private int _armed = -1;
         private int _hover = -1;
@@ -56,6 +61,12 @@ namespace Project05.CombatScene
         private IReadOnlyList<string> _offer;
 
         public Step Current { get; private set; } = Step.Hidden;
+
+        /// <summary>Card i's rect, or null (the reward flight starts from it, feedback-motion.md R-01).</summary>
+        public RectTransform CardRect(int index) => index >= 0 && index < _cards.Count ? _cards[index].Rect : null;
+
+        /// <summary>Reactions (feedback-motion.md U-04); null in tests.</summary>
+        public Project05.UI.Motion.FeedbackFx Feedback { get; set; }
         public int Armed => _armed;
         public bool IsVisible => _root != null && _root.gameObject.activeSelf;
 
@@ -81,18 +92,34 @@ namespace Project05.CombatScene
             _sprites = sprites;
             _catalog = catalog;
             _root = CombatUiFactory.CreateRect("RunPanel", safeFrame, PanelX, PanelY, PanelW, PanelH);
-            CombatUiFactory.CreateImage("Bg", _root, sprites.panelVoid, 0f, 0f, PanelW, PanelH, sliced: true, raycastTarget: true);
-            _title = CombatUiFactory.CreateLabel("Title", _root, sprites.font, string.Empty, 8f, 6f, 200f, 12f, CombatUiFactory.Bone);
-            _steps = CombatUiFactory.CreateLabel("Steps", _root, sprites.font, string.Empty, 170f, 6f, 146f, 12f, CombatUiFactory.Fog, TextAlignmentOptions.TopRight);
+            // R1: one ink step over the enemy zone (checker, no partial alpha); the hero column and workbench stay usable
+            Image dim = CombatUiFactory.CreateImage("Dim", _root, Run("ui_dim-mask_default_4x4") ?? sprites.fillInk0, 0f, 0f, PanelW, PanelH, raycastTarget: true);
+            dim.type = Image.Type.Tiled;
+            // R3: step header plate with the title and the tracker
+            CombatUiFactory.CreateImage("Header", _root, Run("ui_board-wood_default_9s") ?? sprites.panelDefault, 7f, 6f, 296f, 19f, sliced: true);
+            _title = CombatUiFactory.CreateLabel("Title", _root, sprites.font, string.Empty, 26f, 9f, 170f, 12f, CombatUiFactory.Bone);
+            _steps = CombatUiFactory.CreateLabel("Steps", _root, sprites.font, string.Empty, 150f, 9f, 134f, 12f, CombatUiFactory.Fog, TextAlignmentOptions.TopRight);
             _content = CombatUiFactory.CreateRect("Content", _root, 0f, 0f, PanelW, PanelH);
-            CombatUiFactory.CreateImage("DetailBg", _root, sprites.panelDefault, 6f, DetailY, PanelW - 12f, DetailH, sliced: true);
-            _detail = CombatUiFactory.CreateLabel("Detail", _root, sprites.font, string.Empty, 12f, DetailY + 6f, PanelW - 24f, DetailH - 12f, CombatUiFactory.Bone, TextAlignmentOptions.TopLeft, wrap: true);
-            _message = CombatUiFactory.CreateLabel("Message", _root, sprites.font, string.Empty, 8f, 290f, 150f, 12f, CombatUiFactory.Blood, TextAlignmentOptions.TopLeft, wrap: true);
-            _skip = CombatUiFactory.CreateSegmentButton("Skip", _root, sprites, "Bỏ qua", 166f, 286f, 64f, 20f);
-            _skip.onClick.AddListener(() => { if (Current == Step.Reward && Ready) RewardSkipped?.Invoke(); });
-            _confirm = CombatUiFactory.CreateSegmentButton("Confirm", _root, sprites, "Xác nhận", 236f, 286f, 80f, 20f, selected: true);
+            // R6 detail plate, R7 message line
+            CombatUiFactory.CreateImage("DetailBg", _root, sprites.panelDefault, CardX0, DetailY, 294f, DetailH, sliced: true);
+            _detail = CombatUiFactory.CreateLabel("Detail", _root, sprites.font, string.Empty, CardX0 + 7f, DetailY + 6f, 280f, DetailH - 12f, CombatUiFactory.Bone, TextAlignmentOptions.TopLeft, wrap: true);
+            _message = CombatUiFactory.CreateLabel("Message", _root, sprites.font, string.Empty, CardX0, 284f, 294f, 24f, CombatUiFactory.Bone, TextAlignmentOptions.TopLeft, wrap: true);
+
+            // R8 to R11 live in the action strip (art bible 7.10): a strip of their own over the Start group while shown
+            _actions = CombatUiFactory.CreateRect("RunActions", safeFrame, 177f, 333f, 460f, 24f);
+            CombatUiFactory.CreateImage("Strip", _actions, Run("ui_fill-gen_ink-1_4x4") ?? sprites.fillInk1, 0f, 0f, 460f, 24f, raycastTarget: true);
+            CombatUiFactory.CreateImage("Rail", _actions, Run("ui_fill-gen_umber-2_4x4") ?? sprites.fillCandleD, 0f, 0f, 460f, 1f);
+            _skipKey = CombatUiFactory.CreateImage("SkipKey", _actions, Run("ui_plate-iron_default_9s") ?? sprites.panelDefault, 160f, 5f, 14f, 14f, sliced: true);
+            CombatUiFactory.CreateLabel("Text", _skipKey.transform, sprites.font, "K", 0f, 1f, 14f, 12f, CombatUiFactory.Fog, TextAlignmentOptions.Top);
+            _skip = CombatUiFactory.CreateSegmentButton("Skip", _actions, sprites, "Bỏ qua", 176f, 2f, 76f, 19f);
+            _skipLabel = _skip.GetComponentInChildren<TextMeshProUGUI>(true);
+            _skip.onClick.AddListener(Skip);
+            Image enterKey = CombatUiFactory.CreateImage("ConfirmKey", _actions, Run("ui_plate-iron_default_9s") ?? sprites.panelDefault, 258f, 5f, 46f, 14f, sliced: true);
+            CombatUiFactory.CreateLabel("Text", enterKey.transform, sprites.font, "Enter", 0f, 1f, 46f, 12f, CombatUiFactory.Fog, TextAlignmentOptions.Top);
+            _confirm = CombatUiFactory.CreateSegmentButton("Confirm", _actions, sprites, "Xác nhận", 308f, 2f, 148f, 19f, selected: true);
             _confirmLabel = _confirm.GetComponentInChildren<TextMeshProUGUI>(true);
             _confirm.onClick.AddListener(Confirm);
+            _actions.gameObject.SetActive(false);
             _root.gameObject.SetActive(false);
         }
 
@@ -101,8 +128,10 @@ namespace Project05.CombatScene
 
         public void Hide()
         {
+            ClearFusionDetail();
             Current = Step.Hidden;
             if (_root != null) _root.gameObject.SetActive(false);
+            if (_actions != null) _actions.gameObject.SetActive(false);
             SetArmed(-1);
         }
 
@@ -111,10 +140,10 @@ namespace Project05.CombatScene
         public void ShowClaim(int room, TierKind tier, DoorBuff buff, int hpNow, int cellsNow, CurseDef curse, string heroName)
         {
             Begin(Step.Claim, $"Thắng phòng {room}", 0);
-            var box = CombatUiFactory.CreateRect("ClaimBox", _content, 6f, CardY, PanelW - 12f, CardH);
-            CombatUiFactory.CreateImage("Frame", box, DoorFrame(tier), 0f, 0f, PanelW - 12f, CardH, sliced: true);
-            Pips(box, tier, (PanelW - 12f) / 2f, 8f);
-            CombatUiFactory.CreateLabel("Head", box, _sprites.font, "Phần thưởng cửa " + TierName(tier), 0f, 18f, PanelW - 12f, 12f, CombatUiFactory.Candle, TextAlignmentOptions.Top);
+            var box = CombatUiFactory.CreateRect("ClaimBox", _content, CardX0, CardY, 294f, CardH);
+            CombatUiFactory.CreateImage("Frame", box, DoorFrame(tier), 0f, 0f, 294f, CardH, sliced: true);
+            Pips(box, tier, 147f, 8f);
+            CombatUiFactory.CreateLabel("Head", box, _sprites.font, "Phần thưởng cửa " + TierName(tier), 0f, 18f, 294f, 12f, CombatUiFactory.Candle, TextAlignmentOptions.Top);
             float y = 40f;
             Line(box, _sprites.glyphHeartBone8, $"+{hpNow} Máu tối đa" + (hpNow < buff.Hp ? $" (giới hạn, gốc +{buff.Hp})" : string.Empty), 20f, ref y);
             if (buff.Cells > 0)
@@ -126,9 +155,9 @@ namespace Project05.CombatScene
             {
                 y += 4f;
                 CurseTag(box, curse, 20f, y);
-                CombatUiFactory.CreateLabel("CurseLine", box, _sprites.font, curse.NameVi + ": " + curse.LineVi, 64f, y - 1f, PanelW - 90f, 12f, CombatUiFactory.Bone);
+                CombatUiFactory.CreateLabel("CurseLine", box, _sprites.font, curse.NameVi + ": " + curse.LineVi, 64f, y - 1f, 220f, 12f, CombatUiFactory.Bone);
                 y += 14f;
-                CombatUiFactory.CreateLabel("Lasts", box, _sprites.font, "Nguyền kéo dài cả lượt chơi.", 64f, y, PanelW - 90f, 12f, CombatUiFactory.Fog);
+                CombatUiFactory.CreateLabel("Lasts", box, _sprites.font, "Nguyền kéo dài cả lượt chơi.", 64f, y, 220f, 12f, CombatUiFactory.Fog);
             }
 
             SetDetail("Trao cho: " + heroName + "\nNhận ngay, không ngẫu nhiên. Có hiệu lực từ trận sau." +
@@ -166,6 +195,7 @@ namespace Project05.CombatScene
 
             SetDetail(offer.Count > 0 ? "Chọn 1 món (vào kho đồ) hoặc bỏ qua.\nĐộ hiếm theo cửa " + TierName(doorTier) + "." : "Không có món nào.");
             _confirmLabel.text = "Lấy";
+            if (_skipLabel != null) _skipLabel.text = "Bỏ qua";
             SetButtons(confirm: true, skip: true);
         }
 
@@ -178,9 +208,17 @@ namespace Project05.CombatScene
             {
                 DoorCard door = row[i];
                 int index = i;
-                Card card = NewCard(i, DoorFrame(door.Tier), () => Arm(index));
-                BuildDoorFace(card.Rect, door);
-                card.Detail = DoorDetail(door);
+                Card card = NewCard(i, door.IsFusion ? FusionFrame : DoorFrame(door.Tier), () => Arm(index));
+                if (door.IsFusion)
+                {
+                    BuildFusionDoorFace(card.Rect);
+                    card.Detail = FusionDoorDetail;
+                }
+                else
+                {
+                    BuildDoorFace(card.Rect, door);
+                    card.Detail = DoorDetail(door);
+                }
             }
 
             SetDetail("Rê chuột để xem, bấm để chọn, rồi Xác nhận. Cửa đã chọn là cố định.");
@@ -198,10 +236,18 @@ namespace Project05.CombatScene
             Confirm();
         }
 
-        /// <summary>Skips the item shelf, without the input lock (tests and automation).</summary>
+        /// <summary>Skips the item shelf, or leaves the fusion room, without the input lock (tests and automation).</summary>
         public void CommandSkip()
         {
             if (Current == Step.Reward) RewardSkipped?.Invoke();
+            else if (Current == Step.Fusion) FusionLeft?.Invoke();
+        }
+
+        private void Skip()
+        {
+            if (!Ready) return;
+            if (Current == Step.Reward) RewardSkipped?.Invoke();
+            else if (Current == Step.Fusion) FusionLeft?.Invoke();
         }
 
         /// <summary>Run start: pick the hero (debuffs-and-detonation.md: the Alchemist carries the detonation core).</summary>
@@ -339,6 +385,8 @@ namespace Project05.CombatScene
             card.Ring = CombatUiFactory.CreateImage("Ring", card.Rect, Run("ui_door-card_ring-hover_9s"), -2f, -2f, CardW + 4f, CardH + 4f, sliced: true);
             card.Ring.enabled = false;
             Image bg = CombatUiFactory.CreateImage("Frame", card.Rect, frame, 0f, 0f, CardW, CardH, sliced: true, raycastTarget: true);
+            Sprite slab = Run("ui_card-slab_default_9s");   // K7: the generated stone slab is the card body inside its tier edge
+            if (slab != null) CombatUiFactory.CreateImage("Slab", card.Rect, slab, 3f, 3f, CardW - 6f, CardH - 6f, sliced: true);
             var btn = bg.gameObject.AddComponent<Button>();
             btn.transition = Selectable.Transition.None;
             btn.onClick.AddListener(() => onClick());
@@ -356,13 +404,15 @@ namespace Project05.CombatScene
             _hover = index;
             RefreshRings();
             int show = index >= 0 ? index : _armed;
-            if (show >= 0 && show < _cards.Count) _detail.text = _cards[show].Detail;
+            if (Current == Step.Fusion) ShowFusionDetail(show);
+            else if (show >= 0 && show < _cards.Count) _detail.text = _cards[show].Detail;
         }
 
         private void Arm(int index)
         {
             SetArmed(index);
-            if (index >= 0 && index < _cards.Count) _detail.text = _cards[index].Detail;
+            if (Current == Step.Fusion) ShowFusionDetail(index);
+            else if (index >= 0 && index < _cards.Count) _detail.text = _cards[index].Detail;
         }
 
         private void SetArmed(int index)
@@ -370,7 +420,8 @@ namespace Project05.CombatScene
             _armed = index;
             RefreshRings();
             if (Current == Step.Doors) DoorArmed?.Invoke(index);
-            if (_confirm != null) _confirm.interactable = Current == Step.Claim || index >= 0;
+            if (Current == Step.Fusion) FusionArmed?.Invoke(index);
+            if (_confirm != null) _confirm.interactable = Current == Step.Claim || (Current == Step.Fusion ? CanConfirmFusion : index >= 0);
         }
 
         private void RefreshRings()
@@ -384,8 +435,9 @@ namespace Project05.CombatScene
                 _cards[i].Ring.sprite = isArmed ? armed : hover;
                 float grow = isArmed ? 3f : 2f;   // the hover ring sits 2 px outside the card, the armed ring 3 px
                 RectTransform rr = _cards[i].Ring.rectTransform;
+                Vector2 size = _cards[i].Rect.sizeDelta;
                 rr.anchoredPosition = new Vector2(-grow, grow);
-                rr.sizeDelta = new Vector2(CardW + grow * 2f, CardH + grow * 2f);
+                rr.sizeDelta = new Vector2(size.x + grow * 2f, size.y + grow * 2f);
                 _cards[i].Corner.enabled = isArmed;
             }
         }
@@ -407,6 +459,9 @@ namespace Project05.CombatScene
                 case Step.HeroPick:
                     if (_armed >= 0) HeroPicked?.Invoke(_armed);
                     break;
+                case Step.Fusion:
+                    ConfirmFusion();
+                    break;
             }
         }
 
@@ -414,16 +469,27 @@ namespace Project05.CombatScene
         {
             if (!IsVisible || Current == Step.Hidden) return;
             Keyboard kb = Keyboard.current;
-            if (kb == null) return;
-            if (_cards.Count > 0 && (kb.leftArrowKey.wasPressedThisFrame || kb.rightArrowKey.wasPressedThisFrame))
+            Gamepad pad = Gamepad.current;
+            bool left = (kb != null && kb.leftArrowKey.wasPressedThisFrame) || (pad != null && pad.dpad.left.wasPressedThisFrame);
+            bool right = (kb != null && kb.rightArrowKey.wasPressedThisFrame) || (pad != null && pad.dpad.right.wasPressedThisFrame);
+            bool up = (kb != null && kb.upArrowKey.wasPressedThisFrame) || (pad != null && pad.dpad.up.wasPressedThisFrame);
+            bool down = (kb != null && kb.downArrowKey.wasPressedThisFrame) || (pad != null && pad.dpad.down.wasPressedThisFrame);
+            bool confirm = (kb != null && (kb.enterKey.wasPressedThisFrame || kb.numpadEnterKey.wasPressedThisFrame)) || (pad != null && pad.buttonSouth.wasPressedThisFrame);
+            bool skip = (kb != null && kb.kKey.wasPressedThisFrame) || (pad != null && pad.buttonEast.wasPressedThisFrame);
+            // the fusion book is two columns: left/right step one recipe, up/down step a row (item-fusion.md UI)
+            int step = left ? -1 : right ? 1 : Current == Step.Fusion && up ? -2 : Current == Step.Fusion && down ? 2 : 0;
+            if (_cards.Count > 0 && step != 0)
             {
-                int dir = kb.rightArrowKey.wasPressedThisFrame ? 1 : -1;
-                int next = _armed < 0 ? (dir > 0 ? 0 : _cards.Count - 1) : Mathf.Clamp(_armed + dir, 0, _cards.Count - 1);
-                Arm(next);
+                int next = _armed < 0 ? (step > 0 ? 0 : _cards.Count - 1) : _armed + step;
+                if (next >= 0 && next < _cards.Count) Arm(next);
             }
-            else if (kb.enterKey.wasPressedThisFrame || kb.numpadEnterKey.wasPressedThisFrame)
+            else if (confirm)
             {
                 Confirm();
+            }
+            else if (skip && (Current == Step.Reward || Current == Step.Fusion))
+            {
+                Skip();
             }
         }
 
@@ -433,22 +499,59 @@ namespace Project05.CombatScene
             Current = step;
             _root.gameObject.SetActive(true);
             _root.SetAsLastSibling();
+            bool wasHidden = !_actions.gameObject.activeSelf;
+            _actions.gameObject.SetActive(true);
+            _actions.SetAsLastSibling();
+            if (Feedback != null && wasHidden)
+            {
+                Feedback.SlideIn(_root, new Vector2(24f, 0f));   // U-04: the overlay slides in from the right
+                if (step == Step.Claim || step == Step.Reward) Banner(title);
+            }
+            else if (Feedback != null) Feedback.SlideIn(_content, new Vector2(8f, 0f), 0.12f);  // U-05: the next step steps in
             for (int i = _content.childCount - 1; i >= 0; i--) CombatUiFactory.DestroySafe(_content.GetChild(i).gameObject);
+            ClearFusionDetail();
             _cards.Clear();
             _hover = -1;
             _message.text = string.Empty;
             _title.text = string.IsNullOrEmpty(TitleNote) ? title : title + " · " + TitleNote;
-            string[] names = { "Buff", "Đồ", "Cửa" };
+            string[] names = step == Step.Fusion ? new[] { "Dung hợp", "Cửa" } : new[] { "Buff", "Đồ", "Cửa" };
             for (int i = 0; i < names.Length; i++) names[i] = i == stepIndex ? "<color=#EFC186>" + names[i] + "</color>" : names[i];
             _steps.text = string.Join(" · ", names);
             _readyAt = Time.unscaledTime + 0.25f;
             SetArmed(-1);
         }
 
+        /// <summary>
+        /// R2 / C-16: the victory banner grows from a 16 px strip to its full 240 px in 8 steps (240 ms), holds, then goes.
+        /// Input is never blocked by it.
+        /// </summary>
+        private void Banner(string title)
+        {
+            Sprite board = Run("ui_banner-wood_default_9s");
+            if (board == null || Feedback == null) return;
+            const float w = 240f, h = 29f, cx = 147f + CardX0, y = 92f;
+            Image img = CombatUiFactory.CreateImage("VictoryBanner", _root, board, cx - w / 2f, y, w, h, sliced: true);
+            TextMeshProUGUI text = CombatUiFactory.CreateLabel("Text", img.transform, _sprites.font, title, 0f, 8f, w, 12f, CombatUiFactory.Candle, TextAlignmentOptions.Top);
+            RectTransform rt = img.rectTransform;
+            text.enabled = false;
+            Feedback.Motion.Run(0.24f, u =>
+            {
+                if (rt == null) return;
+                float width = Mathf.Round(Mathf.Lerp(16f, w, Mathf.Floor(u * 8f) / 8f));
+                rt.sizeDelta = new Vector2(width, h);
+                rt.anchoredPosition = new Vector2(cx - width / 2f, -y);
+            }, () =>
+            {
+                if (text != null) text.enabled = true;
+                Feedback.Motion.Run(0.9f, null, () => { if (img != null) CombatUiFactory.DestroySafe(img.gameObject); });
+            });
+        }
+
         private void SetButtons(bool confirm, bool skip)
         {
             _confirm.gameObject.SetActive(confirm);
             _skip.gameObject.SetActive(skip);
+            _skipKey.gameObject.SetActive(skip);
         }
 
         private void SetDetail(string text) => _detail.text = text;
@@ -551,18 +654,19 @@ namespace Project05.CombatScene
             return m.Classification == MonsterClassKind.Elite ? "tinh anh, " + role : role;
         }
 
-        private static string Describe(ItemDef def)
+        public static string Describe(ItemDef def)
         {
             var parts = new List<string>();
             foreach (EffectDef e in def.Effects)
             {
                 switch (e.Kind)
                 {
-                    case EffectKind.Damage: parts.Add("Sát thương " + e.Base); break;
+                    case EffectKind.Damage: parts.Add("Sát thương " + e.Base + (e.Target == TargetKind.AllEnemies ? " mọi quái" : string.Empty)); break;
                     case EffectKind.ShieldGain: parts.Add("Giáp +" + e.Amount); break;
                     case EffectKind.Heal: parts.Add("Hồi " + e.Amount); break;
-                    case EffectKind.ApplyStatus: parts.Add("Ấn " + e.Amount); break;
-                    case EffectKind.ConsumeDetonate: parts.Add("Kích nổ Ấn"); break;
+                    case EffectKind.ApplyStatus: parts.Add(Project05.Items.ItemTooltipText.StatusName(e.Status) + " " + e.Amount + (e.Target == TargetKind.AllEnemies ? " mọi quái" : string.Empty)); break;
+                    case EffectKind.ConsumeDetonate: parts.Add("Kích nổ"); break;
+                    case EffectKind.DetonateAll: parts.Add("Kích nổ mọi debuff"); break;
                 }
             }
 

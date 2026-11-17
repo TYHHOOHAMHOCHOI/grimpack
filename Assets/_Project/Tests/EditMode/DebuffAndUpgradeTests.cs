@@ -65,7 +65,9 @@ namespace Project05.Tests.EditMode
                 if (item.Detonates) detonators.Add(item.Id);
             }
 
-            CollectionAssert.AreEquivalent(new[] { "item_plague_catalyst", "item_plague_catalyst_plus" }, detonators);
+            // the Plague Heart detonates too: it is fused from the Catalyst itself (item-fusion.md recipe 10), never an upgrade
+            CollectionAssert.AreEquivalent(new[] { "item_plague_catalyst", "item_plague_catalyst_plus", "item_plague_heart" }, detonators);
+            Assert.AreEqual(_catalog.RecipeMaking("item_plague_heart").Ingredients[0], "item_plague_catalyst");
             HeroDef alchemist = _catalog.FindHero("hero_alchemist");
             Assert.AreEqual("item_plague_catalyst", alchemist.SignatureItemId);
             CollectionAssert.Contains(alchemist.StartingItems, "item_plague_catalyst");
@@ -90,6 +92,12 @@ namespace Project05.Tests.EditMode
                 if (item.Id == "item_cursed_anchor")
                 {
                     Assert.IsTrue(string.IsNullOrEmpty(item.UpgradeId), "a curse item never upgrades");
+                    continue;
+                }
+
+                if (_catalog.RecipeMaking(item.Id) != null)
+                {
+                    Assert.IsTrue(string.IsNullOrEmpty(item.UpgradeId), "a fused item never upgrades (item-fusion.md Rule 2)");
                     continue;
                 }
 
@@ -181,7 +189,8 @@ namespace Project05.Tests.EditMode
             }
 
             Assert.AreEqual(3, weaken);
-            Assert.AreEqual((7 * (1000 - 300) + 500) / 1000, hit.ResolvedAmount, "the Hunter's 7 is cut by 30%");
+            int strike = _catalog.FindMonster("mon_hunter").Moves[0].BaseDamage;   // data-driven (balance-three-item-start.md)
+            Assert.AreEqual((strike * (1000 - 300) + 500) / 1000, hit.ResolvedAmount, "the Hunter's strike is cut by 30%");
         }
 
         [Test]

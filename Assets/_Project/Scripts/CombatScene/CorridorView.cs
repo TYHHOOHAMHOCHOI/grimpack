@@ -74,14 +74,22 @@ namespace Project05.CombatScene
             if (_run == null || _nodes.Count < 9) return;
             int current = _run.Room;
             var tierOf = new Dictionary<int, TierKind>();
-            foreach (RoomRecord rec in _run.History) tierOf[rec.Room] = rec.Tier;
+            var fusion = new HashSet<int>();   // item-fusion.md: fusion rooms get their own node
+            foreach (RoomRecord rec in _run.History)
+            {
+                tierOf[rec.Room] = rec.Tier;
+                if (rec.Fusion) fusion.Add(rec.Room);
+            }
+
             if (!_run.IsBossRoom && current >= 1) tierOf[current] = _run.CurrentDoor?.Tier ?? TierKind.White;
+            if (!_run.IsBossRoom && _run.IsFusionRoom) fusion.Add(current);
 
             for (int r = 1; r <= 8; r++)
             {
                 Image node = _nodes[r - 1];
                 string key;
                 if (r == 1 && (r <= current || _run.IsBossRoom)) key = "ui_map-node_entrance_10x11";
+                else if (r <= current && fusion.Contains(r) && Sprite("ui_map-node_fusion_10x11") != null) key = "ui_map-node_fusion_10x11";
                 else if (r <= current && tierOf.TryGetValue(r, out TierKind t)) key = "ui_map-node_" + RunPanelView.TierKey(t) + "_10x11";
                 else if (r == current + 1 && _preview.HasValue) key = "ui_map-node-preview_" + RunPanelView.TierKey(_preview.Value) + "_10x11";
                 else key = "ui_map-node_ahead_10x11";
@@ -102,7 +110,14 @@ namespace Project05.CombatScene
             var lines = new List<string>();
             foreach (RoomRecord rec in _run.History)
             {
-                string line = "P" + rec.Room + " " + (rec.Entrance ? "Lối vào" : RunPanelView.TierName(rec.Tier));
+                string line = "P" + rec.Room + " " + (rec.Entrance ? "Lối vào" : rec.Fusion ? "Lò Dung Hợp" : RunPanelView.TierName(rec.Tier));
+                if (rec.Fusion)
+                {
+                    ItemDef made = _catalog?.FindItem(_catalog.FindRecipe(rec.RecipeMade)?.ResultId);
+                    lines.Add(line + (made != null ? ", luyện " + made.NameVi : ", không luyện"));
+                    continue;
+                }
+
                 if (rec.HpGranted > 0) line += ", +" + rec.HpGranted + " Máu";
                 if (rec.CellsGranted > 0) line += ", +" + rec.CellsGranted + " ô";
                 CurseDef curse = _run.Config.FindCurse(rec.CurseId);

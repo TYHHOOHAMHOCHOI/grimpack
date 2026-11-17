@@ -9,7 +9,7 @@
    "roleEn": "Tank / Weaken",
    "baseMaxHp": 110,
    "baseSpeed": 22,
-   "initialShield": 8,
+   "initialShield": 4,
    "backpackProfile": {
     "width": 4,
     "height": 4,
@@ -18,10 +18,24 @@
     "unlockSequence": []
    },
    "startingItems": [
-    "item_iron_sword",
-    "item_spiked_buckler",
-    "item_venom_vial",
-    "item_whetstone"
+    {
+     "itemId": "item_iron_sword",
+     "x": 0,
+     "y": 0,
+     "rot": 1
+    },
+    {
+     "itemId": "item_spiked_buckler",
+     "x": 3,
+     "y": 0,
+     "rot": 0
+    },
+    {
+     "itemId": "item_whetstone",
+     "x": 1,
+     "y": 1,
+     "rot": 0
+    }
    ],
    "signatureItemId": "item_spiked_buckler",
    "innateItem": {
@@ -71,7 +85,7 @@
    "nameEn": "Plague Alchemist",
    "roleVi": "Gây Độc / Kích Nổ",
    "roleEn": "Afflictions / Detonator",
-   "baseMaxHp": 86,
+   "baseMaxHp": 94,
    "baseSpeed": 26,
    "initialShield": 0,
    "backpackProfile": {
@@ -82,11 +96,24 @@
     "unlockSequence": []
    },
    "startingItems": [
-    "item_dagger",
-    "item_venom_vial",
-    "item_oil_flask",
-    "item_mortar",
-    "item_plague_catalyst"
+    {
+     "itemId": "item_thorn_dart",
+     "x": 1,
+     "y": 0,
+     "rot": 0
+    },
+    {
+     "itemId": "item_mortar",
+     "x": 1,
+     "y": 1,
+     "rot": 0
+    },
+    {
+     "itemId": "item_plague_catalyst",
+     "x": 2,
+     "y": 3,
+     "rot": 1
+    }
    ],
    "signatureItemId": "item_plague_catalyst",
    "innateItem": {
@@ -137,9 +164,24 @@
     "unlockSequence": []
    },
    "startingItems": [
-    "item_crossbow",
-    "item_swift_boots",
-    "item_whetstone"
+    {
+     "itemId": "item_crossbow",
+     "x": 0,
+     "y": 0,
+     "rot": 0
+    },
+    {
+     "itemId": "item_thorn_dart",
+     "x": 2,
+     "y": 0,
+     "rot": 0
+    },
+    {
+     "itemId": "item_swift_boots",
+     "x": 2,
+     "y": 0,
+     "rot": 3
+    }
    ],
    "signatureItemId": "item_crossbow",
    "innateItem": {
@@ -191,9 +233,24 @@
     "unlockSequence": []
    },
    "startingItems": [
-    "item_drowsy_bell",
-    "item_field_bandage",
-    "item_oak_buckler"
+    {
+     "itemId": "item_drowsy_bell",
+     "x": 3,
+     "y": 0,
+     "rot": 0
+    },
+    {
+     "itemId": "item_dagger",
+     "x": 1,
+     "y": 0,
+     "rot": 0
+    },
+    {
+     "itemId": "item_whetstone",
+     "x": 1,
+     "y": 1,
+     "rot": 0
+    }
    ],
    "signatureItemId": "item_drowsy_bell",
    "innateItem": {

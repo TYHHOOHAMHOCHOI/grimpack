@@ -129,11 +129,18 @@ def clip_to_bed(art: np.ndarray, fp: str) -> np.ndarray:
 
 
 def main() -> int:
+    """--only a,b,c builds just those art ids (re-running every item would re-quantise accepted art against a palette
+    that has grown since, e.g. the Umber pair of 2026-11-17) and writes its own evidence sheet."""
+    only = None
+    if "--only" in sys.argv:
+        only = set(sys.argv[sys.argv.index("--only") + 1].split(","))
     OUT.mkdir(parents=True, exist_ok=True)
     made = 0
     missing = []
     sheet_tiles = []
-    for it in IC.ITEMS:
+    for it in IC.ITEMS + getattr(IC, "FUSED", []):
+        if only is not None and it["art"] not in only:
+            continue
         art_id, fp = it["art"], it["footprint"]
         w, h = interior(fp)
         raw = RAW / f"item_{art_id}_raw.png"
@@ -164,7 +171,7 @@ def main() -> int:
         for i, (it, tile) in enumerate(sheet_tiles):
             big = tile.resize((tile.width * S, tile.height * S), Image.NEAREST)
             sheet.paste(big, ((i % per_row) * col_w + 3, (i // per_row) * row_h + 3), big)
-        sheet.save(EVIDENCE / "items_sheet_2026-11-15.png")
+        sheet.save(EVIDENCE / ("items_fused_sheet_2026-11-17.png" if only is not None else "items_sheet_2026-11-15.png"))
     return 0
 
 

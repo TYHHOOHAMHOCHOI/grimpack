@@ -25,6 +25,9 @@ namespace Project05.CombatScene
 
         private CombatHudView _hud;
         private CombatFx _fx;
+
+        /// <summary>The reactions layer (set by the scene before playback).</summary>
+        public Project05.UI.Motion.FeedbackFx Feedback { get; set; }
         private ItemAvatarFx _avatars;
         private BackpackFx _backpack;
         private Func<long, RectTransform> _plateOf;
@@ -58,6 +61,7 @@ namespace Project05.CombatScene
                 _fx = _hud.GetComponent<CombatFx>();
                 if (_fx == null) _fx = _hud.gameObject.AddComponent<CombatFx>();
                 _fx.Initialize(_hud);
+                _fx.Feedback = Feedback;
                 HudSpriteSet set = _hud.Sprites;
                 _avatars = _hud.GetComponent<ItemAvatarFx>() ?? _hud.gameObject.AddComponent<ItemAvatarFx>();
                 _avatars.Initialize(_fx, set.vfxTrail, set.vfxTrailFoe, set.vfxMote, set.vfxMoteFoe);
@@ -312,6 +316,7 @@ namespace Project05.CombatScene
 
             if (_fx == null) return false;
             _fx.Speed = Speed;
+            _fx.Feedback = Feedback;
             if (_avatars != null) _avatars.Speed = Speed;
             if (_backpack != null) _backpack.Speed = Speed;
 
@@ -342,6 +347,9 @@ namespace Project05.CombatScene
                     _fx.Hit(ev.Target.Side == UnitSide.Hero, ev.Target.Slot, ev.ResolvedAmount, byHero,
                         firstOfSource && source == Archetype.Swing, beat.Kind == BeatKind.Detonation);
                     return ev.ResolvedAmount > 0;
+                case BeatKind.Down:
+                    if (ev.Target.IsValid) _fx.Down(ev.Target.Side == UnitSide.Hero, ev.Target.Slot);
+                    return false;
                 default:
                     if ((ev.Kind == CombatEventKind.ShieldGained || ev.Kind == CombatEventKind.Healed) && ev.Target.IsValid)
                     {

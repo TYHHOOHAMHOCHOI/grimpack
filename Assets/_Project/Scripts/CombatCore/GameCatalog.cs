@@ -16,6 +16,7 @@ namespace Project05.CombatCore
         private readonly Dictionary<string, HeroDef> _heroesById;
         private readonly Dictionary<string, MonsterDef> _monstersById;
         private readonly Dictionary<string, StatusDef> _statusesById;
+        private readonly Dictionary<string, RecipeDef> _recipesById;
 
         public IReadOnlyList<ItemDef> Items { get; }
         public IReadOnlyList<HeroDef> Heroes { get; }
@@ -24,12 +25,20 @@ namespace Project05.CombatCore
         /// <summary>The status kinds (debuffs and stun) in ascending id order; empty for a catalog without a statuses list.</summary>
         public IReadOnlyList<StatusDef> Statuses { get; }
 
+        /// <summary>The fusion recipes in authored order (item-fusion.md); empty for a catalog without a recipes list.</summary>
+        public IReadOnlyList<RecipeDef> Recipes { get; }
+
         public GameCatalog(
             IReadOnlyList<ItemDef> items,
             IReadOnlyList<HeroDef> heroes,
             IReadOnlyList<MonsterDef> monsters,
-            IReadOnlyList<StatusDef> statuses = null)
+            IReadOnlyList<StatusDef> statuses = null,
+            IReadOnlyList<RecipeDef> recipes = null)
         {
+            Recipes = new List<RecipeDef>(recipes ?? Array.Empty<RecipeDef>());
+            _recipesById = new Dictionary<string, RecipeDef>(StringComparer.Ordinal);
+            foreach (RecipeDef r in Recipes) _recipesById[r.Id] = r;
+
             var sortedStatuses = new List<StatusDef>(statuses ?? Array.Empty<StatusDef>());
             sortedStatuses.Sort((a, b) => string.CompareOrdinal(a.Id, b.Id));
             Statuses = sortedStatuses;
@@ -67,6 +76,38 @@ namespace Project05.CombatCore
         /// <summary>A status kind by id, or null (a catalog without statuses treats every status as a plain timed lot).</summary>
         public StatusDef FindStatus(string id) =>
             id != null && _statusesById.TryGetValue(id, out StatusDef status) ? status : null;
+
+        /// <summary>A fusion recipe by id, or null.</summary>
+        public RecipeDef FindRecipe(string id) =>
+            id != null && _recipesById.TryGetValue(id, out RecipeDef recipe) ? recipe : null;
+
+        /// <summary>The recipe whose result is this item, or null (a fused item's popup line).</summary>
+        public RecipeDef RecipeMaking(string resultId)
+        {
+            foreach (RecipeDef r in Recipes)
+            {
+                if (r.ResultId == resultId) return r;
+            }
+
+            return null;
+        }
+
+        /// <summary>The recipes that consume this base item (an ingredient's popup line), in authored order.</summary>
+        public List<RecipeDef> RecipesUsing(string baseItemId)
+        {
+            var list = new List<RecipeDef>();
+            foreach (RecipeDef r in Recipes)
+            {
+                foreach (string i in r.Ingredients)
+                {
+                    if (i != baseItemId) continue;
+                    list.Add(r);
+                    break;
+                }
+            }
+
+            return list;
+        }
 
         public static GameCatalog LoadFromJson(
             string itemsJson,
@@ -244,8 +285,68 @@ namespace Project05.CombatCore
             }
 
             ValidateUpgrades(items, errors);
+
+            // fusion recipes (item-fusion.md): an optional "recipes" array beside "items"
+            var recipes = new List<RecipeDef>();
+            if (!string.IsNullOrWhiteSpace(itemsJson))
+            {
+                try
+                {
+                    if (SimpleJsonParser.Parse(itemsJson) is Dictionary<string, object> rroot && TryGetList(rroot, "recipes", out List<object> rawRecipes))
+                    {
+                        for (int i = 0; i < rawRecipes.Count; i++)
+                        {
+                            if (!(rawRecipes[i] is Dictionary<string, object> ro))
+                            {
+                                errors.Add("recipes[" + i + "]: expected JSON object.");
+                                continue;
+                            }
+
+                            var ingredients = new List<string>();
+                            if (TryGetList(ro, "ingredients", out List<object> rawIngredients))
+                            {
+                                foreach (object o in rawIngredients) ingredients.Add(o as string ?? string.Empty);
+                            }
+
+                            recipes.Add(new RecipeDef(GetString(ro, "id", ""), ingredients, GetString(ro, "result", "")));
+                        }
+
+                        ValidateRecipes(items, recipes, errors);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    errors.Add("itemsJson recipes parse error: " + ex.Message);
+                }
+            }
+
             validationErrors = errors;
-            return errors.Count == 0 ? new GameCatalog(items, heroes, monsters, statuses) : null;
+            return errors.Count == 0 ? new GameCatalog(items, heroes, monsters, statuses, recipes) : null;
+        }
+
+        /// <summary>item-fusion.md Rules 1 and 2: ids, 2 or 3 base ingredients, a Gold-tier result with no upgrade.</summary>
+        private static void ValidateRecipes(List<ItemDef> items, List<RecipeDef> recipes, List<string> errors)
+        {
+            var byId = new Dictionary<string, ItemDef>(StringComparer.Ordinal);
+            foreach (ItemDef i in items) byId[i.Id] = i;
+            var ids = new HashSet<string>(StringComparer.Ordinal);
+            var results = new HashSet<string>(StringComparer.Ordinal);
+            foreach (RecipeDef r in recipes) results.Add(r.ResultId);
+            foreach (RecipeDef r in recipes)
+            {
+                string label = "Recipe '" + r.Id + "'";
+                if (!IsValidId(r.Id)) errors.Add(label + ": invalid or empty id.");
+                else if (!ids.Add(r.Id)) errors.Add(label + ": duplicate recipe ID.");
+                if (r.Size < 2 || r.Size > 3) errors.Add(label + ": needs 2 or 3 ingredients (got " + r.Size + ").");
+                foreach (string ing in r.Ingredients)
+                {
+                    if (!byId.TryGetValue(ing, out ItemDef def)) errors.Add(label + ": unknown ingredient '" + ing + "'.");
+                    else if (def.IsUpgraded || results.Contains(ing) || def.Tier >= TierKind.Gold) errors.Add(label + ": ingredient '" + ing + "' must be a White to Purple base item.");
+                }
+
+                if (!byId.TryGetValue(r.ResultId, out ItemDef result)) errors.Add(label + ": unknown result '" + r.ResultId + "'.");
+                else if (result.Tier != TierKind.Gold || !string.IsNullOrEmpty(result.UpgradeId)) errors.Add(label + ": the result must be Gold-tier with no upgrade.");
+            }
         }
 
         private static StatusDef ParseStatus(Dictionary<string, object> o, int index, List<string> errors)
@@ -430,6 +531,7 @@ namespace Project05.CombatCore
             BackpackProfileDef profile = ParseBackpackProfile(bpObj, label + ".backpackProfile", errors);
 
             var startingItems = new List<string>();
+            var startingLayout = new List<StartingPlacement>();
             string signatureItemId = GetString(obj, "signatureItemId", "");
             if (TryGetList(obj, "startingItems", out List<object> rawStarting))
             {
@@ -438,6 +540,7 @@ namespace Project05.CombatCore
                     if (rawStarting[i] is string sId)
                     {
                         startingItems.Add(sId);
+                        startingLayout.Add(new StartingPlacement(sId, -1, -1, 0));
                     }
                     else if (rawStarting[i] is Dictionary<string, object> itemEntry)
                     {
@@ -446,6 +549,10 @@ namespace Project05.CombatCore
                         if (!string.IsNullOrEmpty(sItemId))
                         {
                             startingItems.Add(sItemId);
+                            int sx = GetInt(itemEntry, "x", -1), sy = GetInt(itemEntry, "y", -1), sr = GetInt(itemEntry, "rot", 0);
+                            if (sx < -1 || sy < -1 || sr < 0 || sr > 3 || (sx < 0) != (sy < 0))
+                                errors.Add(label + ".startingItems[" + i + "]: bad cell (" + sx + ", " + sy + ") or rot " + sr + ".");
+                            startingLayout.Add(new StartingPlacement(sItemId, sx, sy, sr));
                             if (isSig && string.IsNullOrEmpty(signatureItemId))
                             {
                                 signatureItemId = sItemId;
@@ -489,7 +596,7 @@ namespace Project05.CombatCore
             return new HeroDef(
                 id, art, nameVi, nameEn, roleVi, roleEn,
                 baseMaxHp, baseSpeed, initialShield,
-                profile, startingItems, signatureItemId, innate);
+                profile, startingItems, signatureItemId, innate, startingLayout);
         }
 
         private static BackpackProfileDef ParseBackpackProfile(

@@ -2,7 +2,7 @@
 
 > **Status**: Draft (enumeration, dependencies and priorities approved by the user on 2026-11-10; the CD-SYSTEMS gate result is recorded under Priority Tiers)
 > **Created**: 2026-11-10
-> **Last Updated**: 2026-11-17 (systems 38 and 39 added)
+> **Last Updated**: 2026-11-17 (systems 38, 39 and 40 added)
 > **Source Concept**: design/gdd/game-concept.md
 > **Gates**: TD-SYSTEM-BOUNDARY: CONCERNS (resolved by adding systems 36 and 37; constraints below). PR-SCOPE: OPTIMISTIC (adjustments applied; see Scope Notes). CD-SYSTEMS: CONCERNS (six concerns applied; see the note under Priority Tiers).
 
@@ -85,8 +85,11 @@ The 37 systems fall into five groups.
 | 37 | Settings (inferred) | Persistence | MVP | Designed | [settings.md](settings.md) | 6, 7, 29, 31 (interfaces; 31 undesigned) |
 | 38 | Debuffs and Detonation | Gameplay | MVP | Designed | [debuffs-and-detonation.md](debuffs-and-detonation.md) | 2, 3, 4, 13, 36 (9, 10, 11, 12, 14, 15, 18, 27, 29, 30 downstream) |
 | 39 | Item Upgrades (Forge) | Economy | MVP | Designed | [item-upgrades.md](item-upgrades.md) | 2, 5, 8, 15, 19 (10, 18, 25, 26, 29 downstream) |
+| 40 | Item Fusion (Fusion Door) | Economy | MVP | Designed | [item-fusion.md](item-fusion.md) | 2, 5, 8, 17, 39 (10, 18, 26, 35 downstream) |
 
 **Added 2026-11-17 (user decisions):** System 38 replaces the single Ấn (Seal) status with five enemy debuffs (Poison, Burn, Frost, Slow, Weaken) and one detonator, the Plague Alchemist's Plague Catalyst; it supersedes System 13's Seal rules and System 3's `ConsumeDetonate`. System 39 adds one upgrade per item, bought with run gold at a Forge tab beside selling. Both are Designed; independent `/design-review` not yet run, and the reverse references in Systems 2, 3, 4, 5, 8, 9, 10, 11, 12, 14, 15, 18, 25, 26, 27, 29, 30 and 36 are pending.
+
+**Added 2026-11-17 (user decisions):** System 40 adds a Fusion Door: sometimes one of the three doors is a fusion room instead of a fight (no monsters, gold, buff or item offer; it counts as a room), where the player may fuse 2 or 3 items by an open recipe book into one stronger Gold-tier item for 6 or 10 gold. 12 recipes. Designed; independent `/design-review` not yet run; reverse references in Systems 2, 5, 8, 17, 18, 26 and 35 pending.
 
 **UX flag — System 25:** create and review an arrangement-screen UX specification before UI stories. Validate the falling loose-item layer's overlap, overflow and retrieval before implementation; cross-hero preview and the loss-confirmation, playback and effect-target interfaces remain open in its GDD.
 
@@ -109,7 +112,7 @@ The 37 systems fall into five groups.
 | **Core** | Foundation everything depends on | 1, 2, 4, 5, 6, 7, 36 |
 | **Gameplay** | The systems that make the game fun | 3, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 19, 21, 38 |
 | **Progression** | How the player grows over time | 22, 23 |
-| **Economy** | Resource creation and consumption | 18, 20, 39 |
+| **Economy** | Resource creation and consumption | 18, 20, 39, 40 |
 | **Persistence** | Save state and continuity | 24, 37 |
 | **UI** | Player-facing information displays | 25, 26, 27, 28, 29, 30, 31 |
 | **Audio** | Sound and music | 32 |
@@ -128,7 +131,7 @@ The 37 systems fall into five groups.
 | **Alpha** | All features present in rough form. Complete mechanical scope, placeholder content OK. | Alpha milestone (concept Tier 2, Core Game) | Design THIRD |
 | **Full Vision** | Polish, edge cases, nice-to-haves, and content-complete features. | Beta / Release (concept Tier 3) | Design as needed |
 
-*Tier counts: MVP 30 (system 35 thin; 38 and 39 added 2026-11-17), Vertical Slice 5 (plus the full 35), Alpha 3, Full Vision 1; total 39.*
+*Tier counts: MVP 31 (system 35 thin; 38, 39 and 40 added 2026-11-17), Vertical Slice 5 (plus the full 35), Alpha 3, Full Vision 1; total 40.*
 
 *Why these tiers.* The MVP is "can a committed player reach a visible 'my build is going off' moment by the boss, and want another run?". That needs the whole simulation (a deterministic fight with apply-then-detonate across two heroes: Pillar 4), the bet on doors and the commitment-biased capped drops (Pillars 1 and 3), enough UI to read it (Pillar 2: the payoff and the cause must be visible), and the small foundations that are expensive to retrofit (string keys, input, settings). Curses are Vertical Slice because the concept defers Gold and Red; shop, events and recruiting are Alpha (the concept's Tier 2); records, replay and difficulty are Full Vision (Tier 3).
 
@@ -275,11 +278,11 @@ Combining the dependency sort with the priority tiers. Systems 3 and 12 are desi
 
 | Metric | Count |
 |--------|-------|
-| Total systems identified | 39 |
-| Design docs started | 31 |
+| Total systems identified | 40 |
+| Design docs started | 32 |
 | Design docs reviewed | 5 |
 | Design docs approved | 0 |
-| MVP systems designed | 29/30 |
+| MVP systems designed | 30/31 |
 | Vertical Slice systems designed | 1/5 |
 
 ---

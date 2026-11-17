@@ -18,6 +18,8 @@ namespace Project05.CombatCore.Run
         Won = 4,
         /// <summary>A defeat or draw ended the run.</summary>
         Lost = 5,
+        /// <summary>In a fusion room (item-fusion.md Rule 6): no fight; arrange, sell, forge and fuse once, then leave.</summary>
+        Fusion = 6,
     }
 
     /// <summary>Why a claim was refused (System 19 Rule 5).</summary>
@@ -66,6 +68,10 @@ namespace Project05.CombatCore.Run
         public int CellsGranted { get; internal set; }
         public string CurseId { get; internal set; } = string.Empty;
         public string ItemTaken { get; internal set; } = string.Empty;
+        /// <summary>True for a fusion room (item-fusion.md Rule 6).</summary>
+        public bool Fusion { get; internal set; }
+        /// <summary>The recipe fused in this fusion room, or empty.</summary>
+        public string RecipeMade { get; internal set; } = string.Empty;
 
         public RoomRecord(int room, TierKind tier, bool entrance)
         {
@@ -91,6 +97,9 @@ namespace Project05.CombatCore.Run
         private readonly List<RoomRecord> _history = new List<RoomRecord>();
         private DoorCard[] _row = Array.Empty<DoorCard>();
         private List<string> _offer = new List<string>();
+        private readonly RngStream _fusionStream;
+        private bool _lastRowHadFusion;
+        private string _fusedRecipe = string.Empty;
 
         public RunConfig Config => _cfg;
         public ulong Seed => _rng.Seed;
@@ -117,6 +126,16 @@ namespace Project05.CombatCore.Run
         public bool ForceGold { get; set; }
         /// <summary>Calls made on the doors stream, for tests (System 17 Rule 5).</summary>
         public int DoorDrawCalls { get; private set; }
+        /// <summary>Debug policy (like ForceGold): every eligible row holds a Fusion Door; the fusion draw is still made.</summary>
+        public bool ForceFusion { get; set; }
+        /// <summary>Calls made on the fusion stream, for tests (item-fusion.md Rule 4).</summary>
+        public int FusionDrawCalls { get; private set; }
+        /// <summary>Fusion doors offered so far in this run.</summary>
+        public int FusionDoorsOffered { get; private set; }
+        /// <summary>True in the Fusion phase once the visit's one fusion is made (Rule 7).</summary>
+        public bool FusedThisRoom => Phase == RunPhase.Fusion && !string.IsNullOrEmpty(_fusedRecipe);
+        /// <summary>True when the current room is a fusion room (no fight).</summary>
+        public bool IsFusionRoom => CurrentDoor != null && CurrentDoor.IsFusion;
 
         /// <summary>The party curse cap: never more than the party has heroes (System 19 Rule 9).</summary>
         public int CurseCap => Math.Min(_cfg.CurseCapParty, Math.Max(1, HeroCount));
@@ -128,6 +147,7 @@ namespace Project05.CombatCore.Run
             _rng = new SeededRng(seed);
             HeroCount = Math.Max(1, heroCount);
             _doorHp = new int[HeroCount];
+            _fusionStream = SeededRng.DeriveSideStream(seed, "fusion");
             RngStream doors = _rng.GetStream("doors");
             CurrentEncounter = EncounterBuilder.Draw(_cfg, _catalog, 1, TierKind.White, doors)
                 ?? throw new InvalidOperationException("ContractViolation: room 1 has no White template.");
@@ -182,6 +202,7 @@ namespace Project05.CombatCore.Run
             _rng.GetStream("doors").CopyFrom(doors);
             _rng.GetStream("drops").CopyFrom(drops);
             if (row.Length > 0) DoorDrawCalls += 6;
+            FusionPass(row, Room + 1);
             _row = row;
             _offer = offer;
             Phase = CurrentDoor != null && (!CurrentDoor.Buff.IsEmpty || CurrentDoor.Curse != null) ? RunPhase.BuffClaim : RunPhase.Reward;
@@ -267,7 +288,10 @@ namespace Project05.CombatCore.Run
             Phase = RunPhase.Planning;
         }
 
-        /// <summary>Enters the room behind door i. Final: there is no retry or reroll.</summary>
+        /// <summary>
+        /// Enters the room behind door i. Final: there is no retry or reroll. A fusion door leads to the Fusion phase
+        /// (item-fusion.md Rule 6): no fight, so no encounter.
+        /// </summary>
         public bool ChooseDoor(int index)
         {
             if (Phase != RunPhase.DoorChoice || index < 0 || index >= _row.Length) return false;
@@ -275,8 +299,64 @@ namespace Project05.CombatCore.Run
             CurrentEncounter = CurrentDoor.Encounter;
             Room += 1;
             _row = Array.Empty<DoorCard>();
+            _fusedRecipe = string.Empty;
+            Phase = CurrentDoor.IsFusion ? RunPhase.Fusion : RunPhase.Planning;
+            return true;
+        }
+
+        /// <summary>
+        /// Records the visit's one fusion (item-fusion.md Rules 7 and 8, phase checks only): the caller has planned it
+        /// with <see cref="FusionRules.Plan"/>, removed the ingredients, paid and placed the result.
+        /// </summary>
+        public FusionStatus RecordFusion(string recipeId)
+        {
+            if (Phase != RunPhase.Fusion) return FusionStatus.NotFusionRoom;
+            if (FusedThisRoom) return FusionStatus.AlreadyFused;
+            if (_catalog?.FindRecipe(recipeId) == null) return FusionStatus.UnknownRecipe;
+            _fusedRecipe = recipeId;
+            return FusionStatus.Ok;
+        }
+
+        /// <summary>The phase checks of a fusion before planning it: NotFusionRoom, AlreadyFused, or Ok.</summary>
+        public FusionStatus CanFuse => Phase != RunPhase.Fusion ? FusionStatus.NotFusionRoom : FusedThisRoom ? FusionStatus.AlreadyFused : FusionStatus.Ok;
+
+        /// <summary>
+        /// Leaves the fusion room (Rule 7): records it, then builds the row to the next room on the doors stream (and the
+        /// fusion pass), or after the last room enters the boss room.
+        /// </summary>
+        public bool LeaveFusion()
+        {
+            if (Phase != RunPhase.Fusion) return false;
+            _history.Add(new RoomRecord(Room, TierKind.White, false) { Fusion = true, RecipeMade = _fusedRecipe });
+            _fusedRecipe = string.Empty;
+            if (Room < _cfg.Rooms)
+            {
+                RngStream doors = _rng.GetStream("doors").Clone();
+                DoorCard[] row = DoorGenerator.BuildRow(_cfg, _catalog, Room + 1, _curses.Count, CurseCap, doors, ForceGold);
+                _rng.GetStream("doors").CopyFrom(doors);
+                DoorDrawCalls += 6;
+                FusionPass(row, Room + 1);
+                _row = row;
+                Phase = RunPhase.DoorChoice;
+                return true;
+            }
+
+            _row = Array.Empty<DoorCard>();
+            Room = BossRoom;
+            CurrentDoor = null;
+            CurrentEncounter = EncounterBuilder.Spec(_cfg, _catalog, _cfg.Boss, BossRoom, true);
             Phase = RunPhase.Planning;
             return true;
+        }
+
+        private void FusionPass(DoorCard[] row, int targetRoom)
+        {
+            if (row.Length == 0) return;
+            bool eligible = FusionDoor.Eligible(_cfg, targetRoom, FusionDoorsOffered, _lastRowHadFusion);
+            bool placed = FusionDoor.Apply(_cfg, row, targetRoom, FusionDoorsOffered, _lastRowHadFusion, _fusionStream, ForceFusion);
+            if (eligible) FusionDrawCalls++;
+            if (placed) FusionDoorsOffered++;
+            _lastRowHadFusion = placed;
         }
     }
 }

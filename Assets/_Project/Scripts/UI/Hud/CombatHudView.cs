@@ -79,6 +79,15 @@ namespace Project05.UI.Hud
         /// <summary>Redraws only the currency readout.</summary>
         public void SetCurrency(int value) => currency.Text = value.ToString();
 
+        /// <summary>Writes the gold numerals directly (the counter tick of feedback-motion.md P-10 / R-10).</summary>
+        public void SetCurrencyText(string text) => currency.Text = text;
+
+        /// <summary>Hides every enemy slot (a fusion room has no fight, item-fusion.md Rule 6).</summary>
+        public void ClearEnemies()
+        {
+            foreach (EnemySlotView e in enemies) e.Apply(null, sprites);
+        }
+
         /// <summary>Draws a full HUD state.</summary>
         public void Apply(CombatHudData data)
         {

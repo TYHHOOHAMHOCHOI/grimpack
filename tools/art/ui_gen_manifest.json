@@ -1,0 +1,492 @@
+{
+ "_comment": "Generated UI kit (design/art/ui-kit-generated.md). Raws in art-source/ai-raw/ui from Pixellab (create_ui_asset / create_image_pixen, 2026-11-17). Run: python tools/art/build_generated_ui.py",
+ "items": [
+  {
+   "name": "ui_panel-wood_default_9s",
+   "raw": "k1_panel_wood_raw.png",
+   "crop": [
+    11,
+    14,
+    234,
+    231
+   ],
+   "reduce": 3,
+   "border": [
+    16,
+    16,
+    16,
+    16
+   ],
+   "palette": [
+    "INK-0",
+    "INK-1",
+    "INK-2",
+    "INK-3",
+    "INK-4",
+    "UMBER-1",
+    "UMBER-2",
+    "CANDLE-D"
+   ]
+  },
+  {
+   "name": "ui_panel-wood_frame_9s",
+   "raw": "k1_panel_wood_raw.png",
+   "crop": [
+    11,
+    14,
+    234,
+    231
+   ],
+   "reduce": 3,
+   "border": [
+    16,
+    16,
+    16,
+    16
+   ],
+   "palette": [
+    "INK-0",
+    "INK-1",
+    "INK-2",
+    "INK-3",
+    "INK-4",
+    "UMBER-1",
+    "UMBER-2",
+    "CANDLE-D"
+   ],
+   "hollow": true
+  },
+  {
+   "name": "ui_panel-stone_default_9s",
+   "raw": "k1s_panel_stone_raw.png",
+   "crop": [
+    57,
+    57,
+    142,
+    142
+   ],
+   "reduce": 3,
+   "border": [
+    8,
+    8,
+    8,
+    8
+   ],
+   "palette": [
+    "INK-0",
+    "INK-1",
+    "INK-2",
+    "INK-3"
+   ],
+   "hollow": true
+  },
+  {
+   "name": "ui_tray-leather_default_9s",
+   "raw": "k2_tray_leather_raw.png",
+   "crop": [
+    6,
+    6,
+    180,
+    180
+   ],
+   "reduce": 3,
+   "border": [
+    6,
+    6,
+    6,
+    6
+   ],
+   "palette": [
+    "INK-0",
+    "INK-1",
+    "INK-2",
+    "INK-3",
+    "INK-4",
+    "UMBER-1",
+    "UMBER-2",
+    "CANDLE-D"
+   ],
+   "variants": {},
+   "remapAfter": {
+    "UMBER-2": "UMBER-1",
+    "CANDLE-D": "UMBER-2"
+   }
+  },
+  {
+   "name": "ui_card-slab_default_9s",
+   "raw": "k7_door_slab_raw.png",
+   "crop": [
+    9,
+    13,
+    174,
+    262
+   ],
+   "reduce": 2,
+   "border": [
+    8,
+    8,
+    8,
+    8
+   ],
+   "fill": "INK-1",
+   "palette": [
+    "INK-0",
+    "INK-1",
+    "INK-2",
+    "INK-3"
+   ]
+  },
+  {
+   "name": "ui_board-wood_default_9s",
+   "raw": "k12_banner_raw.png",
+   "crop": [
+    16,
+    72,
+    352,
+    59
+   ],
+   "reduce": 3,
+   "border": [
+    18,
+    0,
+    18,
+    0
+   ],
+   "palette": [
+    "INK-0",
+    "INK-1",
+    "INK-2",
+    "INK-3",
+    "INK-4",
+    "UMBER-1",
+    "UMBER-2",
+    "CANDLE-D"
+   ],
+   "variants": {
+    "disabled": {
+     "UMBER-1": "INK-1",
+     "UMBER-2": "INK-2",
+     "CANDLE-D": "INK-2",
+     "INK-4": "INK-3"
+    },
+    "pressed": {
+     "_outline": "CANDLE",
+     "UMBER-1": "CANDLE-D",
+     "UMBER-2": "CANDLE"
+    },
+    "hover": {
+     "_outline": "CANDLE"
+    },
+    "primary": {
+     "_outline": "CANDLE"
+    }
+   }
+  },
+  {
+   "name": "ui_banner-wood_default_9s",
+   "raw": "k12_banner_raw.png",
+   "crop": [
+    16,
+    72,
+    352,
+    59
+   ],
+   "reduce": 2,
+   "border": [
+    26,
+    0,
+    26,
+    0
+   ],
+   "palette": [
+    "INK-0",
+    "INK-1",
+    "INK-2",
+    "INK-3",
+    "INK-4",
+    "UMBER-1",
+    "UMBER-2",
+    "CANDLE-D"
+   ],
+   "variants": {
+    "defeat": {
+     "UMBER-1": "INK-1",
+     "UMBER-2": "INK-2",
+     "CANDLE-D": "INK-3",
+     "INK-4": "INK-3"
+    }
+   }
+  },
+  {
+   "name": "ui_plate-iron_default_9s",
+   "raw": "k9_popup_raw.png",
+   "crop": [
+    5,
+    5,
+    54,
+    54
+   ],
+   "reduce": 2,
+   "border": [
+    5,
+    5,
+    5,
+    5
+   ],
+   "palette": [
+    "INK-0",
+    "INK-1",
+    "INK-2",
+    "INK-3",
+    "INK-4",
+    "UMBER-2"
+   ]
+  },
+  {
+   "name": "ui_btn-mini_default_9s",
+   "raw": "k5m_mini_raw.png",
+   "crop": [
+    13,
+    14,
+    37,
+    36
+   ],
+   "reduce": 2,
+   "border": [
+    4,
+    4,
+    4,
+    4
+   ],
+   "palette": [
+    "INK-0",
+    "INK-1",
+    "INK-2",
+    "INK-3",
+    "INK-4",
+    "UMBER-2"
+   ],
+   "variants": {
+    "hover": {
+     "_outline": "CANDLE"
+    },
+    "pressed": {
+     "_outline": "CANDLE",
+     "INK-4": "CANDLE",
+     "INK-3": "CANDLE-D"
+    }
+   }
+  },
+  {
+   "name": "prop_plinth_base_109x21",
+   "raw": "pedestal_raw.png",
+   "crop": [
+    11,
+    2,
+    218,
+    43
+   ],
+   "reduce": 2,
+   "remap": {
+    "cool": [
+     [
+      "INK-0",
+      0.25
+     ],
+     [
+      "INK-1",
+      0.45
+     ],
+     [
+      "INK-2",
+      0.25
+     ],
+     [
+      "INK-3",
+      0.05
+     ]
+    ],
+    "warm": [
+     [
+      "INK-0",
+      0.3
+     ],
+     [
+      "INK-1",
+      0.5
+     ],
+     [
+      "INK-2",
+      0.2
+     ]
+    ]
+   }
+  },
+  {
+   "name": "ui_glyph-coin_gen_10x10",
+   "raw": "coin_raw.png",
+   "crop": [
+    1,
+    0,
+    30,
+    31
+   ],
+   "reduce": 3,
+   "palette": [
+    "INK-0",
+    "CANDLE-D",
+    "CANDLE",
+    "BONE",
+    "UMBER-2"
+   ]
+  },
+  {
+   "name": "env_heroselect_bg_640x360",
+   "raw": "hs_backdrop_a.png",
+   "opaque": true,
+   "remap": {
+    "cool": [
+     [
+      "INK-0",
+      0.42
+     ],
+     [
+      "INK-1",
+      0.33
+     ],
+     [
+      "INK-2",
+      0.18
+     ],
+     [
+      "INK-3",
+      0.07
+     ]
+    ],
+    "warm": [
+     [
+      "INK-1",
+      0.35
+     ],
+     [
+      "INK-2",
+      0.25
+     ],
+     [
+      "UMBER-1",
+      0.2
+     ],
+     [
+      "UMBER-2",
+      0.12
+     ],
+     [
+      "CANDLE-D",
+      0.06
+     ],
+     [
+      "CANDLE",
+      0.02
+     ]
+    ],
+    "warmSat": 0.3
+   }
+  },
+  {
+   "name": "env_stage_bg_460x316",
+   "raw": "stage_backdrop_b.png",
+   "opaque": true,
+   "remap": {
+    "cool": [
+     [
+      "INK-0",
+      0.5
+     ],
+     [
+      "INK-1",
+      0.35
+     ],
+     [
+      "INK-2",
+      0.15
+     ]
+    ],
+    "warm": [
+     [
+      "INK-0",
+      0.5
+     ],
+     [
+      "INK-1",
+      0.35
+     ],
+     [
+      "INK-2",
+      0.15
+     ]
+    ]
+   }
+  },
+  {
+   "name": "char_tank_showcase_96",
+   "raw": "showcase_tank_raw.png",
+   "palette": [
+    "INK-0",
+    "INK-1",
+    "INK-2",
+    "INK-3",
+    "INK-4",
+    "FOG",
+    "FOG-HI",
+    "BONE",
+    "CANDLE",
+    "CANDLE-D",
+    "BLOOD",
+    "BLOOD-D",
+    "UMBER-1",
+    "UMBER-2",
+    "MOSS",
+    "MOSS-HI"
+   ]
+  },
+  {
+   "name": "char_alchemist_showcase_96",
+   "raw": "showcase_alchemist_raw.png",
+   "palette": [
+    "INK-0",
+    "INK-1",
+    "INK-2",
+    "INK-3",
+    "INK-4",
+    "FOG",
+    "FOG-HI",
+    "BONE",
+    "CANDLE",
+    "CANDLE-D",
+    "BLOOD",
+    "BLOOD-D",
+    "UMBER-1",
+    "UMBER-2",
+    "MOSS",
+    "MOSS-HI"
+   ]
+  },
+  {
+   "name": "ui_emblem-crucible_32x32",
+   "raw": "ui_emblem-crucible_raw.png",
+   "reduce": 2,
+   "palette": [
+    "INK-0",
+    "INK-1",
+    "INK-2",
+    "INK-3",
+    "INK-4",
+    "FOG",
+    "CANDLE-D",
+    "CANDLE",
+    "BONE",
+    "BLOOD"
+   ]
+  }
+ ]
+}

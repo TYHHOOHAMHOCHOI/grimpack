@@ -3,14 +3,23 @@ using System.Collections.Generic;
 
 namespace Project05.CombatCore.Run
 {
-    /// <summary>One door card: its tier, the certain buff, the room behind it and the curse a Gold door carries.</summary>
+    /// <summary>
+    /// One door card: its tier, the certain buff, the room behind it and the curse a Gold door carries; or a fusion door
+    /// (item-fusion.md), which has no fight, no buff and no curse.
+    /// </summary>
     public sealed class DoorCard
     {
         public TierKind Tier { get; }
         public DoorBuff Buff { get; }
+        /// <summary>The room's fight; null for a fusion door.</summary>
         public EncounterSpec Encounter { get; }
         /// <summary>The Gold door's curse, or null.</summary>
         public CurseDef Curse { get; }
+        /// <summary>True for the Fusion Door: a room with no fight where one fusion may be made (item-fusion.md Rule 6).</summary>
+        public bool IsFusion { get; private set; }
+
+        /// <summary>A fusion door card (item-fusion.md Rule 5).</summary>
+        public static DoorCard Fusion() => new DoorCard(TierKind.White, default, null, null) { IsFusion = true };
 
         public DoorCard(TierKind tier, DoorBuff buff, EncounterSpec encounter, CurseDef curse)
         {
@@ -108,6 +117,39 @@ namespace Project05.CombatCore.Run
             }
 
             return row;
+        }
+    }
+
+    /// <summary>The fusion pass over a finished row (item-fusion.md Rules 4 and 5). Pure; draws only on its own stream.</summary>
+    public static class FusionDoor
+    {
+        /// <summary>
+        /// Whether the row to targetRoom may hold a fusion door: rooms FusionMinRoom..Rooms, fewer than FusionMaxPerRun
+        /// offered so far, and the previous row had none.
+        /// </summary>
+        public static bool Eligible(RunConfig cfg, int targetRoom, int offeredSoFar, bool previousRowHadFusion) =>
+            cfg != null && cfg.FusionMaxPerRun > 0 && targetRoom >= cfg.FusionMinRoom && targetRoom <= cfg.Rooms &&
+            offeredSoFar < cfg.FusionMaxPerRun && !previousRowHadFusion;
+
+        /// <summary>
+        /// Applies the pass (force: the debug policy, every eligible row gets the door; the draw is still made): an eligible row makes one bounded draw (0..999) on the fusion stream and gets the door when
+        /// the draw is below FusionChance, or always when none has been offered and the room is at least
+        /// FusionGuaranteeRoom. The door replaces the lowest-tier card, the leftmost on a tie. Returns true when placed.
+        /// </summary>
+        public static bool Apply(RunConfig cfg, DoorCard[] row, int targetRoom, int offeredSoFar, bool previousRowHadFusion, RngStream fusion, bool force = false)
+        {
+            if (row == null || row.Length == 0 || fusion == null || !Eligible(cfg, targetRoom, offeredSoFar, previousRowHadFusion)) return false;
+            int draw = fusion.NextBounded(1000);
+            bool forced = force || (offeredSoFar == 0 && targetRoom >= cfg.FusionGuaranteeRoom);
+            if (!forced && draw >= cfg.FusionChance) return false;
+            int lowest = 0;
+            for (int i = 1; i < row.Length; i++)
+            {
+                if (row[i].Tier < row[lowest].Tier) lowest = i;
+            }
+
+            row[lowest] = DoorCard.Fusion();
+            return true;
         }
     }
 

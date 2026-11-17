@@ -113,6 +113,21 @@ namespace Project05.CombatCore.Run
         /// <summary>Gold at the start of a run (item-upgrades.md).</summary>
         public int StartGold { get; private set; } = 5;
         public IReadOnlyList<EncounterTemplate> Templates { get; private set; } = Array.Empty<EncounterTemplate>();
+
+        // ---- item-fusion.md tuning knobs ("fusion" object); a config without it never offers a fusion door
+        /// <summary>The first room a row may lead to with a fusion door (Rule 4).</summary>
+        public int FusionMinRoom { get; private set; } = int.MaxValue;
+        /// <summary>Chance per eligible row, in permille.</summary>
+        public int FusionChance { get; private set; }
+        /// <summary>From this target room on, a run that has seen no fusion door gets one.</summary>
+        public int FusionGuaranteeRoom { get; private set; } = int.MaxValue;
+        /// <summary>Fusion doors offered per run at most (0 disables fusion).</summary>
+        public int FusionMaxPerRun { get; private set; }
+        public int FusionCost2 { get; private set; } = 6;
+        public int FusionCost3 { get; private set; } = 10;
+
+        /// <summary>The gold a fusion of this many ingredients costs (Rule 10).</summary>
+        public int FusionCost(int ingredients) => ingredients >= 3 ? FusionCost3 : FusionCost2;
         public EncounterTemplate Boss { get; private set; }
         public IReadOnlyList<CurseDef> Curses { get; private set; } = Array.Empty<CurseDef>();
         /// <summary>True for an item that never appears in a reward offer (a pinned curse item).</summary>
@@ -290,6 +305,20 @@ namespace Project05.CombatCore.Run
             if (o.TryGetValue("boss", out object bossObj) && bossObj is Dictionary<string, object> bd)
             {
                 cfg.Boss = ReadTemplate(bd, list);
+            }
+
+            if (o.TryGetValue("fusion", out object fusionObj) && fusionObj is Dictionary<string, object> fd)
+            {
+                cfg.FusionMinRoom = Int(fd, "minRoom", 3);
+                cfg.FusionChance = Int(fd, "chance", 0);
+                cfg.FusionGuaranteeRoom = Int(fd, "guaranteeRoom", int.MaxValue);
+                cfg.FusionMaxPerRun = Int(fd, "maxPerRun", 0);
+                cfg.FusionCost2 = Int(fd, "cost2", 6);
+                cfg.FusionCost3 = Int(fd, "cost3", 10);
+                if (cfg.FusionMinRoom < 2) list.Add("fusion.minRoom: must be at least 2 (room 1 has no door row).");
+                if (cfg.FusionChance < 0 || cfg.FusionChance > 1000) list.Add("fusion.chance: permille out of 0..1000.");
+                if (cfg.FusionMaxPerRun < 0) list.Add("fusion.maxPerRun: negative.");
+                if (cfg.FusionCost2 < 0 || cfg.FusionCost3 < 0) list.Add("fusion.cost2/cost3: negative.");
             }
 
             foreach (object v in Arr(o, "nonDroppable"))

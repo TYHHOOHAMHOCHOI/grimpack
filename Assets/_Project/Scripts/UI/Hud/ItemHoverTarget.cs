@@ -52,9 +52,17 @@ namespace Project05.UI.Hud
             controller = popup;
         }
 
-        public void OnPointerEnter(PointerEventData eventData) => controller.PointerEntered(this);
+        public void OnPointerEnter(PointerEventData eventData)
+        {
+            controller.PointerEntered(this);
+            if (board != null) board.HoverEnter(this);
+        }
 
-        public void OnPointerExit(PointerEventData eventData) => controller.PointerExited(this);
+        public void OnPointerExit(PointerEventData eventData)
+        {
+            controller.PointerExited(this);
+            if (board != null) board.HoverExit(this);
+        }
 
         public void OnSelect(BaseEventData eventData) => controller.ShowNow(this);
 

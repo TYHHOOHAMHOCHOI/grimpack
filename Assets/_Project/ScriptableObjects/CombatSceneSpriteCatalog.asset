@@ -16,16 +16,16 @@ MonoBehaviour:
   num8BoneAtlas: {fileID: 21300000, guid: 12e1365e47808b249a2df9d8f9222d46, type: 3}
   num8FogHiAtlas: {fileID: 21300000, guid: 80bb327f16d5b754394ad5e46fc5b703, type: 3}
   num8Metrics: {fileID: 4900000, guid: fcbd093d4c162c04e95443fdf7e9ff29, type: 3}
-  panelDefault: {fileID: 21300000, guid: bbde0277179c59e4d89338f9ad8e75c4, type: 3}
+  panelDefault: {fileID: 21300000, guid: 88c2b259bd53ad440b193c99abd576a9, type: 3}
   panelVoid: {fileID: 21300000, guid: 966e4bfbdae039f4095fc79aac461b8e, type: 3}
   chipBase: {fileID: 21300000, guid: 3d92a03ec2431e84e9f7f83d18904b47, type: 3}
-  segmentDefault: {fileID: 21300000, guid: 9a4da908b6aebe84e983cd46f51801d0, type: 3}
-  segmentSelected: {fileID: 21300000, guid: c10f121f1a6304e439038b407e177834, type: 3}
-  btnDefault: {fileID: 21300000, guid: 0e82e43f7f6fc984c992071e7d1678ba, type: 3}
-  btnHover: {fileID: 21300000, guid: 5e751d19c38ab5f43961d383e90467df, type: 3}
-  btnPressed: {fileID: 21300000, guid: 66d8f8147f1b26844818365198331419, type: 3}
-  btnFocus: {fileID: 21300000, guid: 259b3500fa7403b4ebaf70bcf1fc1b71, type: 3}
-  btnDisabled: {fileID: 21300000, guid: 2a01a0049ff05b14cb6f586ccb711ffe, type: 3}
+  segmentDefault: {fileID: 21300000, guid: 5639092b05719a741b83cec957d0fcad, type: 3}
+  segmentSelected: {fileID: 21300000, guid: 6ac9311c229edc54fbccafda629d2ea5, type: 3}
+  btnDefault: {fileID: 21300000, guid: 5639092b05719a741b83cec957d0fcad, type: 3}
+  btnHover: {fileID: 21300000, guid: 77074fc186f6ce445ab2f37d0a61caaa, type: 3}
+  btnPressed: {fileID: 21300000, guid: 3ad4e1d6da8c378478a68b7e5710582d, type: 3}
+  btnFocus: {fileID: 21300000, guid: 77074fc186f6ce445ab2f37d0a61caaa, type: 3}
+  btnDisabled: {fileID: 21300000, guid: d28d68dc2559ec8488ccc3d2c6b25e32, type: 3}
   fillInk0: {fileID: 21300000, guid: d533643e2f4b56c489bb6ccfbab1554e, type: 3}
   fillInk1: {fileID: 21300000, guid: 9df3fa27d0a6aec47879e4a21e1e921e, type: 3}
   fillInk2: {fileID: 21300000, guid: cb6109185c83534459b017a74a674325, type: 3}
@@ -79,10 +79,20 @@ MonoBehaviour:
     sprite: {fileID: 21300000, guid: 5354add1101e53e48839577e09714d39, type: 3}
   - key: echo-charm_d_1x1
     sprite: {fileID: 21300000, guid: 072c0622757b6654ea1ee837f0a16f60, type: 3}
+  - key: elixir_d_1x1
+    sprite: {fileID: 21300000, guid: db7d755649972bb40a23dd09e7eeded2, type: 3}
   - key: ember-charm_d_1x1
     sprite: {fileID: 21300000, guid: 7ab891ecac3970544b3b53428dff4921, type: 3}
+  - key: everfrost-maul_c_2x2
+    sprite: {fileID: 21300000, guid: 3ec87c08021fdcd4db2643439aebadd5, type: 3}
+  - key: everfrost-maul_d_2x2
+    sprite: {fileID: 21300000, guid: e7704212776ca6d49bc6cca64447f6d8, type: 3}
   - key: field-bandage_d_1x1
     sprite: {fileID: 21300000, guid: 883676b3b138b89409dfc369364ff5ac, type: 3}
+  - key: firebomb_c_1x2
+    sprite: {fileID: 21300000, guid: bdfadfec3bcf3fe4c8ed1456641a5fd6, type: 3}
+  - key: firebomb_d_1x2
+    sprite: {fileID: 21300000, guid: d9adc4bf7a2816d459efc1b195e9ff2b, type: 3}
   - key: frost-shard_c_1x2
     sprite: {fileID: 21300000, guid: 0bc29553e397fc1459ff38728176e6ba, type: 3}
   - key: frost-shard_d_1x2
@@ -99,6 +109,10 @@ MonoBehaviour:
     sprite: {fileID: 21300000, guid: 253ab03d6f0c00d4da988955740490f8, type: 3}
   - key: heart-charm_d_1x1
     sprite: {fileID: 21300000, guid: da602b242a24eca48ba7c52aacf107bf, type: 3}
+  - key: honed-sword_c_1x3
+    sprite: {fileID: 21300000, guid: 6429b5a2af8ea1344bd7e8db7b6af97d, type: 3}
+  - key: honed-sword_d_1x3
+    sprite: {fileID: 21300000, guid: 0604b7e19a4361f4999c1cf416a5a4b6, type: 3}
   - key: hourglass_c_1x2
     sprite: {fileID: 21300000, guid: f6f3c57df551b9c46b36af6572b0d53e, type: 3}
   - key: hourglass_d_1x2
@@ -119,6 +133,10 @@ MonoBehaviour:
     sprite: {fileID: 21300000, guid: 582ff92977c66ca4d9090317b907e32b, type: 3}
   - key: lull-drum_d_1x2
     sprite: {fileID: 21300000, guid: fcead68d8139e0847ab9232368571974, type: 3}
+  - key: lullaby-bell_c_1x2
+    sprite: {fileID: 21300000, guid: a8257b8c29d58db428aaa0995455b507, type: 3}
+  - key: lullaby-bell_d_1x2
+    sprite: {fileID: 21300000, guid: 3a18b9669bdd9c54a916dcd39530be1a, type: 3}
   - key: mortar_d_1x1
     sprite: {fileID: 21300000, guid: 8357e3a90643d2341abbd082de2521fd, type: 3}
   - key: oak-buckler_d_1x1
@@ -127,6 +145,10 @@ MonoBehaviour:
     sprite: {fileID: 21300000, guid: 7286c945038bd0b41aafc656c4d517c5, type: 3}
   - key: oath-blade_d_1x3
     sprite: {fileID: 21300000, guid: 41ef47f98a04a8640a219948c13cf496, type: 3}
+  - key: oathkeeper_c_1x3
+    sprite: {fileID: 21300000, guid: 6bff2b996e6a53b478446422c7fa8f1d, type: 3}
+  - key: oathkeeper_d_1x3
+    sprite: {fileID: 21300000, guid: 84ecdb2f94e2300418c993abb429612c, type: 3}
   - key: oil-flask_c_1x2
     sprite: {fileID: 21300000, guid: 74b51c812566a8f4aa25b9169ee9d23a, type: 3}
   - key: oil-flask_d_1x2
@@ -139,6 +161,10 @@ MonoBehaviour:
     sprite: {fileID: 21300000, guid: 0403551db060a754699f666b6d892dfb, type: 3}
   - key: plague-censer_d_2x3
     sprite: {fileID: 21300000, guid: c1516d318ed068c438412e977ed50ae8, type: 3}
+  - key: plague-heart_c_1x2
+    sprite: {fileID: 21300000, guid: 8538302d9d399a04abc4bf03a5084606, type: 3}
+  - key: plague-heart_d_1x2
+    sprite: {fileID: 21300000, guid: fe39971ac538f55459d375e4420be1d1, type: 3}
   - key: resonant-bell_c_2x2
     sprite: {fileID: 21300000, guid: f6b0b21a8381345438c19afd1c0e2347, type: 3}
   - key: resonant-bell_d_2x2
@@ -167,6 +193,10 @@ MonoBehaviour:
     sprite: {fileID: 21300000, guid: a41199b22e9c6934dad36d0303f6fea7, type: 3}
   - key: spiked-buckler_d_1x2
     sprite: {fileID: 21300000, guid: 43732e1909fb189439eb2f6b4a872481, type: 3}
+  - key: storm-crossbow_c_2x1
+    sprite: {fileID: 21300000, guid: f076d8636d3709046b837cf3910d21a1, type: 3}
+  - key: storm-crossbow_d_2x1
+    sprite: {fileID: 21300000, guid: 55761ef14d8f2ee4cb47cbff8bbeae3e, type: 3}
   - key: swift-boots_c_l3
     sprite: {fileID: 21300000, guid: 425fcce70aef9f644ba14609f974e2bf, type: 3}
   - key: swift-boots_d_l3
@@ -181,6 +211,10 @@ MonoBehaviour:
     sprite: {fileID: 21300000, guid: 64f8b879194d74147a5401b9851c82a2, type: 3}
   - key: thorn-dart_d_1x1
     sprite: {fileID: 21300000, guid: 96756b202c119a447b0b64fb88f2277b, type: 3}
+  - key: thornwall_c_1x2
+    sprite: {fileID: 21300000, guid: 8a29f8a1712b9ea42a9a47832b24d508, type: 3}
+  - key: thornwall_d_1x2
+    sprite: {fileID: 21300000, guid: 471351e082b9f794495e0441320d8224, type: 3}
   - key: thunder-gong_c_2x2
     sprite: {fileID: 21300000, guid: fdc451a09a8447a49a22e5c364538c0e, type: 3}
   - key: thunder-gong_d_2x2
@@ -189,6 +223,16 @@ MonoBehaviour:
     sprite: {fileID: 21300000, guid: 67fc75cf0bed2c0499fb15ac9fa0ab86, type: 3}
   - key: tower-shield_d_2x3
     sprite: {fileID: 21300000, guid: 7c922c99624295a429516c939492a710, type: 3}
+  - key: twin-axe_c_l
+    sprite: {fileID: 21300000, guid: 8a509bd296937ae48831099c84385bf3, type: 3}
+  - key: twin-axe_d_l
+    sprite: {fileID: 21300000, guid: 8248b51b9c885534eadc68e67a2d0090, type: 3}
+  - key: venom-crossbow_c_2x1
+    sprite: {fileID: 21300000, guid: 84ebe4d3406e77c428ba4f8f03eaaeb9, type: 3}
+  - key: venom-crossbow_d_2x1
+    sprite: {fileID: 21300000, guid: fe549c2f3d933694e95213af129564f6, type: 3}
+  - key: venom-dart_d_1x1
+    sprite: {fileID: 21300000, guid: 4eb725784b7a5f340a5f24d767b0326b, type: 3}
   - key: venom-vial_d_1x1
     sprite: {fileID: 21300000, guid: 2d582551540c4dd4dae407c621d2665c, type: 3}
   - key: void-censer_c_2x3
@@ -535,6 +579,8 @@ MonoBehaviour:
     sprite: {fileID: 21300000, guid: d954dc88424c3214692335b5db508a62, type: 3}
   - key: ui_curse-tag_card_24x10
     sprite: {fileID: 21300000, guid: a5bdb189a28f22a4b92f051ec1c1623d, type: 3}
+  - key: ui_dim-mask_default_4x4
+    sprite: {fileID: 21300000, guid: a4ab116d8b656b74898a750e738b9544, type: 3}
   - key: ui_door-card_armed-corner_4x4
     sprite: {fileID: 21300000, guid: 2a5248fd2723e1a41b26afd96846c34d, type: 3}
   - key: ui_door-card_blue_9s
@@ -603,6 +649,8 @@ MonoBehaviour:
     sprite: {fileID: 21300000, guid: 6b1e205e6bf1acd45ac29be942f0ffa4, type: 3}
   - key: ui_map-node_entrance_10x11
     sprite: {fileID: 21300000, guid: ce22a99da56348e479cb9e7397cbdce5, type: 3}
+  - key: ui_map-node_fusion_10x11
+    sprite: {fileID: 21300000, guid: fbe351191769f424fa0f3bc602ad79c7, type: 3}
   - key: ui_map-node_gold_10x11
     sprite: {fileID: 21300000, guid: 58bca57cadcdaae439c8cdb9085390c2, type: 3}
   - key: ui_map-node_green_10x11
@@ -621,3 +669,99 @@ MonoBehaviour:
     sprite: {fileID: 21300000, guid: 0d255f686784e0242b9124e1243df229, type: 3}
   - key: ui_pip-rank_white_5x5
     sprite: {fileID: 21300000, guid: 9a130fc0e6b77834896bfeca802e74d9, type: 3}
+  - key: char_alchemist_showcase_96
+    sprite: {fileID: 21300000, guid: ff7b8034b4bfcc14c831f8357640edd8, type: 3}
+  - key: char_tank_showcase_96
+    sprite: {fileID: 21300000, guid: 9e6f0df2325973448add43d6873082a5, type: 3}
+  - key: env_heroselect_bg_640x360
+    sprite: {fileID: 21300000, guid: 244dd45538cc71645ace0885ad0d38f4, type: 3}
+  - key: env_stage_bg_460x316
+    sprite: {fileID: 21300000, guid: 66491ae4a3de7b547a9c53f782e261aa, type: 3}
+  - key: prop_plinth_base_109x21
+    sprite: {fileID: 21300000, guid: cee58f8d9274120479b7d37e14722b23, type: 3}
+  - key: ui_banner-wood_default_9s
+    sprite: {fileID: 21300000, guid: a1c28a49c17d03e48bc9fb2db1d28638, type: 3}
+  - key: ui_banner-wood_defeat_9s
+    sprite: {fileID: 21300000, guid: ef1368a08300d2e47b364f9a99f7f85f, type: 3}
+  - key: ui_board-wood_default_9s
+    sprite: {fileID: 21300000, guid: 5639092b05719a741b83cec957d0fcad, type: 3}
+  - key: ui_board-wood_disabled_9s
+    sprite: {fileID: 21300000, guid: d28d68dc2559ec8488ccc3d2c6b25e32, type: 3}
+  - key: ui_board-wood_hover_9s
+    sprite: {fileID: 21300000, guid: 77074fc186f6ce445ab2f37d0a61caaa, type: 3}
+  - key: ui_board-wood_pressed_9s
+    sprite: {fileID: 21300000, guid: 3ad4e1d6da8c378478a68b7e5710582d, type: 3}
+  - key: ui_board-wood_primary_9s
+    sprite: {fileID: 21300000, guid: 6ac9311c229edc54fbccafda629d2ea5, type: 3}
+  - key: ui_btn-mini_default_9s
+    sprite: {fileID: 21300000, guid: 4a32a554ff382e241bc3ccbd647baeb0, type: 3}
+  - key: ui_btn-mini_hover_9s
+    sprite: {fileID: 21300000, guid: 0f8ccff051aa3d64dac7250310a5f166, type: 3}
+  - key: ui_btn-mini_pressed_9s
+    sprite: {fileID: 21300000, guid: 32adff1977259f745a3901910a268d11, type: 3}
+  - key: ui_card-slab_default_9s
+    sprite: {fileID: 21300000, guid: a1ad4bfaa15c6ab4098f516072a499ae, type: 3}
+  - key: ui_divider-wood_default_9s
+    sprite: {fileID: 21300000, guid: f52886ca8bc18b74bb9a2d15174d854e, type: 3}
+  - key: ui_emblem-crucible_32x32
+    sprite: {fileID: 21300000, guid: 3cb240e9b6fe88447910c5d7314aa4d3, type: 3}
+  - key: ui_fill-gen_ink-0_4x4
+    sprite: {fileID: 21300000, guid: b3e66b8d1d9888545b57ed0b85477ba7, type: 3}
+  - key: ui_fill-gen_ink-1_4x4
+    sprite: {fileID: 21300000, guid: be9285e3b7a546e42b6b7d56688156ac, type: 3}
+  - key: ui_fill-gen_ink-3_4x4
+    sprite: {fileID: 21300000, guid: f56830c29d5779544bbd378802d68234, type: 3}
+  - key: ui_fill-gen_umber-1_4x4
+    sprite: {fileID: 21300000, guid: 5ad9002f46e293646ba7252f958d37af, type: 3}
+  - key: ui_fill-gen_umber-2_4x4
+    sprite: {fileID: 21300000, guid: 6605ac5bb838fc54985558e52f989eb0, type: 3}
+  - key: ui_glyph-coin_gen_10x10
+    sprite: {fileID: 21300000, guid: dd3a81e34fabb844f82ea93c21cb7b2b, type: 3}
+  - key: ui_panel-stone_default_9s
+    sprite: {fileID: 21300000, guid: 197e4840d50f8ff4b9e501ae15c2170d, type: 3}
+  - key: ui_panel-wood_default_9s
+    sprite: {fileID: 21300000, guid: 21f0235761f53d64ab2afadd3971b15e, type: 3}
+  - key: ui_panel-wood_frame_9s
+    sprite: {fileID: 21300000, guid: 58dcc6dff9525154cbaf67845998d5bc, type: 3}
+  - key: ui_plate-iron_default_9s
+    sprite: {fileID: 21300000, guid: 88c2b259bd53ad440b193c99abd576a9, type: 3}
+  - key: ui_ring-gen_focus_9s
+    sprite: {fileID: 21300000, guid: f82b0109c97551446ada874ee8ed158d, type: 3}
+  - key: ui_ring-gen_fog_9s
+    sprite: {fileID: 21300000, guid: e61a65fb406350146a07b497b9ca3efa, type: 3}
+  - key: ui_ring-gen_hover_9s
+    sprite: {fileID: 21300000, guid: 37244a3efc139da40b272ab42344fb17, type: 3}
+  - key: ui_tray-leather_default_9s
+    sprite: {fileID: 21300000, guid: bdaaf2b362f4c3a41af44c99cb0c17b7, type: 3}
+  - key: vfx_gold-coin_01
+    sprite: {fileID: 21300000, guid: e413f0c3b82f8804abf1390c9833602f, type: 3}
+  - key: vfx_gold-coin_02
+    sprite: {fileID: 21300000, guid: b0bbda0ec424cec459879bbea7ae0e5e, type: 3}
+  - key: vfx_gold-coin_03
+    sprite: {fileID: 21300000, guid: 8b9b9e0d3d5153b42bd9b0bc15f806eb, type: 3}
+  - key: vfx_gold-coin_04
+    sprite: {fileID: 21300000, guid: 81fb75b33afb23748b2a67dc0690c405, type: 3}
+  - key: vfx_px-blood_01
+    sprite: {fileID: 21300000, guid: 1e41760ba3543fc4a91b0b1fffb0b2d8, type: 3}
+  - key: vfx_px-blood_02
+    sprite: {fileID: 21300000, guid: 84fa3c864a739e646839b178299e8110, type: 3}
+  - key: vfx_px-bone_01
+    sprite: {fileID: 21300000, guid: 8694308ab0bbe1348a163b8bc1e13761, type: 3}
+  - key: vfx_px-bone_02
+    sprite: {fileID: 21300000, guid: de5b9078353781d45ab474f0e835455e, type: 3}
+  - key: vfx_px-fog_01
+    sprite: {fileID: 21300000, guid: 3526ec5b1d446a043b158d1d40b78cb3, type: 3}
+  - key: vfx_px-fog_02
+    sprite: {fileID: 21300000, guid: 5925493b92f4a7041a42e5fa71faf340, type: 3}
+  - key: vfx_px-ink_01
+    sprite: {fileID: 21300000, guid: 4f229b34fa1182c4f8644dd0e1f17d9e, type: 3}
+  - key: vfx_px-ink_02
+    sprite: {fileID: 21300000, guid: afb8ff486aa269440bc646a6c82791af, type: 3}
+  - key: vfx_px-moss_01
+    sprite: {fileID: 21300000, guid: 72130dfdde5970e45b199d482d261025, type: 3}
+  - key: vfx_px-moss_02
+    sprite: {fileID: 21300000, guid: 9efc4445a14a7034b9f9a580ffd258b2, type: 3}
+  - key: vfx_spark_01
+    sprite: {fileID: 21300000, guid: f39e563401b273843929fdb2dbea8a00, type: 3}
+  - key: vfx_spark_02
+    sprite: {fileID: 21300000, guid: bd5988fcbaa5feb41ad1c50e0d7a31f1, type: 3}

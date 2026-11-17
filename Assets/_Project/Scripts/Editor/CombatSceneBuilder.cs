@@ -122,6 +122,7 @@ namespace Project05.Editor
         // ------------------------------------------------------------------ assets
         private static void ConfigureBorders()
         {
+            ApplyGeneratedBorders(Art + "UI/Gen");
             Border(Art + "UI/ui_panel_default_9s.png", new Vector4(4, 4, 4, 4));
             Border(Art + "UI/ui_panel_void_9s.png", new Vector4(4, 4, 4, 4));
             Border(Art + "UI/ui_chip_base_9s.png", new Vector4(3, 0, 3, 0));
@@ -143,6 +144,42 @@ namespace Project05.Editor
             if (importer == null || importer.spriteBorder == border) return;
             importer.spriteBorder = border;
             importer.SaveAndReimport();
+        }
+
+        [System.Serializable]
+        private sealed class GenBorderEntry { public string name; public int l, t, r, b; }
+
+        [System.Serializable]
+        private sealed class GenBorderFile { public List<GenBorderEntry> entries = new List<GenBorderEntry>(); }
+
+        /// <summary>Sets the 9-slice borders listed in a generated folder's borders.json (written by build_generated_ui.py).</summary>
+        private static void ApplyGeneratedBorders(string dir)
+        {
+            string file = dir + "/borders.json";
+            if (!File.Exists(file)) return;
+            GenBorderFile data = JsonUtility.FromJson<GenBorderFile>(File.ReadAllText(file));
+            if (data?.entries == null) return;
+            foreach (GenBorderEntry e in data.entries)
+            {
+                string path = dir + "/" + e.name + ".png";
+                if (File.Exists(path)) Border(path, new Vector4(e.l, e.b, e.r, e.t));   // Unity order: left, bottom, right, top
+            }
+        }
+
+        /// <summary>Imports a generated PNG if Unity has not seen it yet (the pixel-art postprocessor sets the rest).</summary>
+        private static void MakePixelSprite(string path)
+        {
+            if (AssetImporter.GetAtPath(path) == null) AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceSynchronousImport);
+        }
+
+        /// <summary>A sprite of the generated kit (Art/UI/Gen), imported with its 9-slice borders.</summary>
+        private static Sprite Gen(string name)
+        {
+            string path = Art + "UI/Gen/" + name + ".png";
+            MakePixelSprite(path);
+            var sprite = AssetDatabase.LoadAssetAtPath<Sprite>(path);
+            if (sprite == null) throw new FileNotFoundException("Missing generated sprite (run tools/art/build_generated_ui.py)", path);
+            return sprite;
         }
 
         private static Sprite S(string path)
@@ -319,14 +356,18 @@ namespace Project05.Editor
         // ------------------------------------------------------------------ frame and workbench
         private static void BuildFrame(RectTransform safe)
         {
-            Fill("TopStrip", safe, "ink-1", 0, 0, 640, 16, TopLeft);
-            Img("WorkbenchPanel", safe, S("UI/ui_panel_default_9s.png"), 0, 16, TopLeft, 174, 344, true);
-            Img("StagePanel", safe, S("UI/ui_panel_void_9s.png"), 174, 16, TopLeft, 466, 344, true);
-            Fill("WallPlane", safe, "ink-1", 177, 19, 137, 314, TopLeft);
-            for (int y = 33; y < 333; y += 20) Fill("Course", safe, "ink-2", 177, y, 137, 1, TopLeft);
-            Fill("SectionLine", safe, "ink-3", 314, 19, 1, 314, TopLeft);
-            Fill("ActionStrip", safe, "ink-1", 177, 333, 460, 24, TopLeft);
-            Fill("ActionStripEdge", safe, "ink-3", 177, 333, 460, 1, TopLeft);
+            // planning-screen.md P1, P8, P20 to P26 with the generated kit (design/art/ui-kit-generated.md)
+            Img("TopStrip", safe, Gen("ui_fill-gen_ink-1_4x4"), 0, 0, TopLeft, 640, 16);
+            Img("TopStripRail", safe, Gen("ui_fill-gen_umber-2_4x4"), 0, 14, TopLeft, 640, 1);
+            Img("TopStripRailShade", safe, Gen("ui_fill-gen_ink-0_4x4"), 0, 15, TopLeft, 640, 1);
+            Img("StageBackdrop", safe, Gen("env_stage_bg_460x316"), 177, 19, TopLeft);
+            Img("WorkbenchPanel", safe, Gen("ui_panel-wood_default_9s"), 0, 16, TopLeft, 174, 344, true);
+            Img("SectionLine", safe, Gen("ui_fill-gen_ink-1_4x4"), 313, 19, TopLeft, 3, 314);
+            Img("SectionLineLit", safe, Gen("ui_fill-gen_ink-3_4x4"), 313, 19, TopLeft, 1, 314);
+            Img("ActionStrip", safe, Gen("ui_fill-gen_ink-1_4x4"), 177, 333, TopLeft, 460, 24);
+            Img("ActionStripRail", safe, Gen("ui_fill-gen_umber-2_4x4"), 177, 333, TopLeft, 460, 1);
+            Img("ActionStripRailShade", safe, Gen("ui_fill-gen_ink-0_4x4"), 177, 334, TopLeft, 460, 1);
+            Img("StagePanel", safe, Gen("ui_panel-stone_default_9s"), 174, 16, TopLeft, 466, 344, true);
         }
 
         private static void BuildWorkbench(RectTransform safe, ItemPopupController popup)
@@ -337,13 +378,25 @@ namespace Project05.Editor
             Num("NameJoin", wb, 8, "num", 12, 24, "1", TopLeft);
             Img("NameChevron", wb, S("UI/ui_chevron-turn_hero_7x4.png"), 24, 26, TopLeft);
             Label("NameLabel", wb, LabelHero, 34, 22, 80, Bone);
-            // Beds are tiled cells, so the hero grid can grow from 4 x 4 to 7 x 7 by a size change; the 8 x 8 stash follows it.
+            // Beds are tiled cells, so the hero grid can grow from 4 x 4 to 7 x 7 by a size change; the 8 x 4 stash follows it.
+            // Each sits in a leather tray (K2) 2 px around its cells (planning-screen.md P13, P17).
+            Image gridTray = Img("GridTray", wb, Gen("ui_tray-leather_default_9s"), 0, 0, TopLeft, 84, 84, true);
             Image gridBed = Img("GridBed", wb, S("UI/ui_cell-bed_default_20x20.png"), 0, 0, TopLeft, 20, 20);
             gridBed.type = Image.Type.Tiled;
-            Image line = Fill("SectionLine", wb, "ink-3", 0, 0, 160, 1, TopLeft);
-            TextMeshProUGUI stashLabel = Label("StashLabel", wb, LabelStash, 0, 0, 100, Bone);
+            Image line = Img("SectionLine", wb, Gen("ui_divider-wood_default_9s"), 0, 0, TopLeft, 164, 3, true);
+            Image stashTab = Img("StashTab", wb, Gen("ui_plate-iron_default_9s"), 0, 0, TopLeft, 54, 14, true);
+            TextMeshProUGUI stashLabel = Label("StashLabel", stashTab.transform, LabelStash, 0, 1, 54, Bone, TextAlignmentOptions.Top);
+            Image stashTray = Img("StashTray", wb, Gen("ui_tray-leather_default_9s"), 0, 0, TopLeft, 164, 84, true);
             Image stashBed = Img("StashBed", wb, S("UI/ui_cell-bed_default_20x20.png"), 0, 0, TopLeft, 20, 20);
             stashBed.type = Image.Type.Tiled;
+            TextMeshProUGUI stashHint = Label("StashHint", wb, "Đồ thưởng sẽ vào đây", 0, 0, 160, Fog, TextAlignmentOptions.Top);
+
+            // P18: the hero's innate ability, filled in when a hero is picked
+            Img("InnatePlate", wb, Gen("ui_plate-iron_default_9s"), 5, 288, TopLeft, 164, 66, true);
+            Label("InnateTitle", wb, "Nội tại:", 12, 294, 150, Fog);
+            TextMeshProUGUI innate = Label("InnateText", wb, string.Empty, 12, 308, 150, Bone);
+            innate.textWrappingMode = TextWrappingModes.Normal;
+            innate.rectTransform.sizeDelta = new Vector2(150, 42);
 
             var view = wb.gameObject.AddComponent<WorkbenchView>();
             var viewSo = new SerializedObject(view);
@@ -351,6 +404,10 @@ namespace Project05.Editor
             viewSo.FindProperty("sectionLine").objectReferenceValue = line.rectTransform;
             viewSo.FindProperty("stashLabel").objectReferenceValue = stashLabel.rectTransform;
             viewSo.FindProperty("stashBed").objectReferenceValue = stashBed.rectTransform;
+            viewSo.FindProperty("gridTray").objectReferenceValue = gridTray.rectTransform;
+            viewSo.FindProperty("stashTray").objectReferenceValue = stashTray.rectTransform;
+            viewSo.FindProperty("stashHint").objectReferenceValue = stashHint.rectTransform;
+            viewSo.FindProperty("stashLabel").objectReferenceValue = stashTab.rectTransform;
             viewSo.ApplyModifiedPropertiesWithoutUndo();
             view.Layout(WorkbenchLayout.StartGrid);
 
@@ -527,13 +584,8 @@ namespace Project05.Editor
             ("item_field_bandage", 0, 3),
         };
 
-        private static readonly (string id, int x, int y)[] StashLayout =
-        {
-            ("item_dagger", 0, 0), ("item_oak_buckler", 1, 0), ("item_crimson_vial", 2, 0),
-            ("item_war_drum", 3, 0), ("item_swift_boots", 4, 0), ("item_runed_mace", 6, 0),
-            ("item_cleaver_halberd", 7, 0), ("item_oath_blade", 0, 2), ("item_hourglass", 1, 2),
-            ("item_scholar_lens", 2, 2), ("item_echo_charm", 2, 3), ("item_heart_charm", 3, 2),
-        };
+        // balance-three-item-start.md: the stash starts empty.
+        private static readonly (string id, int x, int y)[] StashLayout = System.Array.Empty<(string, int, int)>();
 
         private static ItemCatalog LoadCatalog()
         {
@@ -590,7 +642,7 @@ namespace Project05.Editor
             SerializedProperty views = so.FindProperty("containers");
             views.arraySize = 2;
             SetContainer(views.GetArrayElementAtIndex(0), "grid", Start.GridOrigin.x, Start.GridOrigin.y, WorkbenchLayout.StartGrid, WorkbenchLayout.StartGrid, true);
-            SetContainer(views.GetArrayElementAtIndex(1), "stash", Start.StashOrigin.x, Start.StashOrigin.y, WorkbenchLayout.Stash, WorkbenchLayout.Stash, false);
+            SetContainer(views.GetArrayElementAtIndex(1), "stash", Start.StashOrigin.x, Start.StashOrigin.y, WorkbenchLayout.Stash, WorkbenchLayout.StashRows, false);
             so.ApplyModifiedPropertiesWithoutUndo();
         }
 
@@ -747,8 +799,8 @@ namespace Project05.Editor
         {
             // Start sits at the right end of the strip (art bible 7.3), its key chip to its left, the reason it is off at the left.
             RectTransform group = ModalKit.Rect("StartGroup", parent, 0, 0, 0, 0);
-            Button start = ModalKit.Primary("StartButton", group, _font, LabelStart, 485, 333, 148, "start", Ink0, out TMP_Text startLabel);
-            Image keyChip = Img("KeyChip", group, S("UI/ui_chip_base_9s.png"), 415, 338, TopLeft, 66, 14, true);
+            Button start = ModalKit.Primary("StartButton", group, _font, LabelStart, 485, 335, 148, "wood-primary", Bone, out TMP_Text startLabel);
+            Image keyChip = Img("KeyChip", group, Gen("ui_plate-iron_default_9s"), 415, 338, TopLeft, 66, 14, true);
             Label("KeyLabel", keyChip.transform, LabelStartKey, 0, 1, 66, Fog, TextAlignmentOptions.Top);
             TextMeshProUGUI reason = Label("Reason", group, string.Empty, 185, 339, 220, Fog);
 
@@ -760,7 +812,7 @@ namespace Project05.Editor
             so.FindProperty("speedGroup").objectReferenceValue = speed.gameObject;
             so.FindProperty("startLabel").objectReferenceValue = startLabel;
             so.FindProperty("reasonLabel").objectReferenceValue = reason;
-            so.FindProperty("labelColour").colorValue = Ink0;
+            so.FindProperty("labelColour").colorValue = Bone;
             so.FindProperty("labelDisabledColour").colorValue = Fog;
             so.FindProperty("heldReason").stringValue = LabelStartHeld;
             so.ApplyModifiedPropertiesWithoutUndo();
@@ -817,16 +869,17 @@ namespace Project05.Editor
             catalog.num8FogHiAtlas = AtlasSprite(8, "num-fog-hi");
             catalog.num8Metrics = Metrics(8);
 
-            catalog.panelDefault = S("UI/ui_panel_default_9s.png");
+            catalog.panelDefault = Gen("ui_plate-iron_default_9s");   // popups, detail boxes (K9)
             catalog.panelVoid = S("UI/ui_panel_void_9s.png");
             catalog.chipBase = S("UI/ui_chip_base_9s.png");
-            catalog.segmentDefault = S("UI/ui_segment_default_9s.png");
-            catalog.segmentSelected = S("UI/ui_segment_selected_9s.png");
-            catalog.btnDefault = S("UI/ui_btn_default_120x28.png");
-            catalog.btnHover = S("UI/ui_btn_hover_120x28.png");
-            catalog.btnPressed = S("UI/ui_btn_pressed_120x28.png");
-            catalog.btnFocus = S("UI/ui_btn_focus_120x28.png");
-            catalog.btnDisabled = S("UI/ui_btn_disabled_120x28.png");
+            catalog.segmentDefault = Gen("ui_board-wood_default_9s");
+            catalog.segmentSelected = Gen("ui_board-wood_primary_9s");
+            // generated kit: wooden boards for every runtime button (ui-kit-generated.md K4/K5)
+            catalog.btnDefault = Gen("ui_board-wood_default_9s");
+            catalog.btnHover = Gen("ui_board-wood_hover_9s");
+            catalog.btnPressed = Gen("ui_board-wood_pressed_9s");
+            catalog.btnFocus = Gen("ui_board-wood_hover_9s");
+            catalog.btnDisabled = Gen("ui_board-wood_disabled_9s");
 
             catalog.fillInk0 = S("UI/ui_fill_ink-0_4x4.png");
             catalog.fillInk1 = S("UI/ui_fill_ink-1_4x4.png");
@@ -895,7 +948,7 @@ namespace Project05.Editor
 
             // Run UI (doors, corridor, buffs, curses): every sprite of tools/art/build_run_ui.py, keyed by file name.
             catalog.runUi.Clear();
-            string[] runPrefixes = { "ui_door-card", "ui_pip-rank", "ui_curse", "ui_fill_plum", "ui_glyph-curse", "ui_glyph-cell", "ui_glyph-size", "ui_glyph-elite", "ui_map-" };
+            string[] runPrefixes = { "ui_door-card", "ui_pip-rank", "ui_curse", "ui_fill_plum", "ui_glyph-curse", "ui_glyph-cell", "ui_glyph-size", "ui_glyph-elite", "ui_map-", "ui_dim-mask" };
             string uiDir = Art + "UI";
             if (Directory.Exists(uiDir))
             {
@@ -909,6 +962,24 @@ namespace Project05.Editor
                     Sprite sprite = AssetDatabase.LoadAssetAtPath<Sprite>(assetPath);
                     if (sprite == null) continue;
                     catalog.runUi.Add(new CombatSceneSpriteCatalog.SpriteEntry { key = fileName, sprite = sprite });
+                }
+            }
+
+            // Generated UI kit (design/art/ui-kit-generated.md, tools/art/build_generated_ui.py): every sprite under
+            // Art/UI/Gen and Art/VFX/Gen, keyed by file name, with the 9-slice borders of Gen/borders.json.
+            foreach (string genDir in new[] { Art + "UI/Gen", Art + "VFX/Gen" })
+            {
+                if (!Directory.Exists(genDir)) continue;
+                ApplyGeneratedBorders(genDir);
+                string[] genFiles = Directory.GetFiles(genDir, "*.png");
+                System.Array.Sort(genFiles, System.StringComparer.OrdinalIgnoreCase);
+                foreach (string file in genFiles)
+                {
+                    string assetPath = file.Replace(Path.DirectorySeparatorChar, '/');
+                    MakePixelSprite(assetPath);
+                    Sprite sprite = AssetDatabase.LoadAssetAtPath<Sprite>(assetPath);
+                    if (sprite == null) continue;
+                    catalog.runUi.Add(new CombatSceneSpriteCatalog.SpriteEntry { key = Path.GetFileNameWithoutExtension(assetPath), sprite = sprite });
                 }
             }
 

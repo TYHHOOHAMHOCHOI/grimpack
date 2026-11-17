@@ -46,6 +46,9 @@ namespace Project05.UI.Hud
         /// <summary>Stash width and height in cells.</summary>
         public const int Stash = 8;
 
+        /// <summary>Stash rows (planning-screen.md section 3: 8 x 4, the run starts with an empty stash).</summary>
+        public const int StashRows = 4;
+
         /// <summary>Left edge of both containers.</summary>
         public const int Left = 7;
 
@@ -61,8 +64,8 @@ namespace Project05.UI.Hud
             int n = Mathf.Clamp(size, StartGrid, MaxGrid);
             float gridBottom = GridTop + n * Cell;
             float line = gridBottom + 3;
-            float label = line + 2;
-            float stashTop = label + 14;
+            float label = line + 5;      // planning-screen.md P15: the stash tab at 44 + 20n
+            float stashTop = label + 18; // P17: stash cells at 62 + 20n (tray rim 2 px around them)
             return new WorkbenchRects(new Vector2(Left, GridTop), line, label, new Vector2(Left, stashTop));
         }
     }

@@ -142,6 +142,56 @@ namespace Project05.Items
         /// <param name="item">The definition.</param>
         /// <param name="placed">True when the item sits in a hero grid. Stash items neither give nor receive synergy.</param>
         /// <param name="received">The modifiers its neighbours give it (empty when not placed).</param>
+        /// <summary>
+        /// The fusion lines (item-fusion.md Rule 11): a fused item says what it was made from and is "Huyền thoại"; an
+        /// ingredient (or its +) says what it can become and with what. Inserted before the tag and flavour lines.
+        /// </summary>
+        public static void AddRecipeLines(PopupContent c, ItemRecord item, ItemCatalog catalog)
+        {
+            if (c == null || item == null || catalog == null || catalog.Recipes.Count == 0) return;
+            int at = c.Lines.Count;
+            while (at > 0 && c.Lines[at - 1].Dim) at--;   // before the dim tag and flavour lines
+            var lines = new List<PopupLine>();
+            RecipeRecord made = catalog.RecipeMaking(item.id);
+            if (made != null)
+            {
+                c.Subtitle = "Huyền thoại · " + ShapeName(item);
+                lines.Add(new PopupLine(GlyphKind.Anvil, "Luyện từ: " + Names(made.ingredients, null, catalog)));
+            }
+
+            string baseId = item.IsUpgraded ? item.upgradeOf : item.id;
+            List<RecipeRecord> uses = catalog.RecipesUsing(baseId);
+            for (int i = 0; i < uses.Count && i < 2; i++)
+            {
+                ItemRecord result = catalog.Find(uses[i].result);
+                string others = Names(uses[i].ingredients, baseId, catalog);
+                lines.Add(new PopupLine(GlyphKind.Anvil, "Dùng để luyện: " + (result != null ? result.nameVi : uses[i].result) +
+                                                         (others.Length > 0 ? " (cùng " + others + ")" : string.Empty)));
+            }
+
+            if (uses.Count > 2) lines.Add(new PopupLine(GlyphKind.Anvil, "… và " + (uses.Count - 2) + " công thức khác"));
+            c.Lines.InsertRange(at, lines);
+        }
+
+        private static string Names(string[] ids, string skipOnce, ItemCatalog catalog)
+        {
+            var names = new List<string>();
+            bool skipped = false;
+            foreach (string id in ids)
+            {
+                if (!skipped && id == skipOnce)
+                {
+                    skipped = true;
+                    continue;
+                }
+
+                ItemRecord r = catalog.Find(id);
+                names.Add(r != null ? r.nameVi : id);
+            }
+
+            return string.Join(" + ", names);
+        }
+
         public static PopupContent Build(ItemRecord item, bool placed, IReadOnlyList<SynergyModifier> received)
         {
             var c = new PopupContent

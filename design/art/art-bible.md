@@ -507,7 +507,7 @@ Notes:
 
 ### 3.6 UI Shape Grammar
 
-- **Thick, plain frames.** Panel frames are two to three native pixels thick in INK-3, with a one-pixel INK-4 inner highlight on the key side. No rivets, bolts, filigree or ornament. This is the form language adopted from reference 1.
+- **[Superseded 2026-11-17 by the amendment at the end of this section.]** **Thick, plain frames.** Panel frames are two to three native pixels thick in INK-3, with a one-pixel INK-4 inner highlight on the key side. No rivets, bolts, filigree or ornament. This is the form language adopted from reference 1.
 - **Hierarchy of containers:** panel (thick frame), then section (thin line), then cell (square). Each level is a step quieter than the one above.
 - **Square corners on all chrome.** Chamfers and teeth are reserved for tier (Section 3.2). Buttons are plain rectangles.
 - **The world sits inside the UI, not behind it.** The scene is a window held in the panel frame, as in reference 1. The UI frame is ink: it is cut from the same dark stone as the world and never lit. That keeps the world and the UI one material.
@@ -515,6 +515,20 @@ Notes:
 - **Reserved UI shapes:** intent is a downward pennant tab above an enemy. The curse is a hanging tag. Currency is a round coin. Turn is a chevron. Buff and debuff are shown by chevron direction (up or down) on a plain plate, not by hue.
 
 *Serves the Section 1 rule:* chrome is ink by definition; thick plain frames leave all the light for data. *Pillar:* Pillar 4.
+
+> **Amended 2026-11-17 by user decision: real materials, light ornament.** This block replaces the first bullet above ("Thick, plain frames ... No rivets, bolts, filigree or ornament"). The other five bullets stand. The pieces are generated with Pixellab, palette-locked, and specified in `design/art/ui-kit-generated.md` (K1 to K16).
+>
+> - **The rule.** Chrome is built from four dark materials: rotten wood, tanned leather, stone, and rusted iron hardware. It may carry light ornament (corner caps, end caps, square rivets, one strap). It stays ink: no chrome pixel is lit, so items, numbers and HP remain the brightest things on screen (1.1).
+> - **Materials follow ownership**, extending the warm "you" and cold dungeon split of 4.6: wood and leather hold the player's kit (workbench, menus, drawer, nameboards, buttons, banner, strip rails; trays, tabs, hero cards, gold plate), stone is the dungeon's (stage frame, door-card bodies as single slabs per 6.2, pedestals, backdrops, map strip), and iron is the hardware of both (popup frame, mini buttons, key chips, every cap, clamp, runner and rivet).
+> - **Where ornament may sit, and nowhere else:** (1) a corner cap lying on the frame band, no wider than the band and at most 10 px along each arm (6 px on pieces under 32 px); (2) an end cap on a plate, button, strip or banner, at most 8 px long; (3) at most one strap per edge, only on edges of 160 px or more, off-centre; (4) the drawer's runners on its top and bottom bands. At most 2 rivets per cap. Never inside a field, on cells, plates, HP, intent tabs or chips, within 2 px of content, or overhanging the band toward content. **Door and hero cards carry no ornament:** their corners belong to the tier form.
+> - **Forms ornament may not take** (3.2, 6.7): a chamfered corner; an inner line or second closed ring inside a frame (the Gold bracket); a row of 4 or more equal-spaced points (rivets, nails, stitches read as serration); a hanging piece; a downward point; a disc or ring 3 px or wider; a diamond; a chevron or diagonal brace. Rivet heads are square, 1 x 1 or 2 x 2. A leather seam is one continuous groove on the lit sides only.
+> - **Value limits.** No chrome pixel is brighter than INK-4 (luminance about 0.14), and none falls in the 4.10 lit mask: **0% of any frame is lit**. The top chrome step (INK-4, Candle-D) is limited to the 1 px key-side edges, rivet heads and the top-left faces of caps, and stays under **8%** of opaque pixels on pieces 32 px or larger. Candle-D appears only as isolated 1 to 2 px marks, at most **3%** of a piece.
+> - **Steps, outline, detail.** At most three steps per material (shadow, face, key edge), shadows shared from INK-0 and INK-1; a 1 px INK-0 outer outline; detail only in the band, corners and caps, one repeated module per edge. For UI chrome this overrides the supporting-shape column of 3.7 and the supporting-shape step count of 4.13 rule 4 and 8.11; 4.13 rule 5 (no lit pixel on a thing that does not matter) is unchanged; Section 6 still governs backdrops and pedestals.
+> - **Fields stay flat:** one colour (INK-0, INK-1, INK-2 or Umber-1); marks only darker than the face, isolated, at most 3%.
+> - **Thickness and hierarchy.** Panel band 5 px, tray rim or section line at most 3 px (tray rim 2 px), cell none. The 5 px band plus 2 px tray rim replace the 3 px frame plus 4 px padding, so `n_columns x C + 14` is unchanged. Supersedes the 3 px frame above and the "Panel frame" and "Popup" lines of 8.8.
+> - **Red room.** The stage's stone takes the Wine swap as before; wood, leather and the workbench never shift.
+>
+> *Serves the Section 1 rule:* materials give the chrome character without giving it light. *Pillar:* Pillar 4.
 
 ### 3.7 Lead Shapes Versus Supporting Shapes
 
@@ -752,6 +766,14 @@ The UI uses the same ink, slate, Fog, Bone and Candle colours as the world, and 
 3. **Interaction states** are UI-only. Hover is a Candle 1 px ring; **focus is a Candle 2 px ring drawn above neighbouring plates**; selection is a ring with a 1 px gap **plus a 4 x 4 Candle square at its top-left** (amended by Section 7.11). Primary actions use a Candle 2 px frame with Bone text, and a Candle fill only while pressed. Disabled is INK-3, **but never for text the player must read**: an unaffordable price uses Fog numerals plus a cross glyph (Section 7.10).
 4. **Text colours** are Bone (primary), Fog (secondary) and INK-3 (disabled). The world has no text.
 5. **Moss, Wine and Plum** appear in the UI only as the curse tag and plate (Plum) and in the Red room frame (Wine).
+
+> **Amended 2026-11-17 by user decision: real materials, light ornament (3.6).** Points 2 and 5 now read with this material palette: wood INK-0 / Umber-1 / Umber-2 (Candle-D flecks); leather INK-1 / Umber-1 (lit walls Umber-2) / Umber-2; stone INK-0 / INK-1 or INK-2 / INK-3; iron INK-1 / INK-3 / INK-4 (rust Umber-2, one Candle-D fleck per cap at most).
+>
+> - **Complete chrome palette:** INK-0 to INK-4, Umber-1, Umber-2, Candle-D (restricted, 3.6); W0 to W4 replace INK-0 to INK-4 on the stage's stone in the Red room. **Never chrome:** Fog, Fog-hi, Bone, Ceiling, Candle, Blood, Blood-D, Plum, Plum-E, Moss, Moss-hi, Wine outside the Red-room swap, Red-glow, tier colours. Candle and Bone still appear on interactive states (point 3), which are state, not chrome.
+> - **Additions (approved by the user 2026-11-17; cap 48):** **Umber-1 `#2B201C`** (luminance about 0.016) and **Umber-2 `#4F3628`** (about 0.044). 41 to 43 colours, 5 reserved slots left. The only existing brown is Candle-D; wood from Wine, Plum, Blood-D or Moss would put the Red-room, curse, lost-HP or poison colours on every panel. If refused, the kit is stone and iron only.
+> - **Contrast (hand-computed, NOT VERIFIED):** Bone on Umber-1 about 11.4:1, Fog on Umber-1 about 5.3:1; Fog on Umber-2 about 3.7:1 fails, so no text on Umber-2. INK-4 on Umber-1 is about 2.8:1 (under 3:1), so controls never sit directly on wood or leather.
+> - **Generation:** each call gets only its piece's sub-palette, and output is snapped to that subset (still the master palette, 4.13 rule 1).
+> - Point 5 otherwise stands.
 
 ### 4.10 Lit-Area Budgets and the Squint Test (Section 1 open item 1)
 

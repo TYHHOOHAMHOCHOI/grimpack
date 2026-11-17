@@ -27,8 +27,8 @@ namespace Project05.UI.Hud
         public void Apply(HeroSlotData data, HudSpriteSet sprites)
         {
             HeroPose pose = data.Fallen ? HeroPose.Down2 : data.Pose;
-            body.sprite = sprites.heroPoses[(int)pose];
-            narrow.sprite = sprites.heroNarrow;
+            body.sprite = sprites.Poses[(int)pose];
+            narrow.sprite = sprites.Narrow;
             narrow.enabled = data.Ready && !data.Fallen;
             bodyRect.anchoredPosition = new Vector2(bodyRect.anchoredPosition.x, bodyRestY + (data.Ready ? 1f : 0f));
             pedestal.sprite = data.Fallen ? sprites.pedestalDim : sprites.pedestalDefault;

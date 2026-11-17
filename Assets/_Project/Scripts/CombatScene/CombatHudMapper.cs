@@ -20,7 +20,8 @@ namespace Project05.CombatScene
             int room,
             int roomCount,
             int currency,
-            int speedIndex)
+            int speedIndex,
+            HeroBaselineInput baseline = null)
         {
             var data = new CombatHudData
             {
@@ -45,7 +46,7 @@ namespace Project05.CombatScene
                     }
                 }
 
-                int maxHp = Mathf.Max(1, heroDef.BaseMaxHp + hpBonus);
+                int maxHp = baseline != null ? HeroStatMath.MaxHp(baseline, catalog) : Mathf.Max(1, heroDef.BaseMaxHp + hpBonus);
                 data.Heroes[0] = new HeroSlotData
                 {
                     JoinNumeral = 1,
@@ -294,6 +295,22 @@ namespace Project05.CombatScene
             }
         }
 
+        /// <summary>The chip kind of a status id.</summary>
+        public static StatusKind KindOf(string statusId)
+        {
+            switch (statusId)
+            {
+                case "poison": return StatusKind.Poison;
+                case "burn": return StatusKind.Burn;
+                case "frost": return StatusKind.Frost;
+                case "slow": return StatusKind.Slow;
+                case "weaken": return StatusKind.Weaken;
+                case "stun": return StatusKind.Stun;
+                case "an": return StatusKind.Seal;
+                default: return StatusKind.Droplet;
+            }
+        }
+
         private static void AppendStatuses(IReadOnlyList<ActiveStatusView> src, List<StatusChipData> dst)
         {
             if (src == null) return;
@@ -302,10 +319,13 @@ namespace Project05.CombatScene
                 if (src[i].TotalAmount <= 0) continue;
                 dst.Add(new StatusChipData
                 {
-                    Kind = src[i].StatusId == "an" ? StatusKind.Seal : StatusKind.Droplet,
+                    Kind = KindOf(src[i].StatusId),
                     Amount = (int)Mathf.Min(int.MaxValue, src[i].TotalAmount)
                 });
             }
+
+            // fixed order by kind, so each debuff always sits in the same place (debuffs-and-detonation.md)
+            dst.Sort((a, b) => a.Kind.CompareTo(b.Kind));
         }
 
         private static void AppendReadouts(CombatEventRecord ev, List<ReadoutData> readouts)
@@ -384,7 +404,8 @@ namespace Project05.CombatScene
             if (item == null || item.Effects == null || item.Effects.Count == 0) return GlyphKind.Speed;
             switch (item.Effects[0].Kind)
             {
-                case EffectKind.ApplyStatus: return GlyphKind.Seal;
+                case EffectKind.ApplyStatus: return GlyphKind.Droplet;
+                case EffectKind.DetonateAll: return GlyphKind.Detonate;
                 case EffectKind.ConsumeDetonate: return GlyphKind.Damage;
                 case EffectKind.ShieldGain: return GlyphKind.Shield;
                 case EffectKind.Heal: return GlyphKind.Heart;

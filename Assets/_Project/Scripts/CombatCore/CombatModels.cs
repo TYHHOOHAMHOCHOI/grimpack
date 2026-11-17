@@ -104,19 +104,66 @@ namespace Project05.CombatCore
         public ArrangementGridView FrozenGrid { get; }
         public GridSynergyView FrozenSynergy { get; }
 
+        /// <summary>Signed max-HP term from an active curse (Frailty, or a Pinned curse's HP rider); 0 if none (System 19 Formula 3).</summary>
+        public int CurseHpDelta { get; }
+
+        /// <summary>Signed speed term from an active curse (Sluggish, or a Pinned curse's speed rider), added after the item sum; 0 if none.</summary>
+        public int CurseSpeedDelta { get; }
+
+        /// <summary>Damage the hero takes at the start of each of its own turns from a Wither curse; 0 if none (System 19 Formula 4).</summary>
+        public int WitherPerTurn { get; }
+
+        /// <summary>The curse that the terms above come from, for the trace origin; empty if none.</summary>
+        public string CurseId { get; }
+
         public HeroBaselineInput(
             int slot,
             HeroDef definition,
             int permanentHpBonus,
             ArrangementGridView frozenGrid,
-            GridSynergyView frozenSynergy = null)
+            GridSynergyView frozenSynergy = null,
+            int curseHpDelta = 0,
+            int curseSpeedDelta = 0,
+            int witherPerTurn = 0,
+            string curseId = null)
         {
             Slot = slot;
             Definition = definition;
             PermanentHpBonus = permanentHpBonus;
             FrozenGrid = frozenGrid;
             FrozenSynergy = frozenSynergy;
+            CurseHpDelta = curseHpDelta;
+            CurseSpeedDelta = curseSpeedDelta;
+            WitherPerTurn = witherPerTurn < 0 ? 0 : witherPerTurn;
+            CurseId = curseId ?? string.Empty;
         }
+    }
+
+    /// <summary>
+    /// The one place a hero's max HP and effective speed are computed (System 15 HeroStats with System 19's curse terms),
+    /// so the planning preview, the forecast and the fight always agree.
+    /// </summary>
+    public static class HeroStatMath
+    {
+        /// <summary>maxHP = max(1, h + B_perm + H + C_hp).</summary>
+        public static int MaxHp(HeroDef def, int permanentHpBonus, int itemHpBonus, int curseHpDelta)
+        {
+            long raw = (long)(def != null ? def.BaseMaxHp : 1) + permanentHpBonus + itemHpBonus + curseHpDelta;
+            if (raw < 1L) return 1;
+            return raw > int.MaxValue ? int.MaxValue : (int)raw;
+        }
+
+        /// <summary>Effective speed with the curse term added after the item sum, so the curse always bites.</summary>
+        public static int Speed(HeroDef def, int itemSpeedBonus, int curseSpeedDelta) =>
+            TurnOrderScheduler.EffectiveSpeed(def != null ? def.BaseSpeed : 1, itemSpeedBonus + curseSpeedDelta, 0);
+
+        /// <summary>Max HP of a hero baseline as the fight will use it.</summary>
+        public static int MaxHp(HeroBaselineInput input, GameCatalog catalog) =>
+            MaxHp(input.Definition, input.PermanentHpBonus, TurnOrderScheduler.ComputeHeroHpBonus(input.FrozenGrid, catalog), input.CurseHpDelta);
+
+        /// <summary>Effective speed of a hero baseline as the fight will use it.</summary>
+        public static int Speed(HeroBaselineInput input, GameCatalog catalog) =>
+            Speed(input.Definition, TurnOrderScheduler.ComputeHeroSpeedBonus(input.FrozenGrid, catalog), input.CurseSpeedDelta);
     }
 
     /// <summary>

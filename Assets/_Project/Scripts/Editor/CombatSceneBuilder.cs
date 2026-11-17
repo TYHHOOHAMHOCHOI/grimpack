@@ -127,6 +127,14 @@ namespace Project05.Editor
             Border(Art + "UI/ui_chip_base_9s.png", new Vector4(3, 0, 3, 0));
             foreach (string s in new[] { "default", "selected" }) Border(Art + "UI/ui_segment_" + s + "_9s.png", new Vector4(6, 6, 6, 6));
             foreach (string s in new[] { "default", "active", "hover" }) Border(Art + "UI/ui_sell-frame_" + s + "_9s.png", new Vector4(8, 8, 8, 8));
+            // run UI (tools/art/build_run_ui.py): door cards, rings, curse chip
+            foreach (string t in new[] { "white", "green", "blue", "purple", "gold", "disabled" }) Border(Art + "UI/ui_door-card_" + t + "_9s.png", new Vector4(8, 8, 8, 8));
+            Border(Art + "UI/ui_door-card_ring-hover_9s.png", new Vector4(2, 2, 2, 2));
+            Border(Art + "UI/ui_door-card_ring-armed_9s.png", new Vector4(3, 3, 3, 3));
+            Border(Art + "UI/ui_curse-chip_9s.png", new Vector4(3, 0, 3, 0));
+            // debuff chips and the forge frame (tools/art/build_status_ui.py)
+            foreach (string k in new[] { "poison", "burn", "frost", "slow", "weaken" }) Border(Art + "UI/ui_chip-status_" + k + "_9s.png", new Vector4(3, 0, 3, 0));
+            foreach (string st in new[] { "default", "active", "hover", "invalid" }) Border(Art + "UI/ui_upgrade-frame_" + st + "_9s.png", new Vector4(8, 8, 8, 8));
         }
 
         private static void Border(string path, Vector4 border)
@@ -161,7 +169,9 @@ namespace Project05.Editor
                 AssetDatabase.CreateAsset(set, SetPath);
             }
 
-            string[] glyphIds = { "attack", "multi", "sweep", "windup", "heart", "shield", "speed", "damage", "droplet", "seal", "menu" };
+            // GlyphKind order; the debuff, detonate and anvil glyphs come from tools/art/build_status_ui.py
+            string[] glyphIds = { "attack", "multi", "sweep", "windup", "heart", "shield", "speed", "damage", "droplet", "seal", "menu",
+                "burn", "frost", "slow", "weaken", "detonate", "anvil" };
             string[] tiers = { "white", "green", "blue", "purple", "gold", "red" };
             set.heroPoses = new[]
             {
@@ -170,6 +180,13 @@ namespace Project05.Editor
             };
             set.heroNarrow = S("Characters/char_tank_narrow_01.png");
             set.heroAttack = new[] { S("Characters/char_tank_attack_01.png"), S("Characters/char_tank_attack_02.png") };
+            set.alchemistPoses = new[]
+            {
+                S("Characters/char_alchemist_idle_01.png"), S("Characters/char_alchemist_idle_02.png"), S("Characters/char_alchemist_hurt_01.png"),
+                S("Characters/char_alchemist_hurt_02.png"), S("Characters/char_alchemist_down_01.png"), S("Characters/char_alchemist_down_02.png"),
+            };
+            set.alchemistNarrow = S("Characters/char_alchemist_narrow_01.png");
+            set.alchemistAttack = new[] { S("Characters/char_alchemist_attack_01.png"), S("Characters/char_alchemist_attack_02.png") };
             set.pedestalDefault = S("Props/prop_pedestal_default_52x12.png");
             set.pedestalDim = S("Props/prop_pedestal_dim_52x12.png");
             set.shadowContact = S("Props/prop_shadow-contact_default_30x4.png");
@@ -201,6 +218,18 @@ namespace Project05.Editor
             set.vfxMote = Many("VFX/vfx_status_mote_{0}.png", "01", "02");
             set.vfxMoteFoe = Many("VFX/vfx_status_mote-foe_{0}.png", "01", "02");
             set.dimMask = S("UI/ui_dim-mask_default_4x4.png");
+            // debuff chips by StatusKind: Droplet, Seal, Poison, Burn, Frost, Slow, Weaken, Stun (frozen shows the frost chip)
+            set.statusChips = new[]
+            {
+                S("UI/ui_chip-status_poison_9s.png"), null, S("UI/ui_chip-status_poison_9s.png"), S("UI/ui_chip-status_burn_9s.png"),
+                S("UI/ui_chip-status_frost_9s.png"), S("UI/ui_chip-status_slow_9s.png"), S("UI/ui_chip-status_weaken_9s.png"),
+                S("UI/ui_chip-status_frost_9s.png"),
+            };
+            set.vfxMotePoison = Many("VFX/vfx_status_mote-poison_{0}.png", "01", "02");
+            set.vfxMoteBurn = Many("VFX/vfx_status_mote-burn_{0}.png", "01", "02");
+            set.vfxMoteFrost = Many("VFX/vfx_status_mote-frost_{0}.png", "01", "02");
+            set.vfxMoteSlow = Many("VFX/vfx_status_mote-slow_{0}.png", "01", "02");
+            set.vfxMoteWeaken = Many("VFX/vfx_status_mote-weaken_{0}.png", "01", "02");
             EditorUtility.SetDirty(set);
             return set;
         }
@@ -371,6 +400,45 @@ namespace Project05.Editor
             return view;
         }
 
+        /// <summary>The forge zone ("Rèn"), the sell zone's twin: an anvil, a framed drop area, the cost and the before -> after line.</summary>
+        private static ForgeZoneView BuildForgeZone(RectTransform panel, out RectTransform area)
+        {
+            RectTransform root = Rect("ForgeZone", panel, TopLeft, TopLeft);
+            root.anchoredPosition = Vector2.zero;
+            Image anvil = Img("Anvil", root, S("UI/ui_upgrade-anvil_default_48x28.png"), (DrawerWidth - 48) / 2, 8, TopLeft);
+            Image frame = Img("Frame", root, S("UI/ui_upgrade-frame_default_9s.png"), SellRect.x, SellRect.y, TopLeft, SellRect.width, SellRect.height, true);
+            Label("Title", root, "Rèn +", SellRect.x, SellRect.y + 8, SellRect.width, Bone, TextAlignmentOptions.Top);
+            TextMeshProUGUI preview = Label("Preview", root, string.Empty, SellRect.x + 4, SellRect.y + 30, SellRect.width - 8, Bone, TextAlignmentOptions.Top);
+            preview.textWrappingMode = TextWrappingModes.Normal;
+            preview.rectTransform.sizeDelta = new Vector2(SellRect.width - 8, 40);
+            TextMeshProUGUI hint = Label("Hint", root, "Kéo đồ vào đây", SellRect.x, SellRect.y + 72, SellRect.width, Fog, TextAlignmentOptions.Top);
+
+            RectTransform costRow = Rect("Cost", root, TopLeft, TopLeft);
+            costRow.anchoredPosition = Vector2.zero;
+            Img("Coin", costRow, S("UI/ui_glyph-coin_default_12x12.png"), 69, SellRect.yMax + 6, TopLeft);
+            SpriteNumeralText cost = Num("Amount", costRow, 12, "num", 85, SellRect.yMax + 6, "0", TopLeft);
+            costRow.gameObject.SetActive(false);
+
+            var view = root.gameObject.AddComponent<ForgeZoneView>();
+            var so = new SerializedObject(view);
+            so.FindProperty("anvil").objectReferenceValue = anvil;
+            so.FindProperty("frame").objectReferenceValue = frame;
+            so.FindProperty("anvilIdle").objectReferenceValue = S("UI/ui_upgrade-anvil_default_48x28.png");
+            so.FindProperty("anvilActive").objectReferenceValue = S("UI/ui_upgrade-anvil_active_48x28.png");
+            so.FindProperty("anvilStrike").objectReferenceValue = S("UI/ui_upgrade-anvil_strike_48x28.png");
+            so.FindProperty("frameIdle").objectReferenceValue = S("UI/ui_upgrade-frame_default_9s.png");
+            so.FindProperty("frameReady").objectReferenceValue = S("UI/ui_upgrade-frame_active_9s.png");
+            so.FindProperty("frameOver").objectReferenceValue = S("UI/ui_upgrade-frame_hover_9s.png");
+            so.FindProperty("frameInvalid").objectReferenceValue = S("UI/ui_upgrade-frame_invalid_9s.png");
+            so.FindProperty("hint").objectReferenceValue = hint;
+            so.FindProperty("preview").objectReferenceValue = preview;
+            so.FindProperty("costRow").objectReferenceValue = costRow.gameObject;
+            so.FindProperty("cost").objectReferenceValue = cost;
+            so.ApplyModifiedPropertiesWithoutUndo();
+            area = frame.rectTransform;
+            return view;
+        }
+
         /// <summary>
         /// The sell drawer: a clip over the stage, a panel that springs out from the right edge, the pull tab with its arrow at
         /// the top of the edge, and the sell zone inside. Wires the board to it. Returns the clip's group, which pauses with the screen.
@@ -389,6 +457,8 @@ namespace Project05.Editor
             body.type = Image.Type.Sliced;
             body.raycastTarget = true;
             SellZoneView zone = BuildSellZone(panel, out RectTransform area);
+            ForgeZoneView forge = BuildForgeZone(panel, out RectTransform forgeArea);
+            forge.gameObject.SetActive(false);
 
             RectTransform tabRt = ModalKit.Rect("Tab", panel, -TabWidth, 6, TabWidth, 28);
             Image tabImage = tabRt.gameObject.AddComponent<Image>();
@@ -402,7 +472,19 @@ namespace Project05.Editor
                 pressedSprite = S("UI/ui_drawer-tab_pressed_14x28.png"),
                 selectedSprite = S("UI/ui_drawer-tab_focus_14x28.png"),
             };
-            Image arrow = Img("Arrow", tabRt, S("UI/ui_glyph-arrow-left_bone_5x7.png"), 5, 10, TopLeft);
+            Image arrow = Img("Arrow", tabRt, S("UI/ui_glyph-arrow-left_bone_5x7.png"), 5, 4, TopLeft);
+            Img("Scale", tabRt, S("UI/ui_glyph-scale_bone_8x8.png"), 3, 15, TopLeft);
+
+            // the forge tab under the sell tab (item-upgrades.md): same chrome, an anvil glyph
+            RectTransform forgeTabRt = ModalKit.Rect("ForgeTab", panel, -TabWidth, 38, TabWidth, 28);
+            Image forgeTabImage = forgeTabRt.gameObject.AddComponent<Image>();
+            forgeTabImage.sprite = S("UI/ui_drawer-tab_default_14x28.png");
+            var forgeTab = forgeTabRt.gameObject.AddComponent<Button>();
+            forgeTab.targetGraphic = forgeTabImage;
+            forgeTab.transition = Selectable.Transition.SpriteSwap;
+            forgeTab.spriteState = tab.spriteState;
+            Img("Arrow", forgeTabRt, S("UI/ui_glyph-arrow-left_bone_5x7.png"), 5, 4, TopLeft);
+            Img("Anvil", forgeTabRt, S("UI/ui_glyph-anvil_bone_8x8.png"), 3, 15, TopLeft);
 
             var drawer = panel.gameObject.AddComponent<SellDrawerView>();
             var so = new SerializedObject(drawer);
@@ -413,6 +495,9 @@ namespace Project05.Editor
             so.FindProperty("arrowClose").objectReferenceValue = S("UI/ui_glyph-arrow-right_bone_5x7.png");
             so.FindProperty("openX").floatValue = openX;
             so.FindProperty("closedX").floatValue = closedX;
+            so.FindProperty("forgeTab").objectReferenceValue = forgeTab;
+            so.FindProperty("sellContent").objectReferenceValue = zone.gameObject;
+            so.FindProperty("forgeContent").objectReferenceValue = forge.gameObject;
             so.ApplyModifiedPropertiesWithoutUndo();
 
             // A held plate moves to this layer, so it draws above the stage and the drawer while it is carried.
@@ -424,6 +509,9 @@ namespace Project05.Editor
             boardSo.FindProperty("sellZone").objectReferenceValue = zone;
             boardSo.FindProperty("sellArea").objectReferenceValue = area;
             boardSo.FindProperty("drawer").objectReferenceValue = drawer;
+            boardSo.FindProperty("forgeZone").objectReferenceValue = forge;
+            boardSo.FindProperty("forgeArea").objectReferenceValue = forgeArea;
+            boardSo.FindProperty("plusBadge").objectReferenceValue = S("UI/ui_item-plus_bone_7x7.png");
             boardSo.FindProperty("dragLayer").objectReferenceValue = dragLayer;
             boardSo.ApplyModifiedPropertiesWithoutUndo();
             return group;
@@ -435,7 +523,7 @@ namespace Project05.Editor
         private static readonly (string id, int x, int y)[] GridLayout =
         {
             ("item_iron_sword", 0, 0), ("item_whetstone", 1, 0), ("item_spiked_buckler", 1, 1),
-            ("item_seal_ink", 2, 0), ("item_breaking_bell", 2, 1), ("item_guard_sigil", 3, 0),
+            ("item_venom_vial", 2, 0), ("item_drowsy_bell", 2, 1), ("item_guard_sigil", 3, 0),
             ("item_field_bandage", 0, 3),
         };
 
@@ -498,6 +586,7 @@ namespace Project05.Editor
             so.FindProperty("ghostInvalid").objectReferenceValue = S("UI/ui_ghost_invalid_20x20.png");
             so.FindProperty("ghostCross").objectReferenceValue = S("UI/ui_ghost_cross_20x20.png");
             so.FindProperty("separatorSprite").objectReferenceValue = S("UI/ui_fill_ink-1_4x4.png");
+            so.FindProperty("lockedCellSprite").objectReferenceValue = S("UI/ui_dim-mask_default_4x4.png");
             SerializedProperty views = so.FindProperty("containers");
             views.arraySize = 2;
             SetContainer(views.GetArrayElementAtIndex(0), "grid", Start.GridOrigin.x, Start.GridOrigin.y, WorkbenchLayout.StartGrid, WorkbenchLayout.StartGrid, true);
@@ -804,6 +893,25 @@ namespace Project05.Editor
                 }
             }
 
+            // Run UI (doors, corridor, buffs, curses): every sprite of tools/art/build_run_ui.py, keyed by file name.
+            catalog.runUi.Clear();
+            string[] runPrefixes = { "ui_door-card", "ui_pip-rank", "ui_curse", "ui_fill_plum", "ui_glyph-curse", "ui_glyph-cell", "ui_glyph-size", "ui_glyph-elite", "ui_map-" };
+            string uiDir = Art + "UI";
+            if (Directory.Exists(uiDir))
+            {
+                string[] files = Directory.GetFiles(uiDir, "ui_*.png");
+                System.Array.Sort(files, System.StringComparer.OrdinalIgnoreCase);
+                foreach (string file in files)
+                {
+                    string assetPath = file.Replace(Path.DirectorySeparatorChar, '/');
+                    string fileName = Path.GetFileNameWithoutExtension(assetPath);
+                    if (System.Array.FindIndex(runPrefixes, pre => fileName.StartsWith(pre, System.StringComparison.Ordinal)) < 0) continue;
+                    Sprite sprite = AssetDatabase.LoadAssetAtPath<Sprite>(assetPath);
+                    if (sprite == null) continue;
+                    catalog.runUi.Add(new CombatSceneSpriteCatalog.SpriteEntry { key = fileName, sprite = sprite });
+                }
+            }
+
             catalog.InvalidateCache();
             EditorUtility.SetDirty(catalog);
             return catalog;
@@ -822,6 +930,7 @@ namespace Project05.Editor
             so.FindProperty("itemsJson").objectReferenceValue = AssetDatabase.LoadAssetAtPath<TextAsset>("Assets/_Project/Data/items_mvp.json");
             so.FindProperty("heroesJson").objectReferenceValue = AssetDatabase.LoadAssetAtPath<TextAsset>("Assets/_Project/Data/heroes_mvp.json");
             so.FindProperty("monstersJson").objectReferenceValue = AssetDatabase.LoadAssetAtPath<TextAsset>("Assets/_Project/Data/monsters_mvp.json");
+            so.FindProperty("runJson").objectReferenceValue = AssetDatabase.LoadAssetAtPath<TextAsset>("Assets/_Project/Data/run_mvp.json");
             so.FindProperty("spriteCatalog").objectReferenceValue = spriteCatalog;
             so.FindProperty("hudView").objectReferenceValue = hudView;
             so.FindProperty("popupController").objectReferenceValue = popup;
@@ -1088,7 +1197,7 @@ namespace Project05.Editor
             EditorSceneManager.OpenScene(ScenePath, OpenSceneMode.Single);
             try
             {
-                foreach (string id in new[] { "item_iron_sword", "item_dagger", "item_hourglass", "item_breaking_bell", "item_echo_charm" })
+                foreach (string id in new[] { "item_iron_sword", "item_dagger", "item_hourglass", "item_drowsy_bell", "item_echo_charm" })
                 {
                     ItemHoverTarget target = null;
                     foreach (ItemHoverTarget t in Object.FindObjectsByType<ItemHoverTarget>()) if (t.ItemId == id) target = t;

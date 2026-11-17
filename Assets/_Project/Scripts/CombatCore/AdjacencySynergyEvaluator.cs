@@ -67,10 +67,22 @@ namespace Project05.CombatCore
             IncomingLinks = incomingLinks ?? Array.Empty<SynergyLink>();
         }
 
+        /// <summary>Extra stacks for a status: rules for that status plus rules for every status (empty id).</summary>
         public int GetStatusAmountBonus(string statusId)
         {
             if (statusId == null || _statusBonuses == null) return 0;
-            return _statusBonuses.TryGetValue(statusId, out int val) ? val : 0;
+            int val = _statusBonuses.TryGetValue(statusId, out int v) ? v : 0;
+            if (statusId.Length > 0 && _statusBonuses.TryGetValue(string.Empty, out int all)) val += all;
+            return val;
+        }
+
+        /// <summary>Extra detonation value per stack for a status kind (DetonateValue rules for it and for every kind).</summary>
+        public int GetDetonateValueBonus(string statusId)
+        {
+            if (_statusBonuses == null) return 0;
+            int val = _statusBonuses.TryGetValue(DetonateKeys.For(statusId), out int v) ? v : 0;
+            if (!string.IsNullOrEmpty(statusId) && _statusBonuses.TryGetValue(DetonateKeys.For(string.Empty), out int all)) val += all;
+            return val;
         }
     }
 
@@ -193,9 +205,11 @@ namespace Project05.CombatCore
                         case SynergyKind.DamagePercent: pct += link.Amount; break;
                         case SynergyKind.CooldownReduction: cdr += link.Amount; break;
                         case SynergyKind.StatusAmount:
+                        case SynergyKind.DetonateValue:
                             if (statusBonuses == null) statusBonuses = new Dictionary<string, int>(StringComparer.Ordinal);
-                            statusBonuses.TryGetValue(link.StatusId, out int cur);
-                            statusBonuses[link.StatusId] = cur + link.Amount;
+                            string key = link.Kind == SynergyKind.DetonateValue ? DetonateKeys.For(link.StatusId) : (link.StatusId ?? string.Empty);
+                            statusBonuses.TryGetValue(key, out int cur);
+                            statusBonuses[key] = cur + link.Amount;
                             break;
                     }
                 }
@@ -401,6 +415,8 @@ namespace Project05.CombatCore
                     return target.HasCooldown;
                 case SynergyKind.StatusAmount:
                     return target.AppliesStatus(rule.StatusId);
+                case SynergyKind.DetonateValue:
+                    return target.Detonates;
                 default:
                     return false;
             }

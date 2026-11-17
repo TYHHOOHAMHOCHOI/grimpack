@@ -74,6 +74,25 @@ namespace Project05.Items
         public string nameEn = string.Empty;
         public string flavorVi = string.Empty;
         public string flavorEn = string.Empty;
+        /// <summary>The id of the upgraded (+) version, or empty (item-upgrades.md).</summary>
+        public string upgradeId = string.Empty;
+        /// <summary>For a + item, the id of its base item; empty for a base item.</summary>
+        public string upgradeOf = string.Empty;
+        /// <summary>Gold paid when a room is won while the item is in the hero grid.</summary>
+        public int goldOnWin;
+
+        /// <summary>True for an upgraded (+) item.</summary>
+        public bool IsUpgraded => !string.IsNullOrEmpty(upgradeOf);
+
+        /// <summary>True when the item detonates debuffs.</summary>
+        public bool Detonates
+        {
+            get
+            {
+                foreach (EffectRecord e in effects) if (e.kind == "DetonateAll") return true;
+                return false;
+            }
+        }
 
         /// <summary>True when any effect or trigger has a cooldown (Cooldown and Reaction items).</summary>
         public bool HasCooldown => trigger.kind == "Cooldown" || trigger.kind == "Reaction";
@@ -83,7 +102,7 @@ namespace Project05.Items
         {
             get
             {
-                foreach (EffectRecord e in effects) if (e.kind == "Damage" || e.kind == "ConsumeDetonate") return true;
+                foreach (EffectRecord e in effects) if (e.kind == "Damage" || e.kind == "ConsumeDetonate" || e.kind == "DetonateAll") return true;
                 return false;
             }
         }
@@ -91,7 +110,7 @@ namespace Project05.Items
         /// <summary>True when the item has an ApplyStatus effect for the given status.</summary>
         public bool AppliesStatus(string statusId)
         {
-            foreach (EffectRecord e in effects) if (e.kind == "ApplyStatus" && e.status == statusId) return true;
+            foreach (EffectRecord e in effects) if (e.kind == "ApplyStatus" && (string.IsNullOrEmpty(statusId) || e.status == statusId)) return true;
             return false;
         }
 

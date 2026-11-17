@@ -8,6 +8,8 @@
 > **Last Verified**: 2026-11-11 (document consistency only)
 > **Implements Pillar**: Arrangement Is the Thinking and The Payoff Is the Product.
 
+> **Superseded in part (2026-11-17, user decision):** the Ấn (Seal) status, its uncapped stacking, its working duration and coefficient, and every Ấn example below are replaced by [Debuffs and Detonation](debuffs-and-detonation.md) (System 38): five enemy debuffs (Poison, Burn, Frost, Slow, Weaken) and one detonator. This document's general ledger rules (lots with provenance, oldest-first order, expiry boundary, atomic batches, technical stop) still apply where System 38 cites them. Not rewritten here.
+
 ## Summary
 
 Status Effects describes temporary conditions that one hero or enemy can apply and a later effect can use. The design preserves each contribution's source so the player can follow a setup into its payoff. The two-hero spike uses a timed, uncapped debuff with oldest-first consumption.

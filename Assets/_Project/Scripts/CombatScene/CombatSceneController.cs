@@ -12,7 +12,10 @@ namespace Project05.CombatScene
     {
         Planning = 0,
         Playing = 1,
-        PostCombat = 2
+        PostCombat = 2,
+
+        /// <summary>A room was won: buff claim, item shelf and door choice (the run's reward steps).</summary>
+        RunReward = 3
     }
 
     /// <summary>
@@ -21,7 +24,7 @@ namespace Project05.CombatScene
     /// deterministic <see cref="CombatCore"/> simulation, HUD playback, Post-Combat breakdown,
     /// and the Next-Stage Monster Count Test System (1..6).
     /// </summary>
-    public sealed class CombatSceneController : MonoBehaviour
+    public sealed partial class CombatSceneController : MonoBehaviour
     {
         [Header("Data Catalogs")]
         [SerializeField] private TextAsset itemsJson;
@@ -116,9 +119,11 @@ namespace Project05.CombatScene
             NextMonsterCount = Mathf.Clamp(defaultMonsterCount, 1, 6);
             Currency = startingCurrency;
             _idSource = new SequentialItemIdSource(1);
+            InitRun();
 
             CenterSingleHeroSlot();
             BuildIntegratedPanels();
+            BuildRunPanels();
             SyncArrangementFromExternalBoard();
             PrepareStage(CurrentStage, NextMonsterCount);
         }
@@ -195,7 +200,7 @@ namespace Project05.CombatScene
 
         public bool StartIntegratedFight(int speedIndex)
         {
-            if (!_integratedMode || Phase != CombatScenePhase.Planning || Catalog == null) return false;
+            if (!_integratedMode || Phase != CombatScenePhase.Planning || Catalog == null || !CanStartFight) return false;
 
             SetPickerOpen(false);
             SyncArrangementFromExternalBoard();
@@ -230,7 +235,8 @@ namespace Project05.CombatScene
                 CurrentStage,
                 roomCount,
                 Currency,
-                _playbackSpeedIndex);
+                _playbackSpeedIndex,
+                RunBaseline(Arrangement.CaptureView().HeroGrids[0], null));
             hudView.Apply(startData);
 
             Playback.Play(Catalog, Prepared, LastResult, CurrentStage, roomCount, Currency);
@@ -298,7 +304,7 @@ namespace Project05.CombatScene
         {
             // Next-stage 1..6 monster test selector inside ActionStrip's StartGroup
             Transform startGroupTf = _externalStrip != null ? _externalStrip.transform.parent.Find("StartGroup") : null;
-            if (startGroupTf is RectTransform startGroupRt)
+            if (startGroupTf is RectTransform startGroupRt && !RunActive)
             {
                 NextStagePanel = gameObject.AddComponent<NextStageTestPanel>();
                 NextStagePanel.Initialize(startGroupRt, spriteCatalog, NextMonsterCount);
@@ -506,7 +512,8 @@ namespace Project05.CombatScene
                 CurrentStage,
                 roomCount,
                 Currency,
-                speedIndex);
+                speedIndex,
+                RunBaseline(Arrangement.CaptureView().HeroGrids[0], null));
             hudView.Apply(startData);
 
             Playback.Play(Catalog, Prepared, LastResult, CurrentStage, roomCount, Currency);
@@ -515,6 +522,12 @@ namespace Project05.CombatScene
         public void ProceedToNextStage()
         {
             if (Phase != CombatScenePhase.PostCombat) return;
+            if (RunActive)
+            {
+                RestartRun();   // the run is over: a new run
+                return;
+            }
+
 
             Playback?.StopPlayback();
             PostCombatPanel?.Hide();
@@ -534,6 +547,12 @@ namespace Project05.CombatScene
         public void RetryStage()
         {
             if (Phase != CombatScenePhase.PostCombat) return;
+            if (RunActive)
+            {
+                RestartRun();   // no retry of a room in a run (System 5)
+                return;
+            }
+
 
             Playback?.StopPlayback();
             PostCombatPanel?.Hide();
@@ -578,14 +597,15 @@ namespace Project05.CombatScene
                 CurrentStage,
                 roomCount,
                 Currency,
-                speedIndex);
+                speedIndex,
+                RunBaseline(heroGrid, synergy));
             hudView.Apply(data);
         }
 
         private void PrepareStage(int stage, int monsterCount)
         {
             int count = Mathf.Clamp(monsterCount, 1, 6);
-            _currentSpawns = _presetCatalog.BuildSpawns(Catalog, count, stage);
+            _currentSpawns = RunActive ? _run.BuildSpawns() : _presetCatalog.BuildSpawns(Catalog, count, stage);
             SetPhase(CombatScenePhase.Planning);
 
             Workbench?.SetInteractive(true);
@@ -602,12 +622,7 @@ namespace Project05.CombatScene
             ArrangementGridView heroGrid = view.HeroGrids[0];
             GridSynergyView synergy = AdjacencySynergyEvaluator.Evaluate(heroGrid, Catalog);
 
-            var heroBaseline = new HeroBaselineInput(
-                slot: 0,
-                definition: HeroDef,
-                permanentHpBonus: 0,
-                frozenGrid: heroGrid,
-                frozenSynergy: synergy);
+            HeroBaselineInput heroBaseline = RunBaseline(heroGrid, synergy);   // door HP and curse terms (Systems 17, 19)
 
             var setup = new EncounterSetup(
                 encounterId: CurrentStage,
@@ -615,7 +630,7 @@ namespace Project05.CombatScene
                 heroes: new[] { heroBaseline },
                 enemies: _currentSpawns);
 
-            ulong encounterSeed = DeriveStageSeed(stageSeed, CurrentStage, _currentSpawns.Count);
+            ulong encounterSeed = DeriveStageSeed(RunActive ? _run.Seed : stageSeed, CurrentStage, _currentSpawns.Count);
             var rng = new SeededRng(encounterSeed);
             return CombatRunner.TryPrepare(Catalog, setup, rng, out prepared, out error);
         }
@@ -631,7 +646,7 @@ namespace Project05.CombatScene
             }
 
             // Seed a few starter options into Stash so players can swap immediately without opening Chọn đồ.
-            string[] starterSpares = { "item_dagger", "item_oak_buckler", "item_breaking_bell" };
+            string[] starterSpares = { "item_dagger", "item_oak_buckler", "item_drowsy_bell" };
             for (int i = 0; i < starterSpares.Length; i++)
             {
                 if (Catalog.FindItem(starterSpares[i]) != null)
@@ -728,6 +743,12 @@ namespace Project05.CombatScene
 
         private void HandlePlaybackCompleted(CombatResult result)
         {
+            if (RunActive)
+            {
+                HandleRunPlaybackCompleted(result);
+                return;
+            }
+
             LastResult = result;
             SetPhase(CombatScenePhase.PostCombat);
             PostCombatPanel?.Show(result, Catalog, CurrentStage, NextMonsterCount);

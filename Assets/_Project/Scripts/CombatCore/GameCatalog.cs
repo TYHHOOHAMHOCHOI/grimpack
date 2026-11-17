@@ -15,16 +15,27 @@ namespace Project05.CombatCore
         private readonly Dictionary<string, ItemDef> _itemsById;
         private readonly Dictionary<string, HeroDef> _heroesById;
         private readonly Dictionary<string, MonsterDef> _monstersById;
+        private readonly Dictionary<string, StatusDef> _statusesById;
 
         public IReadOnlyList<ItemDef> Items { get; }
         public IReadOnlyList<HeroDef> Heroes { get; }
         public IReadOnlyList<MonsterDef> Monsters { get; }
 
+        /// <summary>The status kinds (debuffs and stun) in ascending id order; empty for a catalog without a statuses list.</summary>
+        public IReadOnlyList<StatusDef> Statuses { get; }
+
         public GameCatalog(
             IReadOnlyList<ItemDef> items,
             IReadOnlyList<HeroDef> heroes,
-            IReadOnlyList<MonsterDef> monsters)
+            IReadOnlyList<MonsterDef> monsters,
+            IReadOnlyList<StatusDef> statuses = null)
         {
+            var sortedStatuses = new List<StatusDef>(statuses ?? Array.Empty<StatusDef>());
+            sortedStatuses.Sort((a, b) => string.CompareOrdinal(a.Id, b.Id));
+            Statuses = sortedStatuses;
+            _statusesById = new Dictionary<string, StatusDef>(sortedStatuses.Count, StringComparer.Ordinal);
+            for (int i = 0; i < sortedStatuses.Count; i++) _statusesById[sortedStatuses[i].Id] = sortedStatuses[i];
+
             var sortedItems = new List<ItemDef>(items ?? Array.Empty<ItemDef>());
             sortedItems.Sort((a, b) => string.CompareOrdinal(a.Id, b.Id));
             Items = sortedItems;
@@ -52,6 +63,10 @@ namespace Project05.CombatCore
 
         public MonsterDef FindMonster(string id) =>
             id != null && _monstersById.TryGetValue(id, out MonsterDef monster) ? monster : null;
+
+        /// <summary>A status kind by id, or null (a catalog without statuses treats every status as a plain timed lot).</summary>
+        public StatusDef FindStatus(string id) =>
+            id != null && _statusesById.TryGetValue(id, out StatusDef status) ? status : null;
 
         public static GameCatalog LoadFromJson(
             string itemsJson,
@@ -197,8 +212,107 @@ namespace Project05.CombatCore
                 }
             }
 
+            // statuses (debuffs-and-detonation.md): an optional "statuses" array beside "items"
+            var statuses = new List<StatusDef>();
+            if (!string.IsNullOrWhiteSpace(itemsJson))
+            {
+                try
+                {
+                    if (SimpleJsonParser.Parse(itemsJson) is Dictionary<string, object> sroot && TryGetList(sroot, "statuses", out List<object> rawStatuses))
+                    {
+                        var statusIds = new HashSet<string>(StringComparer.Ordinal);
+                        for (int i = 0; i < rawStatuses.Count; i++)
+                        {
+                            if (!(rawStatuses[i] is Dictionary<string, object> so))
+                            {
+                                errors.Add("statuses[" + i + "]: expected JSON object.");
+                                continue;
+                            }
+
+                            StatusDef st = ParseStatus(so, i, errors);
+                            if (st != null && !statusIds.Add(st.Id)) errors.Add("Status '" + st.Id + "': duplicate status ID.");
+                            else if (st != null) statuses.Add(st);
+                        }
+
+                        ValidateStatusReferences(items, statusIds, errors);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    errors.Add("itemsJson statuses parse error: " + ex.Message);
+                }
+            }
+
+            ValidateUpgrades(items, errors);
             validationErrors = errors;
-            return errors.Count == 0 ? new GameCatalog(items, heroes, monsters) : null;
+            return errors.Count == 0 ? new GameCatalog(items, heroes, monsters, statuses) : null;
+        }
+
+        private static StatusDef ParseStatus(Dictionary<string, object> o, int index, List<string> errors)
+        {
+            string id = GetString(o, "id", "");
+            string label = string.IsNullOrEmpty(id) ? "statuses[" + index + "]" : "Status '" + id + "'";
+            if (!IsValidId(id)) errors.Add(label + ": invalid or empty id.");
+            StatusBehavior behavior;
+            switch (GetString(o, "behavior", ""))
+            {
+                case "Stun": behavior = StatusBehavior.Stun; break;
+                case "Poison": behavior = StatusBehavior.Poison; break;
+                case "Burn": behavior = StatusBehavior.Burn; break;
+                case "Frost": behavior = StatusBehavior.Frost; break;
+                case "Slow": behavior = StatusBehavior.Slow; break;
+                case "Weaken": behavior = StatusBehavior.Weaken; break;
+                default:
+                    errors.Add(label + ".behavior: unknown behavior '" + GetString(o, "behavior", "") + "'.");
+                    return null;
+            }
+
+            var st = new StatusDef(id, behavior,
+                GetInt(o, "durationActions", 0), GetInt(o, "cap", 0), GetInt(o, "tickPerStack", 0), GetInt(o, "decayPerTick", 0),
+                GetInt(o, "freezeAt", 0), GetInt(o, "freezeStunActions", 0), GetInt(o, "speedPermillePerStack", 0),
+                GetInt(o, "damagePermillePerStack", 0), GetInt(o, "detonateValue", 0), GetString(o, "nameVi", id), GetString(o, "nameEn", id));
+            if (st.DurationActions < 0 || st.Cap < 0 || st.TickPerStack < 0 || st.DecayPerTick < 0 || st.FreezeAt < 0 || st.DetonateValue < 0)
+                errors.Add(label + ": negative magnitude.");
+            if (st.SpeedPermillePerStack < -1000 || st.SpeedPermillePerStack > 1000 || st.DamagePermillePerStack < -1000 || st.DamagePermillePerStack > 1000)
+                errors.Add(label + ": permille per stack out of [-1000..1000].");
+            if (st.Behavior == StatusBehavior.Poison && st.DurationActions == 0 && st.DecayPerTick <= 0)
+                errors.Add(label + ": an untimed status must decay.");
+            return st;
+        }
+
+        private static void ValidateStatusReferences(List<ItemDef> items, HashSet<string> statusIds, List<string> errors)
+        {
+            foreach (ItemDef item in items)
+            {
+                foreach (EffectDef e in item.Effects)
+                {
+                    if (e.Kind == EffectKind.ApplyStatus && !statusIds.Contains(e.Status))
+                        errors.Add("Item '" + item.Id + "': ApplyStatus uses unknown status '" + e.Status + "'.");
+                }
+
+                foreach (SynergyRuleDef r in item.Synergy)
+                {
+                    if ((r.Kind == SynergyKind.StatusAmount || r.Kind == SynergyKind.DetonateValue) && !string.IsNullOrEmpty(r.StatusId) && !statusIds.Contains(r.StatusId))
+                        errors.Add("Item '" + item.Id + "': synergy uses unknown status '" + r.StatusId + "'.");
+                }
+            }
+        }
+
+        private static void ValidateUpgrades(List<ItemDef> items, List<string> errors)
+        {
+            var byId = new Dictionary<string, ItemDef>(StringComparer.Ordinal);
+            foreach (ItemDef i in items) byId[i.Id] = i;
+            foreach (ItemDef i in items)
+            {
+                if (!string.IsNullOrEmpty(i.UpgradeId))
+                {
+                    if (!byId.TryGetValue(i.UpgradeId, out ItemDef up)) errors.Add("Item '" + i.Id + "': upgrade '" + i.UpgradeId + "' does not exist.");
+                    else if (up.UpgradeOf != i.Id) errors.Add("Item '" + i.Id + "': upgrade '" + up.Id + "' does not point back.");
+                    else if (up.Footprint != i.Footprint || up.Cells.Count != i.Cells.Count) errors.Add("Item '" + i.Id + "': upgrade changes the footprint.");
+                }
+
+                if (!string.IsNullOrEmpty(i.UpgradeOf) && !string.IsNullOrEmpty(i.UpgradeId)) errors.Add("Item '" + i.Id + "': a + item cannot upgrade again.");
+            }
         }
 
         private static ItemDef ParseItem(Dictionary<string, object> obj, int index, List<string> errors)
@@ -279,7 +393,8 @@ namespace Project05.CombatCore
 
             return new ItemDef(
                 id, art, tier, footprint, cells, tags, trigger, effects,
-                hpBonus, speedBonus, synergy, nameVi, nameEn, flavorVi, flavorEn);
+                hpBonus, speedBonus, synergy, nameVi, nameEn, flavorVi, flavorEn,
+                GetString(obj, "upgradeId", ""), GetString(obj, "upgradeOf", ""), GetInt(obj, "goldOnWin", 0));
         }
 
         private static HeroDef ParseHero(
@@ -747,6 +862,7 @@ namespace Project05.CombatCore
                 case "ConsumeDetonate": kind = EffectKind.ConsumeDetonate; break;
                 case "ShieldGain": kind = EffectKind.ShieldGain; break;
                 case "Heal": kind = EffectKind.Heal; break;
+                case "DetonateAll": kind = EffectKind.DetonateAll; break;
                 default:
                     errors.Add(label + ".kind: unknown effect kind '" + kindStr + "'.");
                     kind = EffectKind.Damage;
@@ -824,6 +940,7 @@ namespace Project05.CombatCore
                 case "DamagePercent": kind = SynergyKind.DamagePercent; break;
                 case "CooldownReduction": kind = SynergyKind.CooldownReduction; break;
                 case "StatusAmount": kind = SynergyKind.StatusAmount; break;
+                case "DetonateValue": kind = SynergyKind.DetonateValue; break;
                 default:
                     errors.Add(label + ".kind: unknown synergy kind '" + kindStr + "'.");
                     kind = SynergyKind.DamageFlat;
@@ -849,8 +966,10 @@ namespace Project05.CombatCore
                         errors.Add(label + ".amount: CooldownReduction out of range [-10..10].");
                     break;
                 case SynergyKind.StatusAmount:
-                    if (string.IsNullOrEmpty(statusId))
-                        errors.Add(label + ".statusId: StatusAmount requires non-empty statusId.");
+                case SynergyKind.DetonateValue:
+                    // an empty statusId means every status kind (debuffs-and-detonation.md)
+                    if (amount < -100 || amount > 100)
+                        errors.Add(label + ".amount: out of range [-100..100].");
                     break;
             }
 

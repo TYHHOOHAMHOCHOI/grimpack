@@ -13,10 +13,10 @@ namespace Project05.UI.Hud
     public enum IntentKind { None, Attack, Multi, Sweep, Windup }
 
     /// <summary>Status glyph kinds. Ấn has its own drawing; the droplet is poison (7.8).</summary>
-    public enum StatusKind { Droplet, Seal }
+    public enum StatusKind { Droplet, Seal, Poison, Burn, Frost, Slow, Weaken, Stun }
 
     /// <summary>Glyph drawings available as plate icons (placeholders until item art exists).</summary>
-    public enum GlyphKind { Attack, Multi, Sweep, Windup, Heart, Shield, Speed, Damage, Droplet, Seal, Menu }
+    public enum GlyphKind { Attack, Multi, Sweep, Windup, Heart, Shield, Speed, Damage, Droplet, Seal, Menu, Burn, Frost, Slow, Weaken, Detonate, Anvil }
 
     /// <summary>Item tiers, in rarity order.</summary>
     public enum Tier { White, Green, Blue, Purple, Gold, Red }

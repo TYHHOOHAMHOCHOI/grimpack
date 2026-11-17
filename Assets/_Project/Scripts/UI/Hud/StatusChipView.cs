@@ -10,6 +10,7 @@ namespace Project05.UI.Hud
     {
         [SerializeField] private Image glyph;
         [SerializeField] private SpriteNumeralText amount;
+        private Sprite _plain;
 
         /// <summary>Shows or hides the chip and sets its contents.</summary>
         public void Apply(StatusChipData data, HudSpriteSet sprites)
@@ -18,6 +19,13 @@ namespace Project05.UI.Hud
             if (data == null) return;
             glyph.sprite = sprites.Status(data.Kind);
             amount.Text = data.Amount.ToString();
+            var frame = GetComponent<Image>();
+            if (frame != null)
+            {
+                if (_plain == null) _plain = frame.sprite;
+                Sprite tinted = sprites.StatusChip(data.Kind);
+                frame.sprite = tinted != null ? tinted : _plain;   // the debuff's colour frames its chip (art bible 4.6 amendment)
+            }
         }
     }
 }

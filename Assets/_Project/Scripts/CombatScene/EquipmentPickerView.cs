@@ -70,7 +70,10 @@ namespace Project05.CombatScene
             _sortedItems.Clear();
             if (catalog != null && catalog.Items != null)
             {
-                _sortedItems.AddRange(catalog.Items);
+                foreach (ItemDef def in catalog.Items)
+                {
+                    if (def.Tier < TierKind.Gold) _sortedItems.Add(def);   // Gold and Red items are curse items, never picked (System 19)
+                }
                 _sortedItems.Sort((a, b) =>
                 {
                     int tierCmp = a.Tier.CompareTo(b.Tier);

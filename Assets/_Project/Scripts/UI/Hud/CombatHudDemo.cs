@@ -24,7 +24,8 @@ namespace Project05.UI.Hud
         {
             UnityEditor.EditorApplication.delayCall += () =>
             {
-                if (this != null && isActiveAndEnabled) Show();
+                // never in Play Mode: there the live combat owns the HUD (a fixture here hid the run's real state)
+                if (this != null && isActiveAndEnabled && !Application.isPlaying) Show();
             };
         }
 #endif

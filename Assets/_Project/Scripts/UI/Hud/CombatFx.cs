@@ -132,7 +132,7 @@ namespace Project05.UI.Hud
             m.Recover = recover / Speed;
             m.LungeDir = hasTarget ? new Vector2(heroActor ? 1f : -1f, 0f) : new Vector2(0f, 1f);
             m.LungeDist = hasTarget ? distance : 3f;
-            m.AttackPoses = heroActor && hasTarget && _hud.Sprites.heroAttack.Length >= 2 ? _hud.Sprites.heroAttack : null;
+            m.AttackPoses = heroActor && hasTarget && _hud.Sprites.Attack != null && _hud.Sprites.Attack.Length >= 2 ? _hud.Sprites.Attack : null;
         }
 
         /// <summary>A hit lands on a unit: swing smear (on the first hit of a swing), spark, knock-back, blink and a number.</summary>

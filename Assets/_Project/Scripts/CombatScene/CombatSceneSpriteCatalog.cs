@@ -62,19 +62,40 @@ namespace Project05.CombatScene
         public List<SpriteEntry> itemIcons = new List<SpriteEntry>();
         public List<SpriteEntry> itemPlates = new List<SpriteEntry>();
 
+        [Header("Run UI Sprites (doors, corridor, curses; keyed by file name without .png)")]
+        public List<SpriteEntry> runUi = new List<SpriteEntry>();
+
         private Dictionary<string, Sprite> _iconLookup;
         private Dictionary<string, Sprite> _plateLookup;
+        private Dictionary<string, Sprite> _runLookup;
 
         private void OnEnable()
         {
             _iconLookup = null;
             _plateLookup = null;
+            _runLookup = null;
         }
 
         public void InvalidateCache()
         {
             _iconLookup = null;
             _plateLookup = null;
+            _runLookup = null;
+        }
+
+        /// <summary>A run UI sprite by file name (e.g. "ui_door-card_gold_9s"), or null.</summary>
+        public Sprite GetRunSprite(string key)
+        {
+            if (_runLookup == null)
+            {
+                _runLookup = new Dictionary<string, Sprite>(StringComparer.Ordinal);
+                foreach (SpriteEntry e in runUi)
+                {
+                    if (e != null && !string.IsNullOrEmpty(e.key) && e.sprite != null) _runLookup[e.key] = e.sprite;
+                }
+            }
+
+            return key != null && _runLookup.TryGetValue(key, out Sprite s) ? s : null;
         }
 
         public Sprite GetItemIcon(string art, string footprint, bool compact)

@@ -23,6 +23,17 @@ MonoBehaviour:
   heroAttack:
   - {fileID: 21300000, guid: e84042d84d8b8214c80d00bac6aaf6f4, type: 3}
   - {fileID: 21300000, guid: 64ea64228bdceaf4ea03ad0042b36dbf, type: 3}
+  alchemistPoses:
+  - {fileID: 21300000, guid: 40387443c087ef246971708b9a04af2e, type: 3}
+  - {fileID: 21300000, guid: c9c95603965a5d64281857da3be86504, type: 3}
+  - {fileID: 21300000, guid: b17c9846b423c99499ce39050654fba0, type: 3}
+  - {fileID: 21300000, guid: d814181e528ade34b82fef139356de95, type: 3}
+  - {fileID: 21300000, guid: efdf7a4d081299243805e5f084640046, type: 3}
+  - {fileID: 21300000, guid: 6a4a426a902c643498b390018708d7d2, type: 3}
+  alchemistNarrow: {fileID: 21300000, guid: 1cfa25dce719feb4d916bdb29ab13a2f, type: 3}
+  alchemistAttack:
+  - {fileID: 21300000, guid: d35cc0d0cadcf8c438d767710ddbe450, type: 3}
+  - {fileID: 21300000, guid: ebfa691c0c696574783a071ca0c1cf5f, type: 3}
   pedestalDefault: {fileID: 21300000, guid: 07160788f4ddd684eb37322829f40513, type: 3}
   pedestalDim: {fileID: 21300000, guid: 3b42c168f6e5af04f9fdf8c187a60125, type: 3}
   monsters:
@@ -65,6 +76,12 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 30cbae036ef326e4fbfb5e402a5e7846, type: 3}
   - {fileID: 21300000, guid: dbac6fa548fda5d45b66730481cb1b77, type: 3}
   - {fileID: 21300000, guid: 60f188ed4747fed438047a992dc896cd, type: 3}
+  - {fileID: 21300000, guid: 0a5796582087a834593cd534d6cb48d4, type: 3}
+  - {fileID: 21300000, guid: 41e1f35bf9618d042895bf05aa2b0320, type: 3}
+  - {fileID: 21300000, guid: 71043b453c37ef1419911ff915b0250b, type: 3}
+  - {fileID: 21300000, guid: c2789eae7269b48418006a2e40ac56ae, type: 3}
+  - {fileID: 21300000, guid: 92f555c64326a5b4d821597c0e984009, type: 3}
+  - {fileID: 21300000, guid: d858b2e259eefaf42ae72a6f2adc2037, type: 3}
   glyphBone8:
   - {fileID: 21300000, guid: 6f1ff1e1b16362a4ebf2bb8b4793d602, type: 3}
   - {fileID: 21300000, guid: a48351a18a68db4449ae1fb5215591e5, type: 3}
@@ -77,12 +94,24 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 1906782d3f58d3345be57eb15357f8ec, type: 3}
   - {fileID: 21300000, guid: 1232fa250bbfa3941972ace7be01ef4b, type: 3}
   - {fileID: 21300000, guid: 6f1c0b8790778e64cb662b03b4c249e2, type: 3}
+  - {fileID: 21300000, guid: cab04f6f0a14cd849aaf33be1e2f52ba, type: 3}
+  - {fileID: 21300000, guid: 722657ff33195d947b3aeecbd6f216e5, type: 3}
+  - {fileID: 21300000, guid: 0aa63f866e83447439ed9ebda77d258c, type: 3}
+  - {fileID: 21300000, guid: 8ba463377537680438ef5da3db258ffb, type: 3}
+  - {fileID: 21300000, guid: 4d3af627e0e51d14eaafb0dee1b49cb3, type: 3}
+  - {fileID: 21300000, guid: cae825562107c714f9da7640df9a571d, type: 3}
   glyphBlood8:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 21300000, guid: d8f09fbed484b8d48900688ca88f8ee8, type: 3}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
@@ -96,6 +125,12 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 21300000, guid: 68808f9438585aa44b6d239fdd89ebf2, type: 3}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
@@ -170,3 +205,27 @@ MonoBehaviour:
   chevronTurnFoe: {fileID: 21300000, guid: 67cc2de1f032a4b4eaa4303bf7f72725, type: 3}
   segmentDefault: {fileID: 21300000, guid: 9a4da908b6aebe84e983cd46f51801d0, type: 3}
   segmentSelected: {fileID: 21300000, guid: c10f121f1a6304e439038b407e177834, type: 3}
+  statusChips:
+  - {fileID: 21300000, guid: bb94a8f80d63a094cb99fc0b9d1561db, type: 3}
+  - {fileID: 0}
+  - {fileID: 21300000, guid: bb94a8f80d63a094cb99fc0b9d1561db, type: 3}
+  - {fileID: 21300000, guid: 4e6c4ba4625b59c4e81d5c0746be4788, type: 3}
+  - {fileID: 21300000, guid: fcf9912d3b821e44f8596e1b951ca471, type: 3}
+  - {fileID: 21300000, guid: 401d7a9184ca8cc47bdcd78d9df312ec, type: 3}
+  - {fileID: 21300000, guid: d5034f7fc69ebf34d8d04a3e78add6af, type: 3}
+  - {fileID: 21300000, guid: fcf9912d3b821e44f8596e1b951ca471, type: 3}
+  vfxMotePoison:
+  - {fileID: 21300000, guid: cce341000cb9e8f43a96d6469bd2a16f, type: 3}
+  - {fileID: 21300000, guid: 31caa486dae1bab40af64630a6882901, type: 3}
+  vfxMoteBurn:
+  - {fileID: 21300000, guid: e8beae163a2059740a5f0b2c46449bf3, type: 3}
+  - {fileID: 21300000, guid: 75ce5b644c09c914fb6cb0da7f796f8b, type: 3}
+  vfxMoteFrost:
+  - {fileID: 21300000, guid: 3f53dfe2ccbfdea46ab3c2953988e410, type: 3}
+  - {fileID: 21300000, guid: 64cebe81d62d03c46b6924143b18c1a6, type: 3}
+  vfxMoteSlow:
+  - {fileID: 21300000, guid: ad6efd9db34e84d4086fb59ee0fba1e6, type: 3}
+  - {fileID: 21300000, guid: 8841b32132a78f54fa9788db0e79fa3e, type: 3}
+  vfxMoteWeaken:
+  - {fileID: 21300000, guid: e46a305df7f1fd14580ff7b76db455cd, type: 3}
+  - {fileID: 21300000, guid: 937d95785c2bc764bb53961c1c6cb7b1, type: 3}

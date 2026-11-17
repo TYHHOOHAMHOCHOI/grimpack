@@ -72,12 +72,13 @@ namespace Project05.Items
                 case "weapon": return "vũ khí";
                 case "blade": return "lưỡi sắc";
                 case "axe": return "rìu";
-                case "seal": return "ấn";
+                case "affliction": return "gây hại";
+                case "alchemy": return "giả kim";
                 case "tool": return "dụng cụ";
                 case "armour": return "giáp";
                 case "boots": return "giày";
                 case "ranged": return "tầm xa";
-                case "detonator": return "phá ấn";
+                case "detonator": return "kích nổ";
                 case "bell": return "chuông";
                 case "instrument": return "nhạc cụ";
                 case "charm": return "bùa";
@@ -90,6 +91,36 @@ namespace Project05.Items
                 case "heal": return "hồi máu";
                 case "potion": return "dược phẩm";
                 default: return tag;
+            }
+        }
+
+        /// <summary>A status kind in words (debuffs-and-detonation.md).</summary>
+        public static string StatusName(string statusId)
+        {
+            switch (statusId)
+            {
+                case "poison": return "Độc";
+                case "burn": return "Thiêu Đốt";
+                case "frost": return "Băng Giá";
+                case "slow": return "Làm Chậm";
+                case "weaken": return "Suy Yếu";
+                case "stun": return "Đóng Băng";
+                case "": case null: return "debuff";
+                default: return statusId;
+            }
+        }
+
+        /// <summary>The glyph of a status kind.</summary>
+        public static GlyphKind StatusGlyph(string statusId)
+        {
+            switch (statusId)
+            {
+                case "poison": return GlyphKind.Droplet;
+                case "burn": return GlyphKind.Burn;
+                case "frost": return GlyphKind.Frost;
+                case "slow": return GlyphKind.Slow;
+                case "weaken": return GlyphKind.Weaken;
+                default: return GlyphKind.Seal;
             }
         }
 
@@ -135,7 +166,9 @@ namespace Project05.Items
                     string reactDesc = item.trigger.eventKind == "Damage" &&
                                        (item.trigger.eventSide == "self" || item.trigger.eventSide == "own_hero")
                         ? "Phản ứng khi chủ nhận sát thương, hồi "
-                        : "Phản ứng khi Ấn được áp lên kẻ địch, hồi ";
+                        : item.trigger.eventKind == "StatusConsumed"
+                            ? "Phản ứng khi debuff bị kích nổ, hồi "
+                            : "Phản ứng khi kẻ địch dính debuff, hồi ";
                     c.Lines.Add(new PopupLine(GlyphKind.Speed, reactDesc + nr + (cooldownCut != 0 ? " (gốc " + item.trigger.n + ")" : string.Empty)));
                     break;
                 case "CombatStart":
@@ -157,7 +190,13 @@ namespace Project05.Items
                         break;
                     case "ApplyStatus":
                         int amount = e.amount + ItemSynergy.Sum(received, "StatusAmount", e.status);
-                        c.Lines.Add(new PopupLine(GlyphKind.Seal, "Áp " + amount + " Ấn lên " + Target(e.target) + (amount != e.amount ? " (gốc " + e.amount + ")" : string.Empty)));
+                        c.Lines.Add(new PopupLine(StatusGlyph(e.status), "Gây " + amount + " " + StatusName(e.status) + " lên " + Target(e.target) + (amount != e.amount ? " (gốc " + e.amount + ")" : string.Empty)));
+                        break;
+                    case "DetonateAll":
+                        string boost = percent != 0 ? ", " + Signed(percent / 10) + "% sát thương" : string.Empty;
+                        int extra = ItemSynergy.Sum(received, "DetonateValue");
+                        c.Lines.Add(new PopupLine(GlyphKind.Detonate, "Kích nổ mọi debuff trên mọi kẻ địch: 3-4 sát thương mỗi chồng" +
+                            (extra != 0 ? " (" + Signed(extra) + " từ đồ kề bên)" : string.Empty) + ", +10% mỗi loại thêm" + boost));
                         break;
                     case "ConsumeDetonate":
                         string units = e.units >= 99 ? "mọi" : "tối đa " + e.units;
@@ -218,7 +257,8 @@ namespace Project05.Items
                 case "DamageFlat": return Signed(amount) + " sát thương";
                 case "DamagePercent": return Signed(amount / 10) + "% sát thương";
                 case "CooldownReduction": return "hồi chiêu " + Signed(-amount);
-                case "StatusAmount": return Signed(amount) + " " + (statusId == "an" ? "Ấn" : statusId) + " mỗi lần áp";
+                case "StatusAmount": return Signed(amount) + " " + StatusName(statusId) + " mỗi lần gây";
+                case "DetonateValue": return Signed(amount) + " sát thương nổ mỗi chồng " + StatusName(statusId);
                 default: return kind;
             }
         }

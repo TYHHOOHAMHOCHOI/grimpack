@@ -18,11 +18,11 @@ namespace Project05.Tests.EditMode
         private static PlacedItem At(ItemCatalog c, string id, int x, int y) => new PlacedItem(c.Find(id), x, y);
 
         [Test]
-        public void Catalog_Loads34ItemsWithUniqueIds()
+        public void Catalog_Loads91ItemsWithUniqueIds()
         {
             ItemCatalog c = LoadCatalog();
 
-            Assert.AreEqual(34, c.All.Count);
+            Assert.AreEqual(91, c.All.Count);   // 46 items + 45 upgraded (+) versions (item-upgrades.md)
             var seen = new HashSet<string>();
             foreach (ItemRecord i in c.All) Assert.IsTrue(seen.Add(i.id), i.id);
         }
@@ -37,7 +37,7 @@ namespace Project05.Tests.EditMode
                 Assert.IsTrue(i.cells.Length >= 1 && i.cells.Length <= 9, i.id);
                 Assert.IsTrue(i.hpBonus >= -20 && i.hpBonus <= 40, i.id);
                 Assert.AreEqual(i.trigger.kind == "Passive", i.effects.Length == 0, i.id);
-                foreach (EffectRecord e in i.effects) CollectionAssert.Contains(new[] { "Damage", "ApplyStatus", "ConsumeDetonate", "ShieldGain", "Heal" }, e.kind, i.id);
+                foreach (EffectRecord e in i.effects) CollectionAssert.Contains(new[] { "Damage", "ApplyStatus", "ConsumeDetonate", "DetonateAll", "ShieldGain", "Heal" }, e.kind, i.id);
             }
         }
 
@@ -56,7 +56,7 @@ namespace Project05.Tests.EditMode
             ItemCatalog c = LoadCatalog();
             var placed = new List<PlacedItem>
             {
-                At(c, "item_whetstone", 1, 0), At(c, "item_iron_sword", 0, 0), At(c, "item_seal_stamp", 2, 0),
+                At(c, "item_whetstone", 1, 0), At(c, "item_iron_sword", 0, 0), At(c, "item_oil_flask", 2, 0),
             };
 
             List<SynergyModifier>[] result = ItemSynergy.Evaluate(placed);
@@ -69,8 +69,8 @@ namespace Project05.Tests.EditMode
         public void Evaluate_RuleThatCannotChangeTheTarget_MakesNoLink()
         {
             ItemCatalog c = LoadCatalog();
-            // the drum boosts weapons, but a seal item has no Damage effect
-            var placed = new List<PlacedItem> { At(c, "item_war_drum", 0, 0), At(c, "item_seal_ink", 1, 0) };
+            // the drum boosts weapons, but a debuff item has no Damage effect
+            var placed = new List<PlacedItem> { At(c, "item_war_drum", 0, 0), At(c, "item_venom_vial", 1, 0) };
 
             List<SynergyModifier>[] result = ItemSynergy.Evaluate(placed);
 

@@ -141,6 +141,23 @@ namespace Project05.CombatScene
             }
         }
 
+        /// <summary>The run ended (won or lost): one button starts a new run; no stage selector, no retry.</summary>
+        public void SetRunOver(string summary, string buttonLabel)
+        {
+            if (_root == null) return;
+            foreach (Button b in _nextCountButtons)
+            {
+                if (b != null) b.gameObject.SetActive(false);
+            }
+
+            if (_retryBtn != null) _retryBtn.gameObject.SetActive(false);
+            if (_nextStageBtn != null) _nextStageBtn.gameObject.SetActive(true);
+            if (_nextStageBtnLabel != null) _nextStageBtnLabel.text = buttonLabel;
+            if (_summaryLabel != null) _summaryLabel.text = summary;
+            Transform header = _root.Find("NextCountHeader");
+            if (header != null) header.gameObject.SetActive(false);
+        }
+
         public void Show(CombatResult result, GameCatalog catalog, int stageNumber, int nextMonsterCount)
         {
             if (_root == null) return;

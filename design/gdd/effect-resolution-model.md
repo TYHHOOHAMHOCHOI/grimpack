@@ -112,6 +112,8 @@ The [Status Effects fixture](status-effects.md) applies 3 Ấn from hero A and 2
 
 All arithmetic is integer-only. No floating point, no culture-dependent rounding. Reaction limits are fixed for the spike at `D = 8` and `N = 256` (rules-versioned).
 
+> **Superseded for detonation (2026-11-17, user decision):** the `ConsumeDetonate` kind, the detonation rule `B = min(c × p, RawMax)`, the symbols `c` and `p`, and the Ấn worked examples are replaced by `DetonateAll` in [Debuffs and Detonation](debuffs-and-detonation.md), Formula 5 (`B_e = min(Σ S_ek × (v_k + V_k), RawMax)`, `P_e = P_det + 100 × (K_e − 1) + 300 if Frozen`, no flat term). That formula reuses this section's `RawMax`, `Cap`, `P` clamp and round-half-up unchanged. The rest of this section is not rewritten here.
+
 | Symbol | Meaning | Rule |
 |---|---|---|
 | `d`, `D` | Current and maximum reaction depth | Root `0`; child `d + 1`; allow child only if its depth is at most `D = 8`. A depth-9 child is not queued and publishes `ChainLimit(depth)`. |

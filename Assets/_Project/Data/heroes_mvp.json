@@ -5,8 +5,8 @@
    "art": "tank",
    "nameVi": "Kỵ Sĩ Hắc Quang",
    "nameEn": "Duskblade Crusader",
-   "roleVi": "Đỡ Đòn / Khắc Ấn",
-   "roleEn": "Tank / Seal Bruiser",
+   "roleVi": "Đỡ Đòn / Suy Yếu",
+   "roleEn": "Tank / Weaken",
    "baseMaxHp": 110,
    "baseSpeed": 22,
    "initialShield": 8,
@@ -20,7 +20,7 @@
    "startingItems": [
     "item_iron_sword",
     "item_spiked_buckler",
-    "item_seal_ink",
+    "item_venom_vial",
     "item_whetstone"
    ],
    "signatureItemId": "item_spiked_buckler",
@@ -28,8 +28,8 @@
     "id": "innate_crusader_vow",
     "nameVi": "Lời Thề Thiết Giáp",
     "nameEn": "Ironclad Vow",
-    "descVi": "Đầu trận: +6 Giáp, áp 1 Ấn lên mọi kẻ địch.",
-    "descEn": "Combat start: +6 Shield, apply 1 Seal to all enemies.",
+    "descVi": "Đầu trận: +6 Giáp, gây 1 Suy Yếu lên mọi kẻ địch.",
+    "descEn": "Combat start: +6 Shield, apply 1 Weaken to all enemies.",
     "tags": [
      "relic",
      "shield"
@@ -56,7 +56,7 @@
       "kind": "ApplyStatus",
       "target": "AllEnemies",
       "base": 0,
-      "status": "an",
+      "status": "weaken",
       "amount": 1,
       "units": 0,
       "perUnit": 0
@@ -66,11 +66,11 @@
   },
   {
    "id": "hero_alchemist",
-   "art": "tank",
+   "art": "alchemist",
    "nameVi": "Dược Sư Dịch Hạch",
    "nameEn": "Plague Alchemist",
-   "roleVi": "Khắc Ấn / Phản Ứng",
-   "roleEn": "Seal Setup / Catalyst",
+   "roleVi": "Gây Độc / Kích Nổ",
+   "roleEn": "Afflictions / Detonator",
    "baseMaxHp": 86,
    "baseSpeed": 26,
    "initialShield": 0,
@@ -83,35 +83,36 @@
    },
    "startingItems": [
     "item_dagger",
-    "item_seal_stamp",
-    "item_ink_pot",
-    "item_crimson_vial"
+    "item_venom_vial",
+    "item_oil_flask",
+    "item_mortar",
+    "item_plague_catalyst"
    ],
-   "signatureItemId": "item_seal_stamp",
+   "signatureItemId": "item_plague_catalyst",
    "innateItem": {
     "id": "innate_alchemist_catalyst",
-    "nameVi": "Xúc Tác Cổ Ngữ",
-    "nameEn": "Rune Catalyst",
-    "descVi": "Phản ứng khi áp Ấn lên kẻ địch (hồi 2): gây 3 sát thương lên kẻ địch đầu tiên.",
-    "descEn": "Reaction when Seal applied to enemy (CD 2): deal 3 damage to first enemy.",
+    "nameVi": "Mầm Dịch",
+    "nameEn": "Plague Seed",
+    "descVi": "Khi kích nổ debuff: gây 2 Độc lên mọi kẻ địch, mở vòng mới.",
+    "descEn": "When debuffs are detonated: apply 2 Poison to all enemies, starting the next cycle.",
     "tags": [
      "relic"
     ],
     "trigger": {
      "kind": "Reaction",
-     "n": 2,
+     "n": 1,
      "s": 0,
-     "eventKind": "StatusApplied",
-     "eventStatus": "an",
+     "eventKind": "StatusConsumed",
+     "eventStatus": "",
      "eventSide": "enemy"
     },
     "effects": [
      {
-      "kind": "Damage",
-      "target": "FirstEnemy",
-      "base": 3,
-      "status": "",
-      "amount": 0,
+      "kind": "ApplyStatus",
+      "target": "AllEnemies",
+      "base": 0,
+      "status": "poison",
+      "amount": 2,
       "units": 0,
       "perUnit": 0
      }
@@ -177,8 +178,8 @@
    "art": "tank",
    "nameVi": "Thánh Nữ Tro Tàn",
    "nameEn": "Ashen Cleric",
-   "roleVi": "Hộ Vệ / Phá Ấn",
-   "roleEn": "Support / Detonator",
+   "roleVi": "Hộ Vệ / Làm Chậm",
+   "roleEn": "Support / Slow",
    "baseMaxHp": 92,
    "baseSpeed": 24,
    "initialShield": 4,
@@ -190,11 +191,11 @@
     "unlockSequence": []
    },
    "startingItems": [
-    "item_breaking_bell",
+    "item_drowsy_bell",
     "item_field_bandage",
     "item_oak_buckler"
    ],
-   "signatureItemId": "item_breaking_bell",
+   "signatureItemId": "item_drowsy_bell",
    "innateItem": {
     "id": "innate_cleric_ward",
     "nameVi": "Tro Tàn Hộ Thân",

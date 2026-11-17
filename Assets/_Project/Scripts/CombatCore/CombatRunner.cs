@@ -296,6 +296,67 @@ namespace Project05.CombatCore
                 }
 
                 long rootActionId = ledger.CompletedActions + 1L;
+
+                // Wither (System 19): damage at the start of the hero's own turn, also when the turn is skipped.
+                if (actor.Ref.Side == UnitSide.Hero && actor.WitherPerTurn > 0)
+                {
+                    if (!ledger.ApplyCurseTick(actor, rootActionId))
+                    {
+                        return BuildTechnicalStop(ledger);
+                    }
+
+                    if (!actor.IsAlive)
+                    {
+                        if (!ledger.RecordActionSkipped(actor, rootActionId, deltaTime, gaugeBefore, gaugeAfter, "downed_by_curse"))
+                        {
+                            return BuildTechnicalStop(ledger);
+                        }
+
+                        ledger.IncrementCompletedActions();
+                        bool curseLimitReached = ledger.CompletedActions >= MaxActorActions;
+                        if (ledger.TryEvaluateOutcome(curseLimitReached, out CombatOutcome curseOutcome, out string curseReason))
+                        {
+                            if (!ledger.RecordCombatEnded(rootActionId, null, curseOutcome, curseReason))
+                            {
+                                return BuildTechnicalStop(ledger);
+                            }
+                            return new CombatResult(CombatRunStatus.Completed, curseOutcome, string.Empty, ledger.BuildTrace());
+                        }
+
+                        continue;
+                    }
+                }
+
+                // Poison and Burn tick at the start of the afflicted unit's own turn, before a stun skip (debuffs-and-detonation.md)
+                if (actor.StatusLots.Count > 0)
+                {
+                    if (!ledger.ApplyStatusTicks(actor, rootActionId))
+                    {
+                        return BuildTechnicalStop(ledger);
+                    }
+
+                    if (!actor.IsAlive)
+                    {
+                        if (!ledger.RecordActionSkipped(actor, rootActionId, deltaTime, gaugeBefore, gaugeAfter, "downed_by_status"))
+                        {
+                            return BuildTechnicalStop(ledger);
+                        }
+
+                        ledger.IncrementCompletedActions();
+                        bool tickLimitReached = ledger.CompletedActions >= MaxActorActions;
+                        if (ledger.TryEvaluateOutcome(tickLimitReached, out CombatOutcome tickOutcome, out string tickReason))
+                        {
+                            if (!ledger.RecordCombatEnded(rootActionId, null, tickOutcome, tickReason))
+                            {
+                                return BuildTechnicalStop(ledger);
+                            }
+                            return new CombatResult(CombatRunStatus.Completed, tickOutcome, string.Empty, ledger.BuildTrace());
+                        }
+
+                        continue;
+                    }
+                }
+
                 bool isStunned = actor.HasStatus(CombatLedgerState.StunStatusId);
 
                 if (isStunned)

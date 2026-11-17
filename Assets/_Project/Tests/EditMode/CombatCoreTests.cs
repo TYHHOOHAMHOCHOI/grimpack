@@ -62,7 +62,7 @@ namespace Project05.Tests.EditMode
         [Test]
         public void Catalog_LoadsItemsHeroesMonsters_WithZeroErrors()
         {
-            Assert.AreEqual(34, _catalog.Items.Count);
+            Assert.AreEqual(91, _catalog.Items.Count);   // 46 items + 45 upgraded (+) versions (item-upgrades.md)
             Assert.GreaterOrEqual(_catalog.Heroes.Count, 1);
             Assert.GreaterOrEqual(_catalog.Monsters.Count, 5);
 

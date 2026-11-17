@@ -16,6 +16,10 @@ namespace Project05.Items
 
         /// <summary>At least one cell is taken by another item.</summary>
         Blocked,
+        /// <summary>At least one cell is a locked cell of a hero grid (it opens with a door buff).</summary>
+        Locked,
+        /// <summary>The item is pinned by a curse and cannot move (curses-and-trade-offs.md Rule 3).</summary>
+        Pinned,
     }
 
     /// <summary>One item on the board: its definition, container, origin cell and rotation in quarter turns.</summary>
@@ -27,6 +31,9 @@ namespace Project05.Items
         public int X;
         public int Y;
         public int Rotation;
+
+        /// <summary>Pinned by a curse: it cannot be moved, rotated, stashed or sold.</summary>
+        public bool Pinned;
 
         /// <summary>The footprint for the current rotation, relative to the origin.</summary>
         public CellRecord[] Cells => ItemShapes.Rotate(Record.cells, Rotation);
@@ -44,7 +51,10 @@ namespace Project05.Items
             public int Width;
             public int Height;
             public bool TakesPartInSynergy;
+            public readonly HashSet<long> Locked = new HashSet<long>();
         }
+
+        private static long Key(int x, int y) => ((long)y << 32) | (uint)x;
 
         private readonly Dictionary<string, Container> _containers = new Dictionary<string, Container>();
         private readonly List<BoardItem> _items = new List<BoardItem>();
@@ -77,8 +87,32 @@ namespace Project05.Items
 
             c.Width = width;
             c.Height = height;
+            c.Locked.RemoveWhere(k => (int)(k & 0xFFFFFFFF) >= width || (int)(k >> 32) >= height);
             return true;
         }
+
+        /// <summary>Locks or opens one cell of a container. A cell under an item cannot be locked.</summary>
+        public bool SetLocked(string id, int x, int y, bool locked)
+        {
+            if (!_containers.TryGetValue(id, out Container c) || x < 0 || y < 0 || x >= c.Width || y >= c.Height) return false;
+            if (locked)
+            {
+                if (Occupant(id, x, y) != null) return false;
+                c.Locked.Add(Key(x, y));
+            }
+            else
+            {
+                c.Locked.Remove(Key(x, y));
+            }
+
+            return true;
+        }
+
+        /// <summary>True when the cell is a locked cell of the container.</summary>
+        public bool IsLocked(string id, int x, int y) => _containers.TryGetValue(id, out Container c) && c.Locked.Contains(Key(x, y));
+
+        /// <summary>How many cells of the container are locked.</summary>
+        public int LockedCount(string id) => _containers.TryGetValue(id, out Container c) ? c.Locked.Count : 0;
 
         /// <summary>Width and height of a container, or (0, 0) when it does not exist.</summary>
         public (int width, int height) SizeOf(string id) => _containers.TryGetValue(id, out Container c) ? (c.Width, c.Height) : (0, 0);
@@ -117,6 +151,11 @@ namespace Project05.Items
                     result = PlaceResult.OutOfBounds;
                     badCells?.Add((cx, cy));
                 }
+                else if (c.Locked.Contains(Key(cx, cy)))
+                {
+                    if (result == PlaceResult.Ok) result = PlaceResult.Locked;
+                    badCells?.Add((cx, cy));
+                }
                 else if (Occupant(container, cx, cy, item) != null)
                 {
                     if (result == PlaceResult.Ok) result = PlaceResult.Blocked;
@@ -131,6 +170,7 @@ namespace Project05.Items
         public PlaceResult Move(BoardItem item, string container, int x, int y, int rotation)
         {
             int turns = ((rotation % 4) + 4) % 4;
+            if (item.Pinned && (container != item.Container || x != item.X || y != item.Y || turns != item.Rotation)) return PlaceResult.Pinned;
             PlaceResult result = Check(item, container, x, y, turns);
             if (result != PlaceResult.Ok) return result;
             item.Container = container;

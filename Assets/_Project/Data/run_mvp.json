@@ -1,0 +1,635 @@
+{
+ "_comment": "Run tuning for the MVP floor (Systems 5, 16, 17, 18, 19). Every value is provisional until System 35 measures it. Gold and upgrade costs: item-upgrades.md.",
+ "version": 1,
+ "rooms": 8,
+ "tiers": [
+  "White",
+  "Green",
+  "Blue",
+  "Purple",
+  "Gold"
+ ],
+ "tierInfo": [
+  {
+   "tier": "White",
+   "minRoom": 1,
+   "buffHp": 4,
+   "buffCells": 0,
+   "hpKick": 0,
+   "damageKick": 0,
+   "itemRow": [
+    800,
+    200,
+    0,
+    0
+   ],
+   "gold": 2,
+   "upgradeCost": 4
+  },
+  {
+   "tier": "Green",
+   "minRoom": 2,
+   "buffHp": 8,
+   "buffCells": 0,
+   "hpKick": 0,
+   "damageKick": 0,
+   "itemRow": [
+    500,
+    400,
+    100,
+    0
+   ],
+   "gold": 3,
+   "upgradeCost": 6
+  },
+  {
+   "tier": "Blue",
+   "minRoom": 3,
+   "buffHp": 12,
+   "buffCells": 0,
+   "hpKick": 100,
+   "damageKick": 50,
+   "itemRow": [
+    250,
+    400,
+    300,
+    50
+   ],
+   "gold": 5,
+   "upgradeCost": 9
+  },
+  {
+   "tier": "Purple",
+   "minRoom": 5,
+   "buffHp": 12,
+   "buffCells": 1,
+   "hpKick": 200,
+   "damageKick": 100,
+   "itemRow": [
+    100,
+    300,
+    450,
+    150
+   ],
+   "gold": 7,
+   "upgradeCost": 14
+  },
+  {
+   "tier": "Gold",
+   "minRoom": 6,
+   "buffHp": 16,
+   "buffCells": 1,
+   "hpKick": 300,
+   "damageKick": 100,
+   "itemRow": [
+    50,
+    250,
+    450,
+    250
+   ],
+   "gold": 10,
+   "upgradeCost": 0
+  }
+ ],
+ "tierWeights": [
+  {
+   "room": 2,
+   "weights": [
+    600,
+    400,
+    0,
+    0,
+    0
+   ]
+  },
+  {
+   "room": 3,
+   "weights": [
+    500,
+    350,
+    150,
+    0,
+    0
+   ]
+  },
+  {
+   "room": 4,
+   "weights": [
+    400,
+    350,
+    250,
+    0,
+    0
+   ]
+  },
+  {
+   "room": 5,
+   "weights": [
+    300,
+    300,
+    250,
+    150,
+    0
+   ]
+  },
+  {
+   "room": 6,
+   "weights": [
+    230,
+    280,
+    240,
+    190,
+    60
+   ]
+  },
+  {
+   "room": 7,
+   "weights": [
+    180,
+    270,
+    300,
+    190,
+    60
+   ]
+  },
+  {
+   "room": 8,
+   "weights": [
+    140,
+    260,
+    300,
+    230,
+    70
+   ]
+  }
+ ],
+ "minDistinctRoom": 3,
+ "safeCardRoom": 4,
+ "doorHpCap": 100,
+ "doorCellCap": 3,
+ "curseCapParty": 2,
+ "curseCapHero": 1,
+ "hpRampPerRoom": 60,
+ "damageRampPerRoom": 40,
+ "dangerThresholds": [
+  20,
+  40,
+  70,
+  110
+ ],
+ "offerSize": 3,
+ "curses": [
+  {
+   "id": "curse_anchor",
+   "kind": "Pinned",
+   "p1": 2,
+   "riderKind": "Speed",
+   "riderAmount": -4,
+   "itemId": "item_cursed_anchor",
+   "nameVi": "Neo Nguyền",
+   "nameEn": "Cursed Anchor",
+   "lineVi": "Ghim 1 neo 2 ô vào balo, tốc độ −4",
+   "lineEn": "Pins a 2-cell anchor, speed −4"
+  },
+  {
+   "id": "curse_wither",
+   "kind": "Wither",
+   "p1": 3,
+   "riderKind": "None",
+   "riderAmount": 0,
+   "itemId": "",
+   "nameVi": "Héo Mòn",
+   "nameEn": "Wither",
+   "lineVi": "Mất 3 máu đầu mỗi lượt",
+   "lineEn": "Wither 3 per action"
+  },
+  {
+   "id": "curse_frailty",
+   "kind": "Frailty",
+   "p1": 30,
+   "riderKind": "None",
+   "riderAmount": 0,
+   "itemId": "",
+   "nameVi": "Yếu Ớt",
+   "nameEn": "Frailty",
+   "lineVi": "Máu tối đa −30",
+   "lineEn": "Max HP −30"
+  },
+  {
+   "id": "curse_sluggish",
+   "kind": "Sluggish",
+   "p1": 4,
+   "riderKind": "None",
+   "riderAmount": 0,
+   "itemId": "",
+   "nameVi": "Chậm Chạp",
+   "nameEn": "Sluggish",
+   "lineVi": "Tốc độ −4",
+   "lineEn": "Speed −4"
+  }
+ ],
+ "templates": [
+  {
+   "id": "enc_r1_white",
+   "tier": "White",
+   "roomMin": 1,
+   "roomMax": 1,
+   "weight": 1,
+   "roster": [
+    "mon_hunter"
+   ],
+   "curseId": ""
+  },
+  {
+   "id": "enc_r2_white",
+   "tier": "White",
+   "roomMin": 2,
+   "roomMax": 2,
+   "weight": 1,
+   "roster": [
+    "mon_hunter",
+    "mon_hunter"
+   ],
+   "curseId": ""
+  },
+  {
+   "id": "enc_r3_white",
+   "tier": "White",
+   "roomMin": 3,
+   "roomMax": 3,
+   "weight": 1,
+   "roster": [
+    "mon_swarmer",
+    "mon_hunter"
+   ],
+   "curseId": ""
+  },
+  {
+   "id": "enc_r4_white",
+   "tier": "White",
+   "roomMin": 4,
+   "roomMax": 4,
+   "weight": 1,
+   "roster": [
+    "mon_sweeper",
+    "mon_hunter"
+   ],
+   "curseId": ""
+  },
+  {
+   "id": "enc_r5_white",
+   "tier": "White",
+   "roomMin": 5,
+   "roomMax": 5,
+   "weight": 1,
+   "roster": [
+    "mon_swarmer",
+    "mon_hunter",
+    "mon_swarmer"
+   ],
+   "curseId": ""
+  },
+  {
+   "id": "enc_r6_white",
+   "tier": "White",
+   "roomMin": 6,
+   "roomMax": 6,
+   "weight": 1,
+   "roster": [
+    "mon_brute",
+    "mon_hunter"
+   ],
+   "curseId": ""
+  },
+  {
+   "id": "enc_r7_white",
+   "tier": "White",
+   "roomMin": 7,
+   "roomMax": 7,
+   "weight": 1,
+   "roster": [
+    "mon_brute",
+    "mon_swarmer",
+    "mon_hunter"
+   ],
+   "curseId": ""
+  },
+  {
+   "id": "enc_r8_white",
+   "tier": "White",
+   "roomMin": 8,
+   "roomMax": 8,
+   "weight": 1,
+   "roster": [
+    "mon_brute",
+    "mon_sweeper",
+    "mon_hunter"
+   ],
+   "curseId": ""
+  },
+  {
+   "id": "enc_r2_green",
+   "tier": "Green",
+   "roomMin": 2,
+   "roomMax": 2,
+   "weight": 1,
+   "roster": [
+    "mon_hunter",
+    "mon_hunter",
+    "mon_striker"
+   ],
+   "curseId": ""
+  },
+  {
+   "id": "enc_r3_green",
+   "tier": "Green",
+   "roomMin": 3,
+   "roomMax": 3,
+   "weight": 1,
+   "roster": [
+    "mon_swarmer",
+    "mon_hunter",
+    "mon_striker"
+   ],
+   "curseId": ""
+  },
+  {
+   "id": "enc_r4_green",
+   "tier": "Green",
+   "roomMin": 4,
+   "roomMax": 4,
+   "weight": 1,
+   "roster": [
+    "mon_sweeper",
+    "mon_hunter",
+    "mon_striker"
+   ],
+   "curseId": ""
+  },
+  {
+   "id": "enc_r5_green",
+   "tier": "Green",
+   "roomMin": 5,
+   "roomMax": 5,
+   "weight": 1,
+   "roster": [
+    "mon_swarmer",
+    "mon_hunter",
+    "mon_swarmer",
+    "mon_striker"
+   ],
+   "curseId": ""
+  },
+  {
+   "id": "enc_r6_green",
+   "tier": "Green",
+   "roomMin": 6,
+   "roomMax": 6,
+   "weight": 1,
+   "roster": [
+    "mon_brute",
+    "mon_hunter",
+    "mon_striker"
+   ],
+   "curseId": ""
+  },
+  {
+   "id": "enc_r7_green",
+   "tier": "Green",
+   "roomMin": 7,
+   "roomMax": 7,
+   "weight": 1,
+   "roster": [
+    "mon_brute",
+    "mon_swarmer",
+    "mon_hunter",
+    "mon_striker"
+   ],
+   "curseId": ""
+  },
+  {
+   "id": "enc_r8_green",
+   "tier": "Green",
+   "roomMin": 8,
+   "roomMax": 8,
+   "weight": 1,
+   "roster": [
+    "mon_brute",
+    "mon_sweeper",
+    "mon_hunter",
+    "mon_swarmer"
+   ],
+   "curseId": ""
+  },
+  {
+   "id": "enc_r3_blue",
+   "tier": "Blue",
+   "roomMin": 3,
+   "roomMax": 3,
+   "weight": 1,
+   "roster": [
+    "mon_elite_bruiser",
+    "mon_hunter"
+   ],
+   "curseId": ""
+  },
+  {
+   "id": "enc_r4_blue",
+   "tier": "Blue",
+   "roomMin": 4,
+   "roomMax": 4,
+   "weight": 1,
+   "roster": [
+    "mon_elite_bruiser",
+    "mon_sweeper",
+    "mon_hunter"
+   ],
+   "curseId": ""
+  },
+  {
+   "id": "enc_r5_blue",
+   "tier": "Blue",
+   "roomMin": 5,
+   "roomMax": 5,
+   "weight": 1,
+   "roster": [
+    "mon_elite_bruiser",
+    "mon_swarmer",
+    "mon_hunter"
+   ],
+   "curseId": ""
+  },
+  {
+   "id": "enc_r6_blue",
+   "tier": "Blue",
+   "roomMin": 6,
+   "roomMax": 6,
+   "weight": 1,
+   "roster": [
+    "mon_elite_bruiser",
+    "mon_brute",
+    "mon_hunter"
+   ],
+   "curseId": ""
+  },
+  {
+   "id": "enc_r7_blue",
+   "tier": "Blue",
+   "roomMin": 7,
+   "roomMax": 7,
+   "weight": 1,
+   "roster": [
+    "mon_elite_bruiser",
+    "mon_brute",
+    "mon_swarmer"
+   ],
+   "curseId": ""
+  },
+  {
+   "id": "enc_r8_blue",
+   "tier": "Blue",
+   "roomMin": 8,
+   "roomMax": 8,
+   "weight": 1,
+   "roster": [
+    "mon_elite_bruiser",
+    "mon_brute",
+    "mon_sweeper"
+   ],
+   "curseId": ""
+  },
+  {
+   "id": "enc_r5_purple",
+   "tier": "Purple",
+   "roomMin": 5,
+   "roomMax": 5,
+   "weight": 1,
+   "roster": [
+    "mon_elite_bruiser",
+    "mon_sweeper",
+    "mon_swarmer"
+   ],
+   "curseId": ""
+  },
+  {
+   "id": "enc_r6_purple",
+   "tier": "Purple",
+   "roomMin": 6,
+   "roomMax": 6,
+   "weight": 1,
+   "roster": [
+    "mon_elite_bruiser",
+    "mon_sweeper",
+    "mon_swarmer"
+   ],
+   "curseId": ""
+  },
+  {
+   "id": "enc_r7_purple",
+   "tier": "Purple",
+   "roomMin": 7,
+   "roomMax": 7,
+   "weight": 1,
+   "roster": [
+    "mon_elite_bruiser",
+    "mon_sweeper",
+    "mon_swarmer"
+   ],
+   "curseId": ""
+  },
+  {
+   "id": "enc_r8_purple",
+   "tier": "Purple",
+   "roomMin": 8,
+   "roomMax": 8,
+   "weight": 1,
+   "roster": [
+    "mon_elite_bruiser",
+    "mon_sweeper",
+    "mon_swarmer"
+   ],
+   "curseId": ""
+  },
+  {
+   "id": "enc_r6-8_gold_anchor",
+   "tier": "Gold",
+   "roomMin": 6,
+   "roomMax": 6,
+   "weight": 1,
+   "roster": [
+    "mon_elite_bruiser",
+    "mon_sweeper",
+    "mon_swarmer"
+   ],
+   "curseId": "curse_anchor"
+  },
+  {
+   "id": "enc_r6-8_gold_wither",
+   "tier": "Gold",
+   "roomMin": 6,
+   "roomMax": 7,
+   "weight": 1,
+   "roster": [
+    "mon_elite_bruiser",
+    "mon_sweeper",
+    "mon_swarmer"
+   ],
+   "curseId": "curse_wither"
+  },
+  {
+   "id": "enc_r7-8_gold_sluggish",
+   "tier": "Gold",
+   "roomMin": 7,
+   "roomMax": 7,
+   "weight": 1,
+   "roster": [
+    "mon_elite_bruiser",
+    "mon_sweeper",
+    "mon_swarmer"
+   ],
+   "curseId": "curse_sluggish"
+  },
+  {
+   "id": "enc_r8_gold_frailty",
+   "tier": "Gold",
+   "roomMin": 8,
+   "roomMax": 8,
+   "weight": 1,
+   "roster": [
+    "mon_elite_bruiser",
+    "mon_sweeper",
+    "mon_swarmer"
+   ],
+   "curseId": "curse_frailty"
+  },
+  {
+   "id": "enc_r8_gold_anchor",
+   "tier": "Gold",
+   "roomMin": 8,
+   "roomMax": 8,
+   "weight": 1,
+   "roster": [
+    "mon_elite_bruiser",
+    "mon_sweeper",
+    "mon_swarmer"
+   ],
+   "curseId": "curse_anchor"
+  }
+ ],
+ "boss": {
+  "id": "enc_boss",
+  "tier": "White",
+  "roomMin": 9,
+  "roomMax": 9,
+  "weight": 1,
+  "roster": [
+   "mon_boss"
+  ],
+  "curseId": ""
+ },
+ "nonDroppable": [
+  "item_cursed_anchor",
+  "item_plague_catalyst"
+ ],
+ "startGold": 5
+}

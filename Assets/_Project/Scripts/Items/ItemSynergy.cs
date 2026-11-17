@@ -103,6 +103,7 @@ namespace Project05.Items
                 case "DamagePercent": return target.DealsDamage;
                 case "CooldownReduction": return target.HasCooldown;
                 case "StatusAmount": return target.AppliesStatus(rule.statusId);
+                case "DetonateValue": return target.Detonates;
                 default: return false;
             }
         }
@@ -128,7 +129,8 @@ namespace Project05.Items
             int total = 0;
             foreach (SynergyModifier m in modifiers)
             {
-                if (m.Kind == kind && (statusId == null || m.StatusId == statusId)) total += m.Amount;
+                // a rule with an empty status id covers every status kind
+                if (m.Kind == kind && (statusId == null || m.StatusId == statusId || string.IsNullOrEmpty(m.StatusId))) total += m.Amount;
             }
 
             return total;

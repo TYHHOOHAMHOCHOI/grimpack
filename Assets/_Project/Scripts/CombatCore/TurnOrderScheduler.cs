@@ -121,10 +121,8 @@ namespace Project05.CombatCore
                         continue;
                     }
 
-                    int speedBonus = ComputeHeroSpeedBonus(h.FrozenGrid, catalog);
-                    int effSpeed = EffectiveSpeed(h.Definition.BaseSpeed, speedBonus, 0);
-                    int hpBonus = h.PermanentHpBonus + ComputeHeroHpBonus(h.FrozenGrid, catalog);
-                    int maxHp = Math.Max(1, h.Definition.BaseMaxHp + hpBonus);
+                    int effSpeed = HeroStatMath.Speed(h, catalog);
+                    int maxHp = HeroStatMath.MaxHp(h, catalog);
 
                     units.Add(new SchedulerUnitState
                     {

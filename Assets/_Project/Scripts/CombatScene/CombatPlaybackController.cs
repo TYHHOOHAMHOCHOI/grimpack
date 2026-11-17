@@ -275,7 +275,8 @@ namespace Project05.CombatScene
                 {
                     case EffectKind.Damage: damage = true; break;
                     case EffectKind.ApplyStatus: status = true; break;
-                    case EffectKind.ConsumeDetonate: detonate = true; break;
+                    case EffectKind.ConsumeDetonate:
+                    case EffectKind.DetonateAll: detonate = true; break;
                     default: support = true; break;
                 }
             }

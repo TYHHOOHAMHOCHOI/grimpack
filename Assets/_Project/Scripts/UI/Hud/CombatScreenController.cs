@@ -143,14 +143,15 @@ namespace Project05.UI.Hud
                 liveCombat.SetMonsterSelectorVisible(_model.Phase == ScreenPhase.Planning && !_model.ItemHeld);
             }
 
-            strip.SetStartEnabled(_model.CanStart, _model.ItemHeld);
+            // a won room's reward steps (buff, item, door) come before the next Start
+            strip.SetStartEnabled(_model.CanStart && (liveCombat == null || liveCombat.CanStartFight), _model.ItemHeld);
             if (cursor != null) cursor.Shape = board.Held != null ? CursorShape.Grab : CursorShape.Arrow;
         }
 
         /// <summary>Selling is a planning action: open in Planning with no modal, closed otherwise. Set on every change.</summary>
         private void UpdateSellGate()
         {
-            bool canSell = _model.Phase == ScreenPhase.Planning && !_model.Paused;
+            bool canSell = _model.Phase == ScreenPhase.Planning && !_model.Paused && (liveCombat == null || liveCombat.CanStartFight);
             if (board.SellEnabled != canSell) board.SellEnabled = canSell;
         }
 

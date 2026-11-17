@@ -4,9 +4,9 @@ namespace Project05.CombatCore
 {
     public enum TierKind { White = 0, Green = 1, Blue = 2, Purple = 3, Gold = 4, Red = 5 }
     public enum TriggerKind { Passive = 0, Cooldown = 1, Reaction = 2, CombatStart = 3 }
-    public enum EffectKind { Damage = 0, ApplyStatus = 1, ConsumeDetonate = 2, ShieldGain = 3, Heal = 4 }
+    public enum EffectKind { Damage = 0, ApplyStatus = 1, ConsumeDetonate = 2, ShieldGain = 3, Heal = 4, DetonateAll = 5 }
     public enum TargetKind { FirstEnemy = 0, AllEnemies = 1, Self = 2, AllHeroes = 3, LowestHpHero = 4, BoundHero = 5 }
-    public enum SynergyKind { DamageFlat = 0, DamagePercent = 1, CooldownReduction = 2, StatusAmount = 3 }
+    public enum SynergyKind { DamageFlat = 0, DamagePercent = 1, CooldownReduction = 2, StatusAmount = 3, DetonateValue = 4 }
     public enum ReactionEventKind { None = 0, ItemFired = 1, StatusApplied = 2, StatusConsumed = 3, Damage = 4, UnitDowned = 5 }
     public enum ReactionSideFilter { Any = 0, Hero = 1, Enemy = 2, OwnHero = 3, OtherHero = 4 }
 
@@ -61,7 +61,7 @@ namespace Project05.CombatCore
         CombatEnded = 16
     }
 
-    public enum OriginKind { None = 0, Item = 1, EnemyMove = 2, StatusExpiry = 3, EncounterSetup = 4 }
+    public enum OriginKind { None = 0, Item = 1, EnemyMove = 2, StatusExpiry = 3, EncounterSetup = 4, Curse = 5, StatusTick = 6 }
 
     public readonly struct GridCell : IEquatable<GridCell>
     {

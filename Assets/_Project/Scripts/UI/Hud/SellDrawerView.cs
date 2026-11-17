@@ -29,7 +29,48 @@ namespace Project05.UI.Hud
         [Tooltip("Damping ratio when closing; 1 tucks it away without a bounce.")]
         [SerializeField] private float closeDamping = 1f;
 
+        [Header("Forge tab (item-upgrades.md): one panel, two modes")]
+        [SerializeField] private Button forgeTab;
+        [SerializeField] private GameObject sellContent;
+        [SerializeField] private GameObject forgeContent;
+
         private DrawerSpring _spring;
+
+        /// <summary>What the open drawer shows.</summary>
+        public enum DrawerMode { Sell, Forge }
+
+        /// <summary>The mode shown when the drawer is open.</summary>
+        public DrawerMode Mode { get; private set; } = DrawerMode.Sell;
+
+        /// <summary>The forge tab, so the board can open the forge when a held item is brought over it.</summary>
+        public RectTransform ForgeTabRect => forgeTab != null ? (RectTransform)forgeTab.transform : null;
+
+        /// <summary>Opens the drawer in a mode; the same mode's tab on an open drawer closes it.</summary>
+        public void Select(DrawerMode mode)
+        {
+            if (IsOpen && Mode == mode)
+            {
+                Close();
+                return;
+            }
+
+            SetMode(mode);
+            Open();
+        }
+
+        /// <summary>Opens in a mode without closing (a held item brought over a tab).</summary>
+        public void OpenIn(DrawerMode mode)
+        {
+            SetMode(mode);
+            Open();
+        }
+
+        private void SetMode(DrawerMode mode)
+        {
+            Mode = mode;
+            if (sellContent != null) sellContent.SetActive(mode == DrawerMode.Sell);
+            if (forgeContent != null) forgeContent.SetActive(mode == DrawerMode.Forge);
+        }
 
         /// <summary>Raised when the drawer starts opening or closing.</summary>
         public event Action<bool> Toggled;
@@ -46,9 +87,22 @@ namespace Project05.UI.Hud
             Draw();
         }
 
-        private void OnEnable() => tab.onClick.AddListener(Toggle);
+        private void OnEnable()
+        {
+            tab.onClick.AddListener(SelectSell);
+            if (forgeTab != null) forgeTab.onClick.AddListener(SelectForge);
+            SetMode(Mode);
+        }
 
-        private void OnDisable() => tab.onClick.RemoveListener(Toggle);
+        private void OnDisable()
+        {
+            tab.onClick.RemoveListener(SelectSell);
+            if (forgeTab != null) forgeTab.onClick.RemoveListener(SelectForge);
+        }
+
+        private void SelectSell() => Select(DrawerMode.Sell);
+
+        private void SelectForge() => Select(DrawerMode.Forge);
 
         /// <summary>Opens if closed, closes if open.</summary>
         public void Toggle() => SetOpen(!IsOpen);

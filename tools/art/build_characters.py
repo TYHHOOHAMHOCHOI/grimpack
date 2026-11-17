@@ -163,21 +163,22 @@ def save(a: np.ndarray, path: Path) -> None:
     Image.fromarray(a, "RGBA").save(path)
 
 
-def build_hero(frames: dict[str, np.ndarray]) -> None:
-    idle = PC.process(RAW / "char_tank_idle_01_raw.png", "hero", 48)
+def build_hero(frames: dict[str, np.ndarray], name: str = "tank") -> None:
+    """One hero family from its raw idle and attack images (tank; alchemist added 2026-11-17)."""
+    idle = PC.process(RAW / f"char_{name}_idle_01_raw.png", "hero", 48)
     y0, y1, x0, x1 = bbox(idle)
     hip = y0 + round((y1 - y0) * 0.62)
     eyes = hero_eyes(idle)
-    frames["char_tank_idle_01"] = idle
-    frames["char_tank_idle_02"] = shift_upper(idle, hip, 1)
+    frames[f"char_{name}_idle_01"] = idle
+    frames[f"char_{name}_idle_02"] = shift_upper(idle, hip, 1)
     hurt1 = shut_eyes(translate(idle, -2), translate(eyes, -2))
     hurt2 = shut_eyes(shear(translate(shift_upper(idle, hip, 1), -1), y0, hip, -1), translate(eyes, -1) if False else np.roll(np.roll(eyes, 1, 0), -1, 1))
-    frames["char_tank_hurt_01"] = hurt1
-    frames["char_tank_hurt_02"] = hurt2
+    frames[f"char_{name}_hurt_01"] = hurt1
+    frames[f"char_{name}_hurt_02"] = hurt2
     d1 = shut_eyes(shift_upper(idle, hip, 6), np.roll(eyes, 6, 0))
     d2 = dim_down(shut_eyes(shift_upper(idle, hip, 12), np.roll(eyes, 12, 0)))
-    frames["char_tank_down_01"] = d1
-    frames["char_tank_down_02"] = clip_below_ground(d2)
+    frames[f"char_{name}_down_01"] = d1
+    frames[f"char_{name}_down_02"] = clip_below_ground(d2)
     # narrow overlay (ready state): each eye loses its top row; the freed pixel returns to face colour
     ov = np.zeros_like(idle)
     for comp in components(eyes):
@@ -187,11 +188,11 @@ def build_hero(frames: dict[str, np.ndarray]) -> None:
         top = min(ys)
         for y, x in comp:
             ov[y, x] = (*P.rgb("CANDLE-D" if y == top else "INK-0"), 255)
-    frames["char_tank_narrow_01"] = ov
+    frames[f"char_{name}_narrow_01"] = ov
     # attack key frames (user request 2026-11-16): wind-up and strike, generated from the idle with an edit, then
     # processed by the same rule as the idle so palette, outline and rim match
-    frames["char_tank_attack_01"] = PC.process(RAW / "char_tank_attack_01_raw.png", "hero", 48)
-    frames["char_tank_attack_02"] = PC.process(RAW / "char_tank_attack_02_raw.png", "hero", 48)
+    frames[f"char_{name}_attack_01"] = PC.process(RAW / f"char_{name}_attack_01_raw.png", "hero", 48)
+    frames[f"char_{name}_attack_02"] = PC.process(RAW / f"char_{name}_attack_02_raw.png", "hero", 48)
 
 
 def build_monster(name: str, raw: str, canvas: int, arm_lift: bool, min_eye: int, left_frac: float, frames: dict[str, np.ndarray]) -> None:
@@ -228,14 +229,17 @@ def build_monster(name: str, raw: str, canvas: int, arm_lift: bool, min_eye: int
 
 def main() -> int:
     frames: dict[str, np.ndarray] = {}
-    build_hero(frames)
+    build_hero(frames, "tank")
+    if (RAW / "char_alchemist_idle_01_raw.png").exists():
+        build_hero(frames, "alchemist")
     build_monster("swarmer", "mon_swarmer_idle_01_raw.png", 48, False, 1, 1.0, frames)
     build_monster("brute", "mon_brute_idle_01_raw.png", 64, True, 3, 0.42, frames)
     for name, a in frames.items():
         save(a, (CHARS if name.startswith("char_") else MONS) / f"{name}.png")
     print(f"wrote {len(frames)} frames")
     # evidence sheet: every frame at 4x on its camp's ground (INK-1 wall for heroes, INK-0 void for enemies)
-    groups = [[n for n in frames if n.startswith(p)] for p in ("char_tank", "mon_swarmer", "mon_brute")]
+    groups = [[n for n in frames if n.startswith(p)] for p in ("char_tank", "char_alchemist", "mon_swarmer", "mon_brute")]
+    groups = [g for g in groups if g]
     S = 3
     rows = []
     for g in groups:

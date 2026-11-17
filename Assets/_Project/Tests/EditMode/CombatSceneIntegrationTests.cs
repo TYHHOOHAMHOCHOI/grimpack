@@ -118,9 +118,13 @@ namespace Project05.Tests.EditMode
             Assert.IsNotNull(hud, "Combat.unity must contain CombatHudView.");
 
             RectTransform safeFrame = GameObject.Find("SafeFrame").GetComponent<RectTransform>();
+            var so = new UnityEditor.SerializedObject(controller);
+            so.FindProperty("monsterTestSelector").boolValue = true;   // the old stage loop with the 1..6 selector
+            so.ApplyModifiedPropertiesWithoutUndo();
             controller.InitializeIntegrated(board, hud, strip, popup, safeFrame, initialSpeedIndex: 0);
 
             Assert.IsNotNull(controller.Catalog);
+            Assert.IsNull(controller.Run, "the test selector replaces the run");
             Assert.AreEqual("hero_crusader", controller.HeroDef.Id);
             Assert.AreEqual(CombatScenePhase.Planning, controller.Phase);
             Assert.IsNotNull(controller.NextStagePanel);
@@ -165,6 +169,100 @@ namespace Project05.Tests.EditMode
             Assert.AreEqual(CombatScenePhase.Planning, controller.Phase);
             Assert.AreEqual(5, controller.Prepared.BoundEnemies.Count);
             Assert.AreEqual(heroItemsBeforeFight, board.ExportContainerItems("grid").Count);
+        }
+
+        [Test]
+        public void CombatScene_RunFlow_WinRewardDoor_EntersRoom2()
+        {
+            // Arrange
+            EditorSceneManager.OpenScene("Assets/_Project/Scenes/Combat.unity", OpenSceneMode.Single);
+            CombatSceneController controller = Object.FindFirstObjectByType<CombatSceneController>();
+            ItemBoardController board = Object.FindFirstObjectByType<ItemBoardController>();
+            ActionStripView strip = Object.FindFirstObjectByType<ActionStripView>();
+            ItemPopupController popup = Object.FindFirstObjectByType<ItemPopupController>();
+            CombatHudView hud = Object.FindFirstObjectByType<CombatHudView>();
+            RectTransform safeFrame = GameObject.Find("SafeFrame").GetComponent<RectTransform>();
+            controller.InitializeIntegrated(board, hud, strip, popup, safeFrame, initialSpeedIndex: 0);
+            Assert.IsNotNull(controller.Run, "run_mvp.json must load");
+            Assert.IsNull(controller.NextStagePanel, "the run replaces the monster test selector");
+            Assert.AreEqual(1, controller.Run.Room);
+            Assert.IsNotNull(hud.transform.Find("Corridor"));
+            Assert.AreEqual(controller.Run.CurrentEncounter.Roster.Count, controller.Prepared.BoundEnemies.Count);
+            Assert.AreEqual(5, controller.Currency, "a run starts with 5 gold (item-upgrades.md)");
+
+            // the run starts with the hero pick; nothing can start before it
+            Assert.AreEqual(RunPanelView.Step.HeroPick, controller.RunPanel.Current);
+            Assert.IsFalse(controller.CanStartFight);
+            Assert.IsFalse(controller.StartIntegratedFight(0));
+            controller.RunPanel.Command(1);   // the Plague Alchemist
+            Assert.AreEqual("hero_alchemist", controller.HeroDef.Id);
+            Assert.IsTrue(board.ExportContainerItems("grid").Exists(i => i.Record.id == "item_plague_catalyst"), "the core is in the grid");
+            Assert.IsTrue(controller.CanStartFight);
+
+            // the forge quotes from gold and the catalog (item-upgrades.md)
+            ForgeQuote vial = board.QuoteForge(popup.Catalog.Find("item_venom_vial"));
+            Assert.IsTrue(vial.Ok, vial.Reason);
+            Assert.AreEqual(4, vial.Cost);
+            Assert.AreEqual("item_venom_vial_plus", vial.Upgrade.id);
+            StringAssert.Contains("Độc 3>4", vial.Preview);
+            ForgeQuote core = board.QuoteForge(popup.Catalog.Find("item_plague_catalyst"));
+            Assert.IsFalse(core.Ok);
+            Assert.AreEqual("Thiếu 9 vàng", core.Reason);
+            Assert.AreEqual("Đã rèn +", board.QuoteForge(popup.Catalog.Find("item_venom_vial_plus")).Reason);
+
+            // Act: fight room 1 with playback skipped
+            controller.Playback.HandleSpeedRequested(3);
+            Assert.IsTrue(controller.StartIntegratedFight(0));
+            if (controller.LastResult.Outcome != CombatOutcome.Victory)
+            {
+                Assert.AreEqual(Project05.CombatCore.Run.RunPhase.Lost, controller.Run.Phase);
+                Assert.Inconclusive("room 1 was lost with this seed");
+            }
+
+            Assert.AreEqual(5 + 2, controller.Currency, "room 1 pays the White door's 2 gold");
+
+            // Assert: room 1 has no buff, so the item shelf comes first
+            Assert.AreEqual(CombatScenePhase.RunReward, controller.Phase);
+            Assert.IsFalse(controller.CanStartFight, "no Start during the reward steps");
+            Assert.AreEqual(RunPanelView.Step.Reward, controller.RunPanel.Current);
+            int stash = board.ExportContainerItems("stash").Count;
+            controller.RunPanel.Command(0);
+            Assert.AreEqual(stash + 1, board.ExportContainerItems("stash").Count, "the taken item goes to the stash");
+            Assert.AreEqual(RunPanelView.Step.Doors, controller.RunPanel.Current);
+
+            controller.RunPanel.Command(1);
+            Assert.AreEqual(CombatScenePhase.Planning, controller.Phase);
+            Assert.AreEqual(2, controller.Run.Room);
+            Assert.AreEqual(controller.Run.CurrentEncounter.Roster.Count, controller.Prepared.BoundEnemies.Count);
+            Assert.IsFalse(controller.RunPanel.IsVisible);
+            Assert.IsTrue(controller.CanStartFight);
+        }
+
+        [Test]
+        public void ItemBoard_OpenCellsAndPinnedItem_FollowTheDoorAndCurseRules()
+        {
+            // Arrange
+            EditorSceneManager.OpenScene("Assets/_Project/Scenes/Combat.unity", OpenSceneMode.Single);
+            ItemBoardController board = Object.FindFirstObjectByType<ItemBoardController>();
+            ItemPopupController popup = Object.FindFirstObjectByType<ItemPopupController>();
+            CombatHudView hud = Object.FindFirstObjectByType<CombatHudView>();
+            Assert.AreEqual(16, board.HeroCellsOpen);
+
+            // Act / Assert: one cell opens by growing the square to 5 x 5 with the rest of its ring locked
+            Assert.AreEqual(1, board.OpenHeroCells(1));
+            Assert.AreEqual(17, board.HeroCellsOpen);
+            Assert.AreEqual(49 - 17, board.LockedHeroCellsLeft);
+
+            // a pinned item cannot be picked up
+            ItemRecord anchor = popup.Catalog.Find("item_cursed_anchor");
+            Assert.IsNotNull(anchor);
+            bool refused = false;
+            board.PinnedRefused += () => refused = true;
+            if (!board.CanPlaceInHeroGrid(anchor)) Assert.Inconclusive("the start grid has no 2 free cells");
+            Assert.IsTrue(board.TrySpawnPinned(anchor, hud.Sprites.plateLift[0], null, null, null, out ItemHoverTarget pinned));
+            board.Pickup(pinned, false);
+            Assert.IsTrue(refused);
+            Assert.IsNull(board.Held);
         }
     }
 }

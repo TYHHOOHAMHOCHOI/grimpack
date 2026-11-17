@@ -45,6 +45,10 @@ MonoBehaviour:
   glyphDamageBone8: {fileID: 21300000, guid: b87c161da0e4d6b4782d5d81d9bde40a, type: 3}
   glyphDropletBone8: {fileID: 21300000, guid: 1906782d3f58d3345be57eb15357f8ec, type: 3}
   itemIcons:
+  - key: blight-spear_c_1x3
+    sprite: {fileID: 21300000, guid: 964844238d3f34f48b00dd03be1cff14, type: 3}
+  - key: blight-spear_d_1x3
+    sprite: {fileID: 21300000, guid: 0c291c2e5b706874faec7bbbf8633a0d, type: 3}
   - key: breaking-bell_c_1x2
     sprite: {fileID: 21300000, guid: 49c7a2e0f67f14d4086d4c89fadf24be, type: 3}
   - key: breaking-bell_d_1x2
@@ -53,18 +57,40 @@ MonoBehaviour:
     sprite: {fileID: 21300000, guid: d22e2c986f822944e885704c893b3ee1, type: 3}
   - key: cleaver-halberd_d_1x3
     sprite: {fileID: 21300000, guid: f01ed2e0acd0cdc4aa8123d6d3d49d8c, type: 3}
+  - key: coin-purse_d_1x1
+    sprite: {fileID: 21300000, guid: e6328ca5e6d964d47984ea0eb2d15853, type: 3}
+  - key: cracked-mask_d_1x1
+    sprite: {fileID: 21300000, guid: 201b83b4c6d22004a98b7df07e35df51, type: 3}
   - key: crimson-vial_d_1x1
     sprite: {fileID: 21300000, guid: b0fe17e214a544b4cab2b595972621cd, type: 3}
   - key: crossbow_c_2x1
     sprite: {fileID: 21300000, guid: e4e8593839c562e4cbfb1a0fb0d0e32c, type: 3}
   - key: crossbow_d_2x1
     sprite: {fileID: 21300000, guid: 21d49351a2e0e4e44989f395f8e3fbfb, type: 3}
+  - key: cursed-anchor_c_2x1
+    sprite: {fileID: 21300000, guid: de1bb2e200888214aa0b42189c33fc94, type: 3}
+  - key: cursed-anchor_d_2x1
+    sprite: {fileID: 21300000, guid: 06cfcbfadc76efa4f88b4cf60b76960e, type: 3}
   - key: dagger_d_1x1
     sprite: {fileID: 21300000, guid: 39a6b8d7be371404daaa7723b4bcdb54, type: 3}
+  - key: drowsy-bell_c_1x2
+    sprite: {fileID: 21300000, guid: 56928f29782cbf84f8a8e2a9aece1054, type: 3}
+  - key: drowsy-bell_d_1x2
+    sprite: {fileID: 21300000, guid: 5354add1101e53e48839577e09714d39, type: 3}
   - key: echo-charm_d_1x1
     sprite: {fileID: 21300000, guid: 072c0622757b6654ea1ee837f0a16f60, type: 3}
+  - key: ember-charm_d_1x1
+    sprite: {fileID: 21300000, guid: 7ab891ecac3970544b3b53428dff4921, type: 3}
   - key: field-bandage_d_1x1
     sprite: {fileID: 21300000, guid: 883676b3b138b89409dfc369364ff5ac, type: 3}
+  - key: frost-shard_c_1x2
+    sprite: {fileID: 21300000, guid: 0bc29553e397fc1459ff38728176e6ba, type: 3}
+  - key: frost-shard_d_1x2
+    sprite: {fileID: 21300000, guid: 23d4a3ba29179394eae835dc7736daab, type: 3}
+  - key: glacier-maul_c_t
+    sprite: {fileID: 21300000, guid: 8cdd0fc3ae0c3e14286f2ef5122c9462, type: 3}
+  - key: glacier-maul_d_t
+    sprite: {fileID: 21300000, guid: dbc5f08bac1c6974f8a0041bfdcfd224, type: 3}
   - key: guard-sigil_d_1x1
     sprite: {fileID: 21300000, guid: 248f9a3260b64dd4eaed2073f51e9c57, type: 3}
   - key: hand-axe_c_l
@@ -89,12 +115,30 @@ MonoBehaviour:
     sprite: {fileID: 21300000, guid: 04005927fd1677f418782a49ac519e13, type: 3}
   - key: leather-vest_d_2x2
     sprite: {fileID: 21300000, guid: 37a40f143935a2b41b26e66715ac89a4, type: 3}
+  - key: lull-drum_c_1x2
+    sprite: {fileID: 21300000, guid: 582ff92977c66ca4d9090317b907e32b, type: 3}
+  - key: lull-drum_d_1x2
+    sprite: {fileID: 21300000, guid: fcead68d8139e0847ab9232368571974, type: 3}
+  - key: mortar_d_1x1
+    sprite: {fileID: 21300000, guid: 8357e3a90643d2341abbd082de2521fd, type: 3}
   - key: oak-buckler_d_1x1
     sprite: {fileID: 21300000, guid: 31d97d611904a564ab2cfbb088265a14, type: 3}
   - key: oath-blade_c_1x3
     sprite: {fileID: 21300000, guid: 7286c945038bd0b41aafc656c4d517c5, type: 3}
   - key: oath-blade_d_1x3
     sprite: {fileID: 21300000, guid: 41ef47f98a04a8640a219948c13cf496, type: 3}
+  - key: oil-flask_c_1x2
+    sprite: {fileID: 21300000, guid: 74b51c812566a8f4aa25b9169ee9d23a, type: 3}
+  - key: oil-flask_d_1x2
+    sprite: {fileID: 21300000, guid: e250f4a34153a0346960b98783bda9c3, type: 3}
+  - key: plague-catalyst_c_1x2
+    sprite: {fileID: 21300000, guid: 31d6a439c1e26a44ab0b5cf768bd398b, type: 3}
+  - key: plague-catalyst_d_1x2
+    sprite: {fileID: 21300000, guid: ffeebd24c58adf44ea8a69a9fd96cd36, type: 3}
+  - key: plague-censer_c_2x3
+    sprite: {fileID: 21300000, guid: 0403551db060a754699f666b6d892dfb, type: 3}
+  - key: plague-censer_d_2x3
+    sprite: {fileID: 21300000, guid: c1516d318ed068c438412e977ed50ae8, type: 3}
   - key: resonant-bell_c_2x2
     sprite: {fileID: 21300000, guid: f6b0b21a8381345438c19afd1c0e2347, type: 3}
   - key: resonant-bell_d_2x2
@@ -127,6 +171,16 @@ MonoBehaviour:
     sprite: {fileID: 21300000, guid: 425fcce70aef9f644ba14609f974e2bf, type: 3}
   - key: swift-boots_d_l3
     sprite: {fileID: 21300000, guid: 98f42aa48a3c9a640a3f825acee31828, type: 3}
+  - key: tar-chain_c_s
+    sprite: {fileID: 21300000, guid: 641b38f6610cd7f4f82ab05cfdafe20d, type: 3}
+  - key: tar-chain_d_s
+    sprite: {fileID: 21300000, guid: 779e7b248a829c2488e67805de8f9f59, type: 3}
+  - key: tar-net_c_2x1
+    sprite: {fileID: 21300000, guid: 37585cf92c6fba645ab304b1b02c16d3, type: 3}
+  - key: tar-net_d_2x1
+    sprite: {fileID: 21300000, guid: 64f8b879194d74147a5401b9851c82a2, type: 3}
+  - key: thorn-dart_d_1x1
+    sprite: {fileID: 21300000, guid: 96756b202c119a447b0b64fb88f2277b, type: 3}
   - key: thunder-gong_c_2x2
     sprite: {fileID: 21300000, guid: fdc451a09a8447a49a22e5c364538c0e, type: 3}
   - key: thunder-gong_d_2x2
@@ -135,6 +189,8 @@ MonoBehaviour:
     sprite: {fileID: 21300000, guid: 67fc75cf0bed2c0499fb15ac9fa0ab86, type: 3}
   - key: tower-shield_d_2x3
     sprite: {fileID: 21300000, guid: 7c922c99624295a429516c939492a710, type: 3}
+  - key: venom-vial_d_1x1
+    sprite: {fileID: 21300000, guid: 2d582551540c4dd4dae407c621d2665c, type: 3}
   - key: void-censer_c_2x3
     sprite: {fileID: 21300000, guid: e5911c7e4bfc1d041b01ebdd78736d8e, type: 3}
   - key: void-censer_d_2x3
@@ -157,6 +213,10 @@ MonoBehaviour:
     sprite: {fileID: 21300000, guid: 287956f115ed2f1419d3a0681518dcba, type: 3}
   - key: whirlwind-axe_d_t
     sprite: {fileID: 21300000, guid: 3cb56ae9b0114514ea41b696c525de86, type: 3}
+  - key: witch-cauldron_c_2x2
+    sprite: {fileID: 21300000, guid: 2159017dd3574384cbd9f936cf633544, type: 3}
+  - key: witch-cauldron_d_2x2
+    sprite: {fileID: 21300000, guid: 806d531ed6d187a44a55ec426fd863a0, type: 3}
   itemPlates:
   - key: blue_hi_1x1
     sprite: {fileID: 21300000, guid: c36f09b1848f5c94591d58afd87405ce, type: 3}
@@ -470,3 +530,94 @@ MonoBehaviour:
     sprite: {fileID: 21300000, guid: 87d98346753c7134eb4947e50cee345d, type: 3}
   - key: white_rest_t
     sprite: {fileID: 21300000, guid: 6ccd475a22e5b994a92f8039b74e7999, type: 3}
+  runUi:
+  - key: ui_curse-chip_9s
+    sprite: {fileID: 21300000, guid: d954dc88424c3214692335b5db508a62, type: 3}
+  - key: ui_curse-tag_card_24x10
+    sprite: {fileID: 21300000, guid: a5bdb189a28f22a4b92f051ec1c1623d, type: 3}
+  - key: ui_door-card_armed-corner_4x4
+    sprite: {fileID: 21300000, guid: 2a5248fd2723e1a41b26afd96846c34d, type: 3}
+  - key: ui_door-card_blue_9s
+    sprite: {fileID: 21300000, guid: 6d585e9249c9dd7418f9aaaa41b4f0f3, type: 3}
+  - key: ui_door-card_disabled_9s
+    sprite: {fileID: 21300000, guid: 8f9d73a1cf70aae4b95250b02769b58b, type: 3}
+  - key: ui_door-card_gold_9s
+    sprite: {fileID: 21300000, guid: b6965d7647dbb1948bed96498ce0543d, type: 3}
+  - key: ui_door-card_green_9s
+    sprite: {fileID: 21300000, guid: 33789a3326c2bb14196b14cc8bb7aa16, type: 3}
+  - key: ui_door-card_purple_9s
+    sprite: {fileID: 21300000, guid: 5d8a932056539794ab7c8878f3885095, type: 3}
+  - key: ui_door-card_ring-armed_9s
+    sprite: {fileID: 21300000, guid: 74133dda4b554de44a3646403f0c13a0, type: 3}
+  - key: ui_door-card_ring-hover_9s
+    sprite: {fileID: 21300000, guid: f168d574034678042b08abf3dfbb4374, type: 3}
+  - key: ui_door-card_white_9s
+    sprite: {fileID: 21300000, guid: 09cdc587c944bd446af510a8ef2a775b, type: 3}
+  - key: ui_fill_plum_4x4
+    sprite: {fileID: 21300000, guid: 74f64a9d3e3f2134aa6c3d708995bf18, type: 3}
+  - key: ui_glyph-cell_bone_12x12
+    sprite: {fileID: 21300000, guid: aa256fb8a7a015f4fbf4da033c98b665, type: 3}
+  - key: ui_glyph-cell_bone_8x8
+    sprite: {fileID: 21300000, guid: 5e7cc9f92480e5a4bb9d289dfa575efb, type: 3}
+  - key: ui_glyph-curse-frailty_bone_12x12
+    sprite: {fileID: 21300000, guid: ad313f6ad54ea2343b7c8fc56ddd21dd, type: 3}
+  - key: ui_glyph-curse-frailty_bone_8x8
+    sprite: {fileID: 21300000, guid: fd04198e13a22d94fb34115e0176cb99, type: 3}
+  - key: ui_glyph-curse-pinned_bone_12x12
+    sprite: {fileID: 21300000, guid: 2df61d67aa3423740b4c9e8569df5e75, type: 3}
+  - key: ui_glyph-curse-pinned_bone_8x8
+    sprite: {fileID: 21300000, guid: dfcd568bb329050429862e3699b742e4, type: 3}
+  - key: ui_glyph-curse-sluggish_bone_12x12
+    sprite: {fileID: 21300000, guid: a15fee937c415fc4d8ba2351007c7000, type: 3}
+  - key: ui_glyph-curse-sluggish_bone_8x8
+    sprite: {fileID: 21300000, guid: aa8b00f8a2ffc0a40927050c956d755c, type: 3}
+  - key: ui_glyph-curse-wither_bone_12x12
+    sprite: {fileID: 21300000, guid: 2f3f6d597d2e6f64a9e71e2a313235c2, type: 3}
+  - key: ui_glyph-curse-wither_bone_8x8
+    sprite: {fileID: 21300000, guid: 009497685d95a104bb01003ab7f1ef69, type: 3}
+  - key: ui_glyph-elite_bone_6x6
+    sprite: {fileID: 21300000, guid: d6fe2f410ee9fbd48ae755c1e83139c7, type: 3}
+  - key: ui_glyph-size-l_bone_10x10
+    sprite: {fileID: 21300000, guid: 58dbfabedfeb3e745ab2e3ed32a20448, type: 3}
+  - key: ui_glyph-size-m_bone_10x10
+    sprite: {fileID: 21300000, guid: ca7e316256ebd5448ac83c8a342962bb, type: 3}
+  - key: ui_glyph-size-s_bone_10x10
+    sprite: {fileID: 21300000, guid: ff074cd530a6554418412b10cc2b0f86, type: 3}
+  - key: ui_map-marker_now_6x2
+    sprite: {fileID: 21300000, guid: c0739bd55b865d4428708c5ea9541e17, type: 3}
+  - key: ui_map-node-preview_blue_10x11
+    sprite: {fileID: 21300000, guid: aee00d346124c92428e3b1ee67463a4c, type: 3}
+  - key: ui_map-node-preview_gold_10x11
+    sprite: {fileID: 21300000, guid: 9d44f1871006906429c5acac4f9d74f2, type: 3}
+  - key: ui_map-node-preview_green_10x11
+    sprite: {fileID: 21300000, guid: 6175748f4f64eac4e9d48c88d3334286, type: 3}
+  - key: ui_map-node-preview_purple_10x11
+    sprite: {fileID: 21300000, guid: 204434d3f98e1ff44ada2ddc44b533bd, type: 3}
+  - key: ui_map-node-preview_white_10x11
+    sprite: {fileID: 21300000, guid: d332982a7f3da7a48af029c429bb289b, type: 3}
+  - key: ui_map-node_ahead_10x11
+    sprite: {fileID: 21300000, guid: a93c05b7af14efe419ddeb6fc4ebb5f8, type: 3}
+  - key: ui_map-node_blue_10x11
+    sprite: {fileID: 21300000, guid: b06398d246d177849aff61bcd98f23c7, type: 3}
+  - key: ui_map-node_boss_12x12
+    sprite: {fileID: 21300000, guid: 6b1e205e6bf1acd45ac29be942f0ffa4, type: 3}
+  - key: ui_map-node_entrance_10x11
+    sprite: {fileID: 21300000, guid: ce22a99da56348e479cb9e7397cbdce5, type: 3}
+  - key: ui_map-node_gold_10x11
+    sprite: {fileID: 21300000, guid: 58bca57cadcdaae439c8cdb9085390c2, type: 3}
+  - key: ui_map-node_green_10x11
+    sprite: {fileID: 21300000, guid: 482fa5116fae21d4093923b534ed8f7b, type: 3}
+  - key: ui_map-node_purple_10x11
+    sprite: {fileID: 21300000, guid: 910afa538848c0f49888ce662335c5ef, type: 3}
+  - key: ui_map-node_white_10x11
+    sprite: {fileID: 21300000, guid: 29aa8f596ec7f5f4988791fb4fbcab7a, type: 3}
+  - key: ui_pip-rank_blue_5x5
+    sprite: {fileID: 21300000, guid: 3008341acd9a08742ae4550cbf7272ef, type: 3}
+  - key: ui_pip-rank_gold_5x5
+    sprite: {fileID: 21300000, guid: 96b056e355c70c642a5bc5cb436e8115, type: 3}
+  - key: ui_pip-rank_green_5x5
+    sprite: {fileID: 21300000, guid: 54c20ec4be6d9114db16b2a8133afb96, type: 3}
+  - key: ui_pip-rank_purple_5x5
+    sprite: {fileID: 21300000, guid: 0d255f686784e0242b9124e1243df229, type: 3}
+  - key: ui_pip-rank_white_5x5
+    sprite: {fileID: 21300000, guid: 9a130fc0e6b77834896bfeca802e74d9, type: 3}

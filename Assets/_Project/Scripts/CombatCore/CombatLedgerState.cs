@@ -30,15 +30,22 @@ namespace Project05.CombatCore
         public int DamagePercentPermille;
         public Dictionary<string, int> StatusAmountBonuses;
 
+        /// <summary>Extra stacks this item adds to a status: rules for that status plus rules for every status.</summary>
         public int GetStatusBonus(string statusId)
         {
-            if (StatusAmountBonuses != null &&
-                !string.IsNullOrEmpty(statusId) &&
-                StatusAmountBonuses.TryGetValue(statusId, out int bonus))
-            {
-                return bonus;
-            }
-            return 0;
+            if (StatusAmountBonuses == null || string.IsNullOrEmpty(statusId)) return 0;
+            int bonus = StatusAmountBonuses.TryGetValue(statusId, out int b) ? b : 0;
+            if (StatusAmountBonuses.TryGetValue(string.Empty, out int all)) bonus += all;
+            return bonus;
+        }
+
+        /// <summary>Extra detonation value per stack of a kind (DetonateValue rules for it and for every kind).</summary>
+        public int GetDetonateBonus(string statusId)
+        {
+            if (StatusAmountBonuses == null) return 0;
+            int bonus = StatusAmountBonuses.TryGetValue(DetonateKeys.For(statusId), out int b) ? b : 0;
+            if (StatusAmountBonuses.TryGetValue(DetonateKeys.For(string.Empty), out int all)) bonus += all;
+            return bonus;
         }
     }
 
@@ -51,12 +58,20 @@ namespace Project05.CombatCore
         public int Shield;
         public int Gauge;
         public int EffectiveSpeed;
+        /// <summary>Speed before status terms (Slow, Frost); EffectiveSpeed is recomputed from it each step.</summary>
+        public int BaseEffectiveSpeed;
         public int ActionOrdinal;
 
         public List<MutableHeroItem> Items;
         public int IntentIndex;
         public IReadOnlyList<BoundIntentEntry> IntentSequence;
         public List<MutableStatusLot> StatusLots = new List<MutableStatusLot>();
+
+        /// <summary>Wither curse damage taken at the start of each own turn (heroes only; 0 if none).</summary>
+        public int WitherPerTurn;
+
+        /// <summary>The active curse of a hero, used as the source of its Wither damage.</summary>
+        public string CurseId = string.Empty;
 
         public bool IsAlive => Hp > 0;
 
@@ -134,6 +149,7 @@ namespace Project05.CombatCore
         public const string StunStatusId = "stun";
 
         private readonly int _encounterId;
+        private readonly GameCatalog _catalog;
         private readonly List<MutableUnit> _heroes = new List<MutableUnit>();
         private readonly List<MutableUnit> _enemies = new List<MutableUnit>();
         private readonly List<SchedulerUnitState> _schedulerUnits = new List<SchedulerUnitState>();
@@ -157,6 +173,7 @@ namespace Project05.CombatCore
             EncounterSetup setup,
             IReadOnlyList<BoundEnemyState> boundEnemies)
         {
+            _catalog = catalog;
             _encounterId = setup.EncounterId;
 
             var sortedHeroes = new List<HeroBaselineInput>(setup.Heroes);
@@ -173,10 +190,8 @@ namespace Project05.CombatCore
                     synergy = AdjacencySynergyEvaluator.Evaluate(grid, catalog);
                 }
 
-                int hpBonus = input.PermanentHpBonus + TurnOrderScheduler.ComputeHeroHpBonus(grid, catalog);
-                int maxHp = Math.Max(1, def.BaseMaxHp + hpBonus);
-                int speedBonus = TurnOrderScheduler.ComputeHeroSpeedBonus(grid, catalog);
-                int effSpeed = TurnOrderScheduler.EffectiveSpeed(def.BaseSpeed, speedBonus, 0);
+                int maxHp = HeroStatMath.MaxHp(input, catalog);
+                int effSpeed = HeroStatMath.Speed(input, catalog);
 
                 var heroUnit = new MutableUnit
                 {
@@ -187,8 +202,11 @@ namespace Project05.CombatCore
                     Shield = Math.Max(0, def.InitialShield),
                     Gauge = 0,
                     EffectiveSpeed = effSpeed,
+                    BaseEffectiveSpeed = effSpeed,
                     ActionOrdinal = 0,
-                    Items = BuildHeroItems(input.Slot, def, grid, synergy, catalog)
+                    Items = BuildHeroItems(input.Slot, def, grid, synergy, catalog),
+                    WitherPerTurn = input.WitherPerTurn,
+                    CurseId = input.CurseId
                 };
 
                 _heroes.Add(heroUnit);
@@ -219,6 +237,7 @@ namespace Project05.CombatCore
                     Shield = 0,
                     Gauge = 0,
                     EffectiveSpeed = bound.EffectiveSpeed,
+                    BaseEffectiveSpeed = bound.EffectiveSpeed,
                     ActionOrdinal = 0,
                     IntentIndex = 0,
                     IntentSequence = bound.Sequence
@@ -313,14 +332,15 @@ namespace Project05.CombatCore
                                 link.Kind,
                                 link.Amount));
 
-                            if (link.Kind == SynergyKind.StatusAmount && !string.IsNullOrEmpty(link.StatusId))
+                            if (link.Kind == SynergyKind.StatusAmount || link.Kind == SynergyKind.DetonateValue)
                             {
                                 if (statusBonuses == null)
                                 {
                                     statusBonuses = new Dictionary<string, int>(StringComparer.Ordinal);
                                 }
-                                statusBonuses.TryGetValue(link.StatusId, out int cur);
-                                statusBonuses[link.StatusId] = cur + link.Amount;
+                                string key = link.Kind == SynergyKind.DetonateValue ? DetonateKeys.For(link.StatusId) : (link.StatusId ?? string.Empty);
+                                statusBonuses.TryGetValue(key, out int cur);
+                                statusBonuses[key] = cur + link.Amount;
                             }
                         }
                     }
@@ -482,6 +502,9 @@ namespace Project05.CombatCore
             {
                 MutableUnit e = _enemies[i];
                 SchedulerUnitState s = _schedulerUnits[idx];
+                int permille = StatusPermille(e, speed: true);
+                e.EffectiveSpeed = permille == 0 ? e.BaseEffectiveSpeed : TurnOrderScheduler.EffectiveSpeed(e.BaseEffectiveSpeed, 0, permille);
+                s.EffectiveSpeed = e.EffectiveSpeed;   // Slow and Frost act on the gauge (debuffs-and-detonation.md)
                 s.Gauge = e.Gauge;
                 s.ActionOrdinal = e.ActionOrdinal;
                 s.IntentIndex = e.IntentIndex;
@@ -740,8 +763,22 @@ namespace Project05.CombatCore
                 return RecordEffectSkipped(actorRef, target.Ref, origin, rootActionId, depth, parentEffectSeq, effectOrdinal, "zero_amount");
             }
 
+            StatusDef def = StatusOf(statusId);
+            if (def != null && def.Cap > 0)
+            {
+                long held = target.GetStatusTotal(statusId);
+                long room = def.Cap - held;
+                if (room <= 0)
+                {
+                    return RecordEffectSkipped(actorRef, target.Ref, origin, rootActionId, depth, parentEffectSeq, effectOrdinal, "status_cap");
+                }
+
+                if (amount > room) amount = (int)room;   // the excess is thrown away; the event records what was added
+            }
+
             long seq = _nextSeq;
-            int expiryActionOrdinal = target.ActionOrdinal + DefaultStatusDurationActions;
+            int duration = def == null ? DefaultStatusDurationActions : def.DurationActions;
+            int expiryActionOrdinal = duration > 0 ? target.ActionOrdinal + duration : int.MaxValue;
             long occId = AllocateOccurrenceId();
 
             target.StatusLots.Add(new MutableStatusLot
@@ -785,7 +822,282 @@ namespace Project05.CombatCore
                 reasonCode: string.Empty,
                 outcome: null);
 
-            return AppendEvent(emitted);
+            if (!AppendEvent(emitted))
+            {
+                return false;
+            }
+
+            // Frost: reaching the threshold converts every stack into a Freeze (a stun of FreezeStunActions)
+            if (def != null && def.FreezeAt > 0 && target.GetStatusTotal(statusId) >= def.FreezeAt)
+            {
+                if (!ExpireAllOf(target, statusId, rootActionId, "frozen"))
+                {
+                    return false;
+                }
+
+                StatusDef stun = StatusOf(StunStatusId) ?? StatusDef.DefaultStun;
+                int stunActions = def.FreezeStunActions > 0 ? def.FreezeStunActions : 1;
+                target.StatusLots.Add(new MutableStatusLot
+                {
+                    StatusId = stun.Id,
+                    OriginalAmount = 1,
+                    RemainingAmount = 1,
+                    SourceRefId = _nextSeq,
+                    ExpiryActionOrdinal = target.ActionOrdinal + stunActions
+                });
+                if (!AppendEvent(new CombatEventRecord(
+                    seq: _nextSeq, kind: CombatEventKind.StatusApplied, rootActionId: rootActionId, depth: depth,
+                    parentEffectSeq: emitted.Seq, effectOrdinal: effectOrdinal, origin: origin, actor: actorRef, target: target.Ref,
+                    triggerKind: null, actionOrdinal: target.ActionOrdinal, nextReadyAt: 0, deltaTime: 0,
+                    gaugeBefore: target.Gauge, gaugeAfter: target.Gauge, statusId: stun.Id, statusAmount: 1,
+                    expiryActionOrdinal: target.ActionOrdinal + stunActions, occurrenceId: AllocateOccurrenceId(), consumedSources: null,
+                    resolvedAmount: 1, shieldBefore: target.Shield, shieldAfter: target.Shield, hpBefore: target.Hp, hpAfter: target.Hp,
+                    reasonCode: "frozen", outcome: null)))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        // ------------------------------------------------------------------ debuffs (debuffs-and-detonation.md)
+        /// <summary>The catalog entry of a status, or null for a plain timed lot.</summary>
+        public StatusDef StatusOf(string statusId) => _catalog != null ? _catalog.FindStatus(statusId) : null;
+
+        /// <summary>Sum of the per-stack permille of the unit's statuses: speed (Slow, Frost) or outgoing damage (Weaken).</summary>
+        public int StatusPermille(MutableUnit unit, bool speed)
+        {
+            if (unit == null || unit.StatusLots.Count == 0 || _catalog == null) return 0;
+            long total = 0;
+            for (int i = 0; i < unit.StatusLots.Count; i++)
+            {
+                MutableStatusLot lot = unit.StatusLots[i];
+                if (lot.RemainingAmount <= 0) continue;
+                StatusDef def = StatusOf(lot.StatusId);
+                if (def == null) continue;
+                total += lot.RemainingAmount * (speed ? def.SpeedPermillePerStack : def.DamagePermillePerStack);
+            }
+
+            return total < -1000 ? -1000 : (total > 100000 ? 100000 : (int)total);
+        }
+
+        /// <summary>Outgoing damage permille of an actor (Weaken lowers what an enemy deals).</summary>
+        public int OutgoingDamagePermille(UnitRef actorRef)
+        {
+            MutableUnit actor = FindUnit(actorRef);
+            return actor == null ? 0 : StatusPermille(actor, speed: false);
+        }
+
+        /// <summary>Removes every stack of one status from a unit as an expiry (e.g. Frost turning into a Freeze).</summary>
+        private bool ExpireAllOf(MutableUnit unit, string statusId, long rootActionId, string reason)
+        {
+            long total = 0;
+            var sources = new List<StatusSourceContribution>();
+            for (int i = 0; i < unit.StatusLots.Count; i++)
+            {
+                MutableStatusLot lot = unit.StatusLots[i];
+                if (lot.RemainingAmount <= 0 || !string.Equals(lot.StatusId, statusId, StringComparison.Ordinal)) continue;
+                long amt = lot.RemainingAmount;
+                lot.ExpiredAmount += amt;
+                lot.RemainingAmount = 0;
+                total += amt;
+                sources.Add(new StatusSourceContribution(lot.IsBaseline, lot.SourceRefId, amt > int.MaxValue ? int.MaxValue : (int)amt));
+            }
+
+            if (total == 0) return true;
+            return AppendEvent(new CombatEventRecord(
+                seq: _nextSeq, kind: CombatEventKind.StatusExpired, rootActionId: rootActionId, depth: 0, parentEffectSeq: null,
+                effectOrdinal: 0L, origin: StatusOrigin(unit, statusId, OriginKind.StatusExpiry), actor: unit.Ref, target: unit.Ref, triggerKind: null,
+                actionOrdinal: unit.ActionOrdinal, nextReadyAt: 0, deltaTime: 0, gaugeBefore: unit.Gauge, gaugeAfter: unit.Gauge,
+                statusId: statusId, statusAmount: total, expiryActionOrdinal: 0, occurrenceId: AllocateOccurrenceId(),
+                consumedSources: sources.ToArray(), resolvedAmount: total > int.MaxValue ? int.MaxValue : (int)total,
+                shieldBefore: unit.Shield, shieldAfter: unit.Shield, hpBefore: unit.Hp, hpAfter: unit.Hp, reasonCode: reason, outcome: null));
+        }
+
+        private static CombatOrigin StatusOrigin(MutableUnit unit, string statusId, OriginKind kind) => new CombatOrigin(
+            kind,
+            unit.Ref.Side == UnitSide.Hero ? unit.Ref.Slot : -1,
+            0L,
+            statusId ?? string.Empty,
+            new GridCell(0, 0),
+            unit.Ref.Side == UnitSide.Enemy ? unit.Ref.InstanceId : -1,
+            unit.DefinitionId,
+            string.Empty,
+            0L,
+            Array.Empty<AppliedModifierRef>());
+
+        /// <summary>
+        /// Poison and Burn tick at the start of the carrier's own turn, before its intent and before a stun skip: each
+        /// status deals TickPerStack per stack (base damage, shield first, the status as source), then DecayPerTick stacks
+        /// leave oldest first. Kinds go in ordinal id order. Returns false only on a technical stop.
+        /// </summary>
+        public bool ApplyStatusTicks(MutableUnit unit, long rootActionId)
+        {
+            if (unit == null || !unit.IsAlive || unit.StatusLots.Count == 0 || _catalog == null) return true;
+            var ids = new List<string>();
+            for (int i = 0; i < unit.StatusLots.Count; i++)
+            {
+                MutableStatusLot lot = unit.StatusLots[i];
+                if (lot.RemainingAmount <= 0 || ids.Contains(lot.StatusId)) continue;
+                StatusDef def = StatusOf(lot.StatusId);
+                if (def != null && def.TickPerStack > 0) ids.Add(lot.StatusId);
+            }
+
+            ids.Sort(StringComparer.Ordinal);
+            for (int k = 0; k < ids.Count && unit.IsAlive; k++)
+            {
+                StatusDef def = StatusOf(ids[k]);
+                long stacks = unit.GetStatusTotal(ids[k]);
+                if (stacks <= 0) continue;
+                long dmg = stacks * def.TickPerStack;
+                int damage = dmg > int.MaxValue ? int.MaxValue : (int)dmg;
+                if (!ApplyDamage(unit.Ref, unit, damage, StatusOrigin(unit, ids[k], OriginKind.StatusTick), rootActionId, 0, null, 0L, false, out _, out _))
+                {
+                    return false;
+                }
+
+                if (def.DecayPerTick > 0 && !DecayOldest(unit, ids[k], def.DecayPerTick, rootActionId))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private bool DecayOldest(MutableUnit unit, string statusId, int count, long rootActionId)
+        {
+            long left = count, total = 0;
+            var sources = new List<StatusSourceContribution>();
+            for (int i = 0; i < unit.StatusLots.Count && left > 0; i++)
+            {
+                MutableStatusLot lot = unit.StatusLots[i];
+                if (lot.RemainingAmount <= 0 || !string.Equals(lot.StatusId, statusId, StringComparison.Ordinal)) continue;
+                long take = lot.RemainingAmount < left ? lot.RemainingAmount : left;
+                lot.RemainingAmount -= take;
+                lot.ExpiredAmount += take;
+                left -= take;
+                total += take;
+                sources.Add(new StatusSourceContribution(lot.IsBaseline, lot.SourceRefId, (int)take));
+            }
+
+            if (total == 0) return true;
+            return AppendEvent(new CombatEventRecord(
+                seq: _nextSeq, kind: CombatEventKind.StatusExpired, rootActionId: rootActionId, depth: 0, parentEffectSeq: null,
+                effectOrdinal: 0L, origin: StatusOrigin(unit, statusId, OriginKind.StatusExpiry), actor: unit.Ref, target: unit.Ref, triggerKind: null,
+                actionOrdinal: unit.ActionOrdinal, nextReadyAt: 0, deltaTime: 0, gaugeBefore: unit.Gauge, gaugeAfter: unit.Gauge,
+                statusId: statusId, statusAmount: total, expiryActionOrdinal: 0, occurrenceId: AllocateOccurrenceId(),
+                consumedSources: sources.ToArray(), resolvedAmount: (int)total,
+                shieldBefore: unit.Shield, shieldAfter: unit.Shield, hpBefore: unit.Hp, hpAfter: unit.Hp, reasonCode: "decay", outcome: null));
+        }
+
+        /// <summary>
+        /// Detonation (DetonateAll): removes every debuff stack on the target, one StatusConsumed per kind in ordinal
+        /// order, then one detonation damage: B = sum stacks x (value + bonus), P = item percent + 100 x (kinds - 1)
+        /// + 300 when frozen, r = (B x (1000 + P) + 500) / 1000. No debuff means an empty detonation and no damage.
+        /// </summary>
+        public bool DetonateAllDebuffs(
+            UnitRef actorRef,
+            MutableUnit target,
+            MutableHeroItem sourceItem,
+            int damagePercentPermille,
+            CombatOrigin origin,
+            long rootActionId,
+            int depth,
+            long? parentEffectSeq,
+            long effectOrdinal,
+            List<CombatEventRecord> consumedEvents,
+            out CombatEventRecord detonationDamageEvent,
+            out CombatEventRecord downedEvent)
+        {
+            detonationDamageEvent = null;
+            downedEvent = null;
+            if (target == null || !target.IsAlive)
+            {
+                return RecordEffectSkipped(actorRef, target != null ? target.Ref : UnitRef.None, origin, rootActionId, depth, parentEffectSeq, effectOrdinal, "target_dead");
+            }
+
+            bool frozen = target.HasStatus(StunStatusId);
+            var ids = new List<string>();
+            for (int i = 0; i < target.StatusLots.Count; i++)
+            {
+                MutableStatusLot lot = target.StatusLots[i];
+                if (lot.RemainingAmount <= 0 || ids.Contains(lot.StatusId)) continue;
+                StatusDef def = StatusOf(lot.StatusId);
+                if (def != null && def.IsDebuff) ids.Add(lot.StatusId);
+            }
+
+            if (ids.Count == 0)
+            {
+                return RecordDetonationEmpty(actorRef, target, string.Empty, origin, rootActionId, depth, parentEffectSeq, effectOrdinal);
+            }
+
+            ids.Sort(StringComparer.Ordinal);
+            long baseDamage = 0;
+            long? lastSeq = parentEffectSeq;
+            for (int k = 0; k < ids.Count; k++)
+            {
+                StatusDef def = StatusOf(ids[k]);
+                long consumed = 0;
+                var sources = new List<StatusSourceContribution>();
+                for (int i = 0; i < target.StatusLots.Count; i++)
+                {
+                    MutableStatusLot lot = target.StatusLots[i];
+                    if (lot.RemainingAmount <= 0 || !string.Equals(lot.StatusId, ids[k], StringComparison.Ordinal)) continue;
+                    long take = lot.RemainingAmount;
+                    lot.RemainingAmount = 0;
+                    lot.ConsumedAmount += take;
+                    consumed += take;
+                    sources.Add(new StatusSourceContribution(lot.IsBaseline, lot.SourceRefId, take > int.MaxValue ? int.MaxValue : (int)take));
+                }
+
+                int value = def.DetonateValue + (sourceItem != null ? sourceItem.GetDetonateBonus(ids[k]) : 0);
+                baseDamage += consumed * (value < 0 ? 0 : value);
+                var ev = new CombatEventRecord(
+                    seq: _nextSeq, kind: CombatEventKind.StatusConsumed, rootActionId: rootActionId, depth: depth,
+                    parentEffectSeq: parentEffectSeq, effectOrdinal: effectOrdinal, origin: origin, actor: actorRef, target: target.Ref,
+                    triggerKind: null, actionOrdinal: target.ActionOrdinal, nextReadyAt: 0, deltaTime: 0,
+                    gaugeBefore: target.Gauge, gaugeAfter: target.Gauge, statusId: ids[k], statusAmount: consumed,
+                    expiryActionOrdinal: 0, occurrenceId: AllocateOccurrenceId(), consumedSources: sources.ToArray(),
+                    resolvedAmount: consumed > int.MaxValue ? int.MaxValue : (int)consumed,
+                    shieldBefore: target.Shield, shieldAfter: target.Shield, hpBefore: target.Hp, hpAfter: target.Hp,
+                    reasonCode: "detonated", outcome: null);
+                if (!AppendEvent(ev)) return false;
+                consumedEvents?.Add(ev);
+                lastSeq = ev.Seq;
+            }
+
+            int percent = damagePercentPermille + 100 * (ids.Count - 1) + (frozen ? 300 : 0);
+            int resolved = ComputeResolvedDamage(baseDamage, 0, percent);
+            return ApplyDamage(actorRef, target, resolved, origin, rootActionId, depth, lastSeq, effectOrdinal, isDetonation: true,
+                out detonationDamageEvent, out downedEvent);
+        }
+
+        /// <summary>
+        /// Wither (System 19 Formula 4): at the start of the hero's own turn, before a stun can skip it, the hero takes its
+        /// Wither damage as an ordinary damage step with the curse as its source, so a shield absorbs it and it can down
+        /// the hero. Returns false only on a technical stop.
+        /// </summary>
+        public bool ApplyCurseTick(MutableUnit hero, long rootActionId)
+        {
+            if (hero == null || !hero.IsAlive || hero.WitherPerTurn <= 0)
+            {
+                return true;
+            }
+
+            var origin = new CombatOrigin(
+                OriginKind.Curse,
+                hero.Ref.Slot,
+                0L,
+                hero.CurseId ?? string.Empty,
+                new GridCell(0, 0),
+                0,
+                string.Empty,
+                string.Empty,
+                0L,
+                Array.Empty<AppliedModifierRef>());
+            return ApplyDamage(hero.Ref, hero, hero.WitherPerTurn, origin, rootActionId, 0, null, 0L, false, out _, out _);
         }
 
         public bool ApplyDamage(

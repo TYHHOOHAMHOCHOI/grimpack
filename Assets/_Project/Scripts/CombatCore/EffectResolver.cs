@@ -15,6 +15,8 @@ namespace Project05.CombatCore
         public int DamagePercentPermille;
         public int StatusAmountBonus;
         public int BoundHeroInstanceId;
+        /// <summary>The hero item that queued the effect (its detonation bonuses), or null.</summary>
+        public MutableHeroItem SourceItem;
     }
 
     /// <summary>
@@ -73,7 +75,8 @@ namespace Project05.CombatCore
                         DamageFlatBonus = item.DamageFlatBonus,
                         DamagePercentPermille = item.DamagePercentPermille,
                         StatusAmountBonus = eff.Kind == EffectKind.ApplyStatus ? item.GetStatusBonus(eff.Status) : 0,
-                        BoundHeroInstanceId = -1
+                        BoundHeroInstanceId = -1,
+                        SourceItem = item
                     });
                 }
             }
@@ -302,10 +305,12 @@ namespace Project05.CombatCore
             {
                 case EffectKind.Damage:
                 {
+                    // Weaken lowers what an enemy deals (debuffs-and-detonation.md)
+                    int weaken = queued.ActorRef.Side == UnitSide.Enemy ? ledger.OutgoingDamagePermille(queued.ActorRef) : 0;
                     int resolvedDamage = CombatLedgerState.ComputeResolvedDamage(
                         queued.Effect.Base,
                         queued.DamageFlatBonus,
-                        queued.DamagePercentPermille);
+                        queued.DamagePercentPermille + weaken);
 
                     if (!ledger.ApplyDamage(
                         queued.ActorRef,
@@ -411,6 +416,50 @@ namespace Project05.CombatCore
                             return false;
                         }
                     }
+                    return true;
+                }
+                case EffectKind.DetonateAll:
+                {
+                    var consumed = new List<CombatEventRecord>();
+                    if (!ledger.DetonateAllDebuffs(
+                        queued.ActorRef,
+                        target,
+                        queued.SourceItem,
+                        queued.DamagePercentPermille,
+                        queued.Origin,
+                        rootActionId,
+                        queued.Depth,
+                        queued.ParentEffectSeq,
+                        queued.EffectOrdinal,
+                        consumed,
+                        out CombatEventRecord detEv,
+                        out CombatEventRecord detDownEv))
+                    {
+                        return false;
+                    }
+
+                    for (int c = 0; c < consumed.Count; c++)
+                    {
+                        if (!DispatchReactionsForEvent(ledger, consumed[c], rootActionId, ref nextEffectOrdinal, queue, firedReactionsInRoot))
+                        {
+                            return false;
+                        }
+                    }
+
+                    if (detEv != null && !DispatchReactionsForEvent(ledger, detEv, rootActionId, ref nextEffectOrdinal, queue, firedReactionsInRoot))
+                    {
+                        return false;
+                    }
+
+                    if (detDownEv != null)
+                    {
+                        lastTerminalCauseSeq = detDownEv.Seq;
+                        if (!DispatchReactionsForEvent(ledger, detDownEv, rootActionId, ref nextEffectOrdinal, queue, firedReactionsInRoot))
+                        {
+                            return false;
+                        }
+                    }
+
                     return true;
                 }
                 case EffectKind.ShieldGain:

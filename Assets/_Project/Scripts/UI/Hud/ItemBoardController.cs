@@ -44,6 +44,11 @@ namespace Project05.UI.Hud
         [Tooltip("The sell zone's drop area; a held item released over it is sold.")]
         [SerializeField] private RectTransform sellArea;
         [SerializeField] private SellZoneView sellZone;
+        [Tooltip("The forge zone's drop area inside the drawer (item-upgrades.md).")]
+        [SerializeField] private RectTransform forgeArea;
+        [SerializeField] private ForgeZoneView forgeZone;
+        [Tooltip("Bone '+' badge drawn on an upgraded item's plate.")]
+        [SerializeField] private Sprite plusBadge;
         [Tooltip("The drawer that holds the sell zone; selling needs it open.")]
         [SerializeField] private SellDrawerView drawer;
         [Tooltip("Top layer a held plate moves to, so it draws above the stage and the drawer.")]
@@ -51,6 +56,8 @@ namespace Project05.UI.Hud
         [SerializeField] private WorkbenchView workbench;
         [Tooltip("Fill used for the 2 px gap drawn between two items that touch (user request 2026-11-16).")]
         [SerializeField] private Sprite separatorSprite;
+        [Tooltip("1 px INK-0 checker tiled over a locked hero-grid cell (it opens with a door buff).")]
+        [SerializeField] private Sprite lockedCellSprite;
         [Tooltip("Provisional sell price per tier (White, Green, Blue, Purple, Gold, Red) until Currency and Shop (System 20) exists.")]
         [SerializeField] private int[] sellPriceByTier = { 1, 2, 3, 5, 8, 12 };
 
@@ -73,14 +80,23 @@ namespace Project05.UI.Hud
         private PlaceResult _targetResult = PlaceResult.OutOfBounds;
         private readonly List<(int x, int y)> _bad = new List<(int x, int y)>();
         private bool _overSell;
+        private bool _overForge;
+        private ForgeQuote _quote;
         private bool _separatorsDirty = true;
         private RectTransform _separatorLayer;
         private readonly List<Image> _separators = new List<Image>();
+        private readonly List<Image> _locks = new List<Image>();
         private Transform _heldParent;
         private bool _sellEnabled = true;
 
         /// <summary>Raised when an item is sold, with its record and price. The listener owns the money.</summary>
         public event Action<ItemRecord, int> ItemSold;
+
+        /// <summary>The scene's answer for the held item: can it be upgraded now, for how much (gold, catalog). Null = no forge.</summary>
+        public Func<ItemRecord, ForgeQuote> QuoteForge;
+
+        /// <summary>An item was upgraded in place: (from, to, gold cost). The scene pays.</summary>
+        public event Action<ItemRecord, ItemRecord, int> ItemUpgraded;
 
         /// <summary>Raised whenever items on the board change (move, rotate, sell, or spawn).</summary>
         public event Action BoardChanged;
@@ -100,7 +116,17 @@ namespace Project05.UI.Hud
         }
 
         /// <summary>The price the held item would sell for, or 0.</summary>
-        public int HeldPrice => _heldItem == null ? 0 : ItemSale.Price(_heldItem.Record.tier, sellPriceByTier);
+        public int HeldPrice => _heldItem == null ? 0 : PriceOf(_heldItem.Record);
+
+        /// <summary>Sell price of a record; a + item sells for the next tier's price (item-upgrades.md).</summary>
+        public int PriceOf(ItemRecord record)
+        {
+            if (record == null) return 0;
+            if (!record.IsUpgraded) return ItemSale.Price(record.tier, sellPriceByTier);
+            int index = Array.FindIndex(ItemSale.Tiers, t => string.Equals(t, record.tier, StringComparison.OrdinalIgnoreCase));
+            int next = Mathf.Clamp(index + 1, 0, ItemSale.Tiers.Length - 1);
+            return ItemSale.Price(ItemSale.Tiers[next], sellPriceByTier);
+        }
 
         /// <summary>The item being held, or null.</summary>
         public ItemHoverTarget Held => _held;
@@ -316,6 +342,12 @@ namespace Project05.UI.Hud
         {
             if (InputLocked) return;
             EnsureBoard();
+            if (_held == null && _map.TryGetValue(target, out BoardItem pinned) && pinned.Pinned)
+            {
+                PinnedRefused?.Invoke();   // a cursed item never leaves its cells
+                return;
+            }
+
             if (_held != null || !_map.TryGetValue(target, out _heldItem)) return;
 
             _held = target;
@@ -352,6 +384,12 @@ namespace Project05.UI.Hud
             if (_overSell && _sellEnabled)
             {
                 Sell();
+                return;
+            }
+
+            if (_overForge && _sellEnabled)
+            {
+                Forge();
                 return;
             }
 
@@ -410,13 +448,69 @@ namespace Project05.UI.Hud
             _held = null;
             _heldItem = null;
             _overSell = false;
+            _overForge = false;
             popup.Suppressed = false;
             HideGhost();
             ShowSellZone();
         }
 
+        /// <summary>
+        /// Upgrades the held item in place (item-upgrades.md): same cells, same rotation, the + record and a badge; the item
+        /// goes back where it was picked up. A refused upgrade (gold, already +) also sends it back.
+        /// </summary>
+        private void Forge()
+        {
+            ForgeQuote quote = QuoteForge != null ? QuoteForge(_heldItem.Record) : default;
+            if (!quote.Ok || quote.Upgrade == null)
+            {
+                Cancel();
+                forgeZone?.Show(ForgeZoneState.Refused, quote);
+                return;
+            }
+
+            ItemRecord from = _heldItem.Record;
+            BoardItem item = _heldItem;
+            ItemHoverTarget target = _held;
+            _board.Move(item, _origin.container, _origin.x, _origin.y, _origin.rot);
+            item.Record = quote.Upgrade;
+            End();
+            target.Configure(quote.Upgrade.id, item.Container, item.X, item.Y, item.Rotation, this, popup);
+            AddPlusBadge(target);
+            forgeZone?.Strike();
+            ItemUpgraded?.Invoke(from, quote.Upgrade, quote.Cost);
+            BoardChanged?.Invoke();
+        }
+
+        /// <summary>Marks a plate as upgraded with the Bone '+' badge at the bottom-right of its icon.</summary>
+        public void AddPlusBadge(ItemHoverTarget target)
+        {
+            if (target == null || plusBadge == null || target.transform.Find("PlusBadge") != null) return;
+            var go = new GameObject("PlusBadge", typeof(RectTransform), typeof(Image));
+            go.transform.SetParent(target.transform, false);
+            var rt = (RectTransform)go.transform;
+            rt.anchorMin = rt.anchorMax = rt.pivot = new Vector2(1f, 0f);
+            rt.sizeDelta = new Vector2(7f, 7f);
+            rt.anchoredPosition = new Vector2(-3f, 3f);
+            var img = go.GetComponent<Image>();
+            img.sprite = plusBadge;
+            img.raycastTarget = false;
+        }
+
+        private void ShowForgeZone()
+        {
+            if (forgeZone == null) return;
+            if (!_sellEnabled) forgeZone.Show(ForgeZoneState.Locked, default);
+            else if (_held == null) forgeZone.Show(ForgeZoneState.Idle, default);
+            else
+            {
+                _quote = QuoteForge != null ? QuoteForge(_heldItem.Record) : default;
+                forgeZone.Show(_overForge ? ForgeZoneState.Over : ForgeZoneState.Ready, _quote);
+            }
+        }
+
         private void ShowSellZone()
         {
+            ShowForgeZone();
             if (sellZone == null) return;
             if (!_sellEnabled) sellZone.Show(SellZoneState.Locked, 0);
             else if (_held == null) sellZone.Show(SellZoneState.Idle, 0);
@@ -474,7 +568,7 @@ namespace Project05.UI.Hud
             int next = (index + 1) % stops;
             _overSell = next == containers.Length;
             _targetContainer = _overSell ? null : containers[next].id;
-            if (_overSell && drawer != null) drawer.Open();
+            if (_overSell && drawer != null) drawer.OpenIn(SellDrawerView.DrawerMode.Sell);
             _targetX = 0;
             _targetY = 0;
             _pointerMode = false;
@@ -490,16 +584,29 @@ namespace Project05.UI.Hud
 
             if (_pointerMode)
             {
-                // Bringing a held item over the closed drawer's tab opens it, so selling never needs a free hand.
-                if (drawer != null && !drawer.IsOpen && _sellEnabled && FrameMath.RectOf(drawer.TabRect, safeFrame).Contains(_pointer))
+                // Bringing a held item over a drawer tab opens it in that mode, so selling or forging never needs a free hand.
+                if (drawer != null && _sellEnabled)
                 {
-                    drawer.Open();
+                    if (!(drawer.IsOpen && drawer.Mode == SellDrawerView.DrawerMode.Sell) && FrameMath.RectOf(drawer.TabRect, safeFrame).Contains(_pointer))
+                    {
+                        drawer.OpenIn(SellDrawerView.DrawerMode.Sell);
+                    }
+                    else if (drawer.ForgeTabRect != null && !(drawer.IsOpen && drawer.Mode == SellDrawerView.DrawerMode.Forge) &&
+                             FrameMath.RectOf(drawer.ForgeTabRect, safeFrame).Contains(_pointer))
+                    {
+                        drawer.OpenIn(SellDrawerView.DrawerMode.Forge);
+                    }
                 }
 
                 _overSell = CanSell && SellRect().Contains(_pointer);
+                _overForge = CanForge && FrameMath.RectOf(forgeArea, safeFrame).Contains(_pointer);
             }
 
-            if (_overSell)
+            if (_overForge)
+            {
+                _targetContainer = null;
+            }
+            else if (_overSell)
             {
                 _targetContainer = null;
                 if (!_pointerMode) centre = SellRect().center;
@@ -532,8 +639,11 @@ namespace Project05.UI.Hud
             ghostLayer.SetAsLastSibling();
         }
 
-        /// <summary>Selling is possible now: allowed by the screen, and the drawer (if any) is open.</summary>
-        private bool CanSell => _sellEnabled && sellArea != null && (drawer == null || drawer.IsOpen);
+        /// <summary>Selling is possible now: allowed by the screen, and the drawer (if any) is open on the sell zone.</summary>
+        private bool CanSell => _sellEnabled && sellArea != null && (drawer == null || (drawer.IsOpen && drawer.Mode == SellDrawerView.DrawerMode.Sell));
+
+        /// <summary>Forging is possible now: allowed by the screen, and the drawer is open on the forge zone.</summary>
+        private bool CanForge => _sellEnabled && forgeArea != null && QuoteForge != null && drawer != null && drawer.IsOpen && drawer.Mode == SellDrawerView.DrawerMode.Forge;
 
         private Rect SellRect() => FrameMath.RectOf(sellArea, safeFrame);
 
@@ -590,6 +700,152 @@ namespace Project05.UI.Hud
         {
             SetRect(target, Center(item, item.Rotation), item.Rotation);
             _separatorsDirty = true;
+        }
+
+        // ------------------------------------------------------------------ locked cells and pinned items (doors, curses)
+        /// <summary>Raised when the player tries to pick up an item pinned by a curse.</summary>
+        public event Action PinnedRefused;
+
+        /// <summary>Open cells of the hero grid (its square minus its locked cells).</summary>
+        public int HeroCellsOpen
+        {
+            get
+            {
+                EnsureBoard();
+                ContainerView grid = Array.Find(containers, c => c.grid);
+                return grid == null ? 0 : grid.cols * grid.rows - _board.LockedCount(grid.id);
+            }
+        }
+
+        /// <summary>Locked cells the hero grid can still open up to 7 x 7 (a door's +1 cell needs one).</summary>
+        public int LockedHeroCellsLeft => Mathf.Max(0, WorkbenchLayout.MaxGrid * WorkbenchLayout.MaxGrid - HeroCellsOpen);
+
+        /// <summary>
+        /// Opens cells of the hero grid one at a time (a door's +1 cell, System 17 Rule 7). The grid grows as a square:
+        /// when no locked cell is left in it, the square grows by one with its new ring locked, then a cell opens. The
+        /// order is the last column top to bottom, then the last row left to right. Returns how many opened.
+        /// </summary>
+        public int OpenHeroCells(int count)
+        {
+            EnsureBoard();
+            int opened = 0;
+            for (int k = 0; k < count; k++)
+            {
+                ContainerView grid = Array.Find(containers, c => c.grid);
+                if (grid == null) break;
+                if (!TryNextLocked(grid, out int x, out int y))
+                {
+                    int n = grid.cols;
+                    if (n >= WorkbenchLayout.MaxGrid || !ResizeHeroGrid(n + 1)) break;
+                    for (int i = 0; i <= n; i++)
+                    {
+                        _board.SetLocked(grid.id, n, i, true);
+                        _board.SetLocked(grid.id, i, n, true);
+                    }
+
+                    if (!TryNextLocked(grid, out x, out y)) break;
+                }
+
+                _board.SetLocked(grid.id, x, y, false);
+                opened++;
+            }
+
+            _separatorsDirty = true;
+            if (opened > 0) BoardChanged?.Invoke();
+            return opened;
+        }
+
+        private bool TryNextLocked(ContainerView grid, out int x, out int y)
+        {
+            int n = grid.cols;
+            for (y = 0; y < n; y++)
+            {
+                x = n - 1;
+                if (_board.IsLocked(grid.id, x, y)) return true;
+            }
+
+            y = n - 1;
+            for (x = 0; x < n; x++)
+            {
+                if (_board.IsLocked(grid.id, x, y)) return true;
+            }
+
+            x = y = 0;
+            return false;
+        }
+
+        /// <summary>True when the item fits somewhere in the hero grid now (a Pinned curse's NeedsSpace check).</summary>
+        public bool CanPlaceInHeroGrid(ItemRecord record)
+        {
+            EnsureBoard();
+            ContainerView grid = Array.Find(containers, c => c.grid);
+            return grid != null && record != null && TryFindFreePlacement(record, grid.id, grid.cols, grid.rows, out _, out _, out _);
+        }
+
+        /// <summary>
+        /// Creates a cursed item pinned in the hero grid at the first legal position (orientation 0 first, then reading
+        /// order), with the Plum pinned marks on its plate. Never falls back to the stash.
+        /// </summary>
+        public bool TrySpawnPinned(ItemRecord record, Sprite plateSprite, Sprite iconSprite, Sprite plumFill, Sprite pinGlyph, out ItemHoverTarget spawned)
+        {
+            spawned = null;
+            if (!CanPlaceInHeroGrid(record)) return false;
+            ContainerView grid = Array.Find(containers, c => c.grid);
+            if (!TrySpawnItem(record, plateSprite, iconSprite, grid.id, out spawned)) return false;
+            if (!_map.TryGetValue(spawned, out BoardItem item) || item.Container != grid.id) return false;
+            item.Pinned = true;
+            RectTransform plate = spawned.Rect;
+            if (plumFill != null)
+            {
+                Mark(plate, "PinStripB", plumFill, new Vector2(0f, 0f), new Vector2(1f, 0f), new Vector2(0f, 2f), Vector2.zero);
+                Mark(plate, "PinStripR", plumFill, new Vector2(1f, 0f), new Vector2(1f, 1f), new Vector2(2f, 0f), Vector2.zero);
+                Image chip = Mark(plate, "PinChip", plumFill, new Vector2(1f, 0f), new Vector2(1f, 0f), new Vector2(10f, 10f), new Vector2(-3f, 3f));
+                if (pinGlyph != null) Mark(chip.rectTransform, "PinGlyph", pinGlyph, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(8f, 8f), Vector2.zero);
+            }
+
+            return true;
+        }
+
+        private static Image Mark(RectTransform parent, string name, Sprite sprite, Vector2 anchorMin, Vector2 anchorMax, Vector2 size, Vector2 offset)
+        {
+            var go = new GameObject(name, typeof(RectTransform), typeof(Image));
+            go.transform.SetParent(parent, false);
+            var rt = (RectTransform)go.transform;
+            rt.anchorMin = anchorMin;
+            rt.anchorMax = anchorMax;
+            rt.pivot = new Vector2(anchorMax.x >= 1f ? 1f : 0f, 0f);
+            rt.sizeDelta = size;
+            rt.anchoredPosition = offset;
+            var img = go.GetComponent<Image>();
+            img.sprite = sprite;
+            img.raycastTarget = false;
+            return img;
+        }
+
+        /// <summary>Takes every item of a container off the board and removes its plate (a new hero's kit replaces the old).</summary>
+        public void RemoveAllIn(string containerId)
+        {
+            EnsureBoard();
+            var gone = new List<ItemHoverTarget>();
+            foreach (KeyValuePair<ItemHoverTarget, BoardItem> pair in _map)
+            {
+                if (pair.Value.Container == containerId) gone.Add(pair.Key);
+            }
+
+            foreach (ItemHoverTarget t in gone)
+            {
+                _board.Remove(_map[t]);
+                _map.Remove(t);
+                if (t != null)
+                {
+                    t.gameObject.SetActive(false);
+                    if (Application.isPlaying) Destroy(t.gameObject);
+                    else DestroyImmediate(t.gameObject);
+                }
+            }
+
+            _separatorsDirty = true;
+            BoardChanged?.Invoke();
         }
 
         /// <summary>The plate of a board item, or null.</summary>
@@ -662,6 +918,43 @@ namespace Project05.UI.Hud
             }
 
             for (int i = used; i < _separators.Count; i++) _separators[i].gameObject.SetActive(false);
+
+            // locked cells of the hero grid: a dark checker over the whole cell, so they never read as free cells
+            int locks = 0;
+            foreach (ContainerView c in containers)
+            {
+                if (!c.grid) continue;
+                for (int y = 0; y < c.rows; y++)
+                {
+                    for (int x = 0; x < c.cols; x++)
+                    {
+                        if (!_board.IsLocked(c.id, x, y)) continue;
+                        Image lockImg;
+                        if (locks < _locks.Count) lockImg = _locks[locks];
+                        else
+                        {
+                            var go = new GameObject("LockedCell", typeof(RectTransform), typeof(Image));
+                            go.hideFlags = HideFlags.DontSave;
+                            go.transform.SetParent(_separatorLayer, false);
+                            lockImg = go.GetComponent<Image>();
+                            lockImg.raycastTarget = false;
+                            lockImg.sprite = lockedCellSprite != null ? lockedCellSprite : separatorSprite;
+                            lockImg.type = Image.Type.Tiled;
+                            var lrt = lockImg.rectTransform;
+                            lrt.anchorMin = lrt.anchorMax = lrt.pivot = new Vector2(0f, 1f);
+                            _locks.Add(lockImg);
+                        }
+
+                        locks++;
+                        lockImg.gameObject.SetActive(true);
+                        Vector2 tl = c.origin + new Vector2(x * Cell, y * Cell);
+                        lockImg.rectTransform.anchoredPosition = new Vector2(tl.x, -tl.y);
+                        lockImg.rectTransform.sizeDelta = new Vector2(Cell, Cell);
+                    }
+                }
+            }
+
+            for (int i = locks; i < _locks.Count; i++) _locks[i].gameObject.SetActive(false);
             _separatorLayer.SetAsLastSibling();
             ghostLayer.SetAsLastSibling();
         }

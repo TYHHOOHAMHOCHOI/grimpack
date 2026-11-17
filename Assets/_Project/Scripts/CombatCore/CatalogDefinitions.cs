@@ -92,6 +92,18 @@ namespace Project05.CombatCore
         public string FlavorVi { get; }
         public string FlavorEn { get; }
 
+        /// <summary>The id of this item's upgraded version (item-upgrades.md), or empty when it has none.</summary>
+        public string UpgradeId { get; }
+
+        /// <summary>For an upgraded (+) item, the id of its base item; empty for a base item.</summary>
+        public string UpgradeOf { get; }
+
+        /// <summary>Gold paid when a room is won while the item sits in a hero grid (e.g. Coin Purse).</summary>
+        public int GoldOnWin { get; }
+
+        /// <summary>True for an upgraded (+) item.</summary>
+        public bool IsUpgraded => !string.IsNullOrEmpty(UpgradeOf);
+
         public bool HasCooldown => Trigger.Kind == TriggerKind.Cooldown || Trigger.Kind == TriggerKind.Reaction;
 
         public bool DealsDamage
@@ -101,18 +113,33 @@ namespace Project05.CombatCore
                 for (int i = 0; i < Effects.Count; i++)
                 {
                     EffectKind k = Effects[i].Kind;
-                    if (k == EffectKind.Damage || k == EffectKind.ConsumeDetonate) return true;
+                    if (k == EffectKind.Damage || k == EffectKind.ConsumeDetonate || k == EffectKind.DetonateAll) return true;
                 }
                 return false;
             }
         }
 
+        /// <summary>True when the item detonates debuffs (DetonateAll).</summary>
+        public bool Detonates
+        {
+            get
+            {
+                for (int i = 0; i < Effects.Count; i++)
+                {
+                    if (Effects[i].Kind == EffectKind.DetonateAll) return true;
+                }
+
+                return false;
+            }
+        }
+
+        /// <summary>True when the item applies this status; an empty id asks whether it applies any status.</summary>
         public bool AppliesStatus(string statusId)
         {
             for (int i = 0; i < Effects.Count; i++)
             {
                 if (Effects[i].Kind == EffectKind.ApplyStatus &&
-                    string.Equals(Effects[i].Status, statusId, StringComparison.Ordinal))
+                    (string.IsNullOrEmpty(statusId) || string.Equals(Effects[i].Status, statusId, StringComparison.Ordinal)))
                 {
                     return true;
                 }
@@ -144,8 +171,14 @@ namespace Project05.CombatCore
             string nameVi,
             string nameEn,
             string flavorVi,
-            string flavorEn)
+            string flavorEn,
+            string upgradeId = null,
+            string upgradeOf = null,
+            int goldOnWin = 0)
         {
+            UpgradeId = upgradeId ?? string.Empty;
+            UpgradeOf = upgradeOf ?? string.Empty;
+            GoldOnWin = goldOnWin;
             Id = id ?? string.Empty;
             Art = art ?? string.Empty;
             Tier = tier;

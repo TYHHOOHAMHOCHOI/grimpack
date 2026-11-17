@@ -29,6 +29,25 @@ namespace Project05.UI.Hud
         public Sprite heroNarrow;
         [Tooltip("Attack wind-up and strike, shown by combat playback during the lunge.")]
         public Sprite[] heroAttack = Array.Empty<Sprite>();
+
+        [Header("Plague Alchemist (hero art 'alchemist')")]
+        public Sprite[] alchemistPoses = new Sprite[6];
+        public Sprite alchemistNarrow;
+        public Sprite[] alchemistAttack = Array.Empty<Sprite>();
+
+        /// <summary>The art id of the hero on the pedestal (set at run start, never saved).</summary>
+        [NonSerialized] public string ActiveHeroArt = "tank";
+
+        private bool UseAlchemist => ActiveHeroArt == "alchemist" && alchemistPoses != null && alchemistPoses.Length >= 6 && alchemistPoses[0] != null;
+
+        /// <summary>The poses of the hero on the pedestal (idle 1-2, hurt 1-2, down 1-2).</summary>
+        public Sprite[] Poses => UseAlchemist ? alchemistPoses : heroPoses;
+
+        /// <summary>The eyes-narrow overlay of the hero on the pedestal.</summary>
+        public Sprite Narrow => UseAlchemist ? alchemistNarrow : heroNarrow;
+
+        /// <summary>The attack frames of the hero on the pedestal.</summary>
+        public Sprite[] Attack => UseAlchemist ? alchemistAttack : heroAttack;
         public Sprite pedestalDefault;
         public Sprite pedestalDim;
 
@@ -73,11 +92,41 @@ namespace Project05.UI.Hud
         public Sprite segmentDefault;
         public Sprite segmentSelected;
 
-        /// <summary>The 12 px Bone glyph for a kind.</summary>
-        public Sprite Glyph12(GlyphKind kind) => glyphBone12[(int)kind];
+        [Header("Debuffs (debuffs-and-detonation.md)")]
+        [Tooltip("Status chip frames tinted per debuff, indexed by StatusKind (Droplet, Seal, Poison, Burn, Frost, Slow, Weaken, Stun).")]
+        public Sprite[] statusChips = Array.Empty<Sprite>();
 
-        /// <summary>The 8 px Bone glyph for a kind.</summary>
-        public Sprite Glyph8(GlyphKind kind) => glyphBone8[(int)kind];
+        [Tooltip("Status motes recoloured per debuff: poison, burn, frost, slow, weaken (2 frames each).")]
+        public Sprite[] vfxMotePoison = Array.Empty<Sprite>();
+        public Sprite[] vfxMoteBurn = Array.Empty<Sprite>();
+        public Sprite[] vfxMoteFrost = Array.Empty<Sprite>();
+        public Sprite[] vfxMoteSlow = Array.Empty<Sprite>();
+        public Sprite[] vfxMoteWeaken = Array.Empty<Sprite>();
+
+        /// <summary>The 12 px Bone glyph for a kind (null when not drawn).</summary>
+        public Sprite Glyph12(GlyphKind kind) => (int)kind < glyphBone12.Length ? glyphBone12[(int)kind] : null;
+
+        /// <summary>The 8 px Bone glyph for a kind (null when not drawn).</summary>
+        public Sprite Glyph8(GlyphKind kind) => (int)kind < glyphBone8.Length ? glyphBone8[(int)kind] : null;
+
+        /// <summary>The tinted chip frame of a status, or null for the plain chip.</summary>
+        public Sprite StatusChip(StatusKind kind) => (int)kind < statusChips.Length ? statusChips[(int)kind] : null;
+
+        /// <summary>The mote frames tinted for a status id, or the shared ones.</summary>
+        public Sprite[] MoteFor(string statusId)
+        {
+            Sprite[] m = null;
+            switch (statusId)
+            {
+                case "poison": m = vfxMotePoison; break;
+                case "burn": m = vfxMoteBurn; break;
+                case "frost": m = vfxMoteFrost; break;
+                case "slow": m = vfxMoteSlow; break;
+                case "weaken": m = vfxMoteWeaken; break;
+            }
+
+            return m != null && m.Length > 0 ? m : vfxMote;
+        }
 
         /// <summary>The flat Fog-hi intent glyph, or null for <see cref="IntentKind.None"/>.</summary>
         public Sprite Intent(IntentKind kind, int size)
@@ -87,6 +136,18 @@ namespace Project05.UI.Hud
         }
 
         /// <summary>The status glyph (8 px Bone).</summary>
-        public Sprite Status(StatusKind kind) => Glyph8(kind == StatusKind.Seal ? GlyphKind.Seal : GlyphKind.Droplet);
+        public Sprite Status(StatusKind kind)
+        {
+            switch (kind)
+            {
+                case StatusKind.Seal: return Glyph8(GlyphKind.Seal);
+                case StatusKind.Burn: return Glyph8(GlyphKind.Burn) ?? Glyph8(GlyphKind.Droplet);
+                case StatusKind.Frost:
+                case StatusKind.Stun: return Glyph8(GlyphKind.Frost) ?? Glyph8(GlyphKind.Droplet);
+                case StatusKind.Slow: return Glyph8(GlyphKind.Slow) ?? Glyph8(GlyphKind.Droplet);
+                case StatusKind.Weaken: return Glyph8(GlyphKind.Weaken) ?? Glyph8(GlyphKind.Droplet);
+                default: return Glyph8(GlyphKind.Droplet);
+            }
+        }
     }
 }
